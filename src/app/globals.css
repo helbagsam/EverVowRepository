@@ -1,0 +1,95 @@
+@import "tailwindcss";
+@import "material-symbols/outlined.css";
+
+@theme {
+  --color-brand-bg: var(--bg);
+  --color-brand-surface: var(--surface);
+  --color-brand-surface-hover: var(--surface-hover);
+  --color-brand-primary: var(--primary);
+  --color-brand-primary-hover: var(--primary-hover);
+  --color-brand-accent: var(--accent);
+  --color-brand-text: var(--text-main);
+  --color-brand-text-muted: var(--text-muted);
+  --color-brand-border: var(--border);
+  --color-brand-success: var(--success);
+  --color-brand-success-bg: var(--success-bg);
+  --color-brand-warning: var(--warning);
+  --color-brand-warning-bg: var(--warning-bg);
+  --color-brand-danger: var(--danger);
+  --color-brand-danger-bg: var(--danger-bg);
+
+  --font-headline: var(--font-eb-garamond), serif;
+  --font-body: var(--font-jakarta-sans), sans-serif;
+}
+
+@layer base {
+  :root {
+    --bg: #fff8f5;
+    --surface: #ffffff;
+    --surface-hover: #fbf2ed;
+    --primary: #8b4a52;
+    --primary-hover: #70343c;
+    --accent: #B8965A;
+    --text-main: #1e1b18;
+    --text-muted: #524344;
+    --border: #e9e1dc;
+    --success: #5A8B74;
+    --success-bg: #E8F3ED;
+    --warning: #E6B36A;
+    --warning-bg: #FCF4E6;
+    --danger: #D97070;
+    --danger-bg: #F9EBEB;
+  }
+
+  .dark {
+    --bg: #161412;
+    --surface: #221f1d;
+    --surface-hover: #2e2a27;
+    --primary: #b86f79;
+    --primary-hover: #d28791;
+    --accent: #d4b275;
+    --text-main: #fcfaf9;
+    --text-muted: #bbaea9;
+    --border: #3d3633;
+    --success: #76a890;
+    --success-bg: rgba(90, 139, 116, 0.15);
+    --warning: #f0c586;
+    --warning-bg: rgba(230, 179, 106, 0.15);
+    --danger: #e88d8d;
+    --danger-bg: rgba(217, 112, 112, 0.15);
+  }
+}
+
+body {
+  @apply bg-brand-bg text-brand-text font-body antialiased transition-colors duration-300;
+}
+
+.glass-panel {
+  @apply bg-brand-surface/80 backdrop-blur-md border border-brand-border shadow-sm;
+}
+
+.card {
+  @apply bg-brand-surface border border-brand-border rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media print {
+  @page {
+    margin: 1.5cm;
+  }
+  body {
+    background: white !important;
+  }
+  .card,
+  section {
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}
