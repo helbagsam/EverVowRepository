@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
-import { FileText, Plus, Search, Filter, Edit, Eye, Trash2, Upload, Paperclip, X } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { FileText, Plus, Search, Filter, Edit, Eye, Trash2, Upload, Paperclip, X, Loader2 } from 'lucide-react';
 import { useAppContext, Requirement } from '../store/AppContext';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { useUploadThing } from '../utils/uploadthing';
 
 export const Administration: React.FC = () => {
   const { requirements, addRequirement, deleteRequirement, editRequirement } = useAppContext();
@@ -13,6 +14,59 @@ export const Administration: React.FC = () => {
   const [showStatusFilterPanel, setShowStatusFilterPanel] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [confirmState, setConfirmState] = useState<{ isOpen: boolean, title: string, message: string, type: 'danger' | 'info', confirmText: string, onConfirm: () => void } | null>(null);
+
+  // --- Upload dokumen (JPG/PNG) ke UploadThing ---
+  // uploadTargetId: 'new' -> file dijadikan Requirement baru (dari drop zone/"Add Evidence"),
+  // string lain -> file dipasang ke Requirement yang sudah ada (dari tombol per-baris).
+  const [uploadTargetId, setUploadTargetId] = useState<string | 'new' | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { startUpload, isUploading } = useUploadThing('weddingImageUploader', {
+    onClientUploadComplete: (res) => {
+      const url = res?.[0]?.ufsUrl;
+      const fileName = res?.[0]?.name;
+      if (url && uploadTargetId === 'new') {
+        addRequirement({
+          id: Date.now().toString(),
+          name: fileName || 'Dokumen Baru',
+          desc: '',
+          status: 'Selesai',
+          category: 'Other',
+          file: url,
+        });
+      } else if (url && uploadTargetId) {
+        const target = requirements.find(r => r.id === uploadTargetId);
+        if (target) editRequirement({ ...target, file: url, status: 'Selesai' });
+      }
+      setUploadTargetId(null);
+    },
+    onUploadError: (err) => {
+      alert(`Upload gagal: ${err.message}`);
+      setUploadTargetId(null);
+    },
+  });
+
+  const triggerUploadFor = (targetId: string | 'new') => {
+    setUploadTargetId(targetId);
+    fileInputRef.current?.click();
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) startUpload(Array.from(files));
+    e.target.value = '';
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      setUploadTargetId('new');
+      startUpload(Array.from(files));
+    }
+  };
   
   const [newReq, setNewReq] = useState<Partial<Requirement>>({
     name: '',
@@ -191,7 +245,14 @@ export const Administration: React.FC = () => {
                       <td className="px-6 py-4">
                         <div className="flex justify-center gap-2">
                           <button onClick={() => openEditModal(req)} className="p-1.5 text-brand-text-muted hover:text-brand-primary rounded-lg transition-colors"><Edit size={16} /></button>
-                          <button className="p-1.5 text-brand-primary rounded-lg transition-colors">{req.file ? <Eye size={16} /> : <Upload size={16} />}</button>
+                          <button
+                            onClick={() => req.file ? window.open(req.file, '_blank') : triggerUploadFor(req.id)}
+                            disabled={isUploading && uploadTargetId === req.id}
+                            title={req.file ? 'Lihat file' : 'Unggah file'}
+                            className="p-1.5 text-brand-primary rounded-lg transition-colors disabled:opacity-50"
+                          >
+                            {isUploading && uploadTargetId === req.id ? <Loader2 size={16} className="animate-spin" /> : req.file ? <Eye size={16} /> : <Upload size={16} />}
+                          </button>
                           <button onClick={() => handleDelete(req.id)} className="p-1.5 text-brand-text-muted hover:text-brand-danger rounded-lg transition-colors"><Trash2 size={16} /></button>
                         </div>
                       </td>
@@ -207,15 +268,37 @@ export const Administration: React.FC = () => {
             </div>
           </div>
           
-          <div className="p-8 border-2 border-dashed border-brand-border rounded-xl bg-brand-surface-hover/30 flex flex-col items-center justify-center gap-3 hover:border-brand-primary transition-colors cursor-pointer group">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+            className="hidden"
+            onChange={handleFileInputChange}
+          />
+          <div
+            onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+            onDragLeave={() => setIsDragOver(false)}
+            onDrop={handleDrop}
+            className={`p-8 border-2 border-dashed rounded-xl bg-brand-surface-hover/30 flex flex-col items-center justify-center gap-3 transition-colors cursor-pointer group ${isDragOver ? 'border-brand-primary bg-brand-primary/5' : 'border-brand-border hover:border-brand-primary'}`}
+            onClick={() => !isUploading && triggerUploadFor('new')}
+          >
             <div className="w-12 h-12 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary group-hover:scale-110 transition-transform">
-              <Upload size={24} />
+              {isUploading && uploadTargetId === 'new' ? <Loader2 size={24} className="animate-spin" /> : <Upload size={24} />}
             </div>
             <div className="text-center">
-              <p className="text-sm font-semibold text-brand-text">Drag and drop file to upload</p>
-              <p className="text-xs text-brand-text-muted mt-1">Support PDF, JPG, PNG (Max 5MB)</p>
+              <p className="text-sm font-semibold text-brand-text">
+                {isUploading && uploadTargetId === 'new' ? 'Mengunggah...' : 'Drag and drop file to upload'}
+              </p>
+              <p className="text-xs text-brand-text-muted mt-1">Support JPG, PNG (Max 4MB)</p>
             </div>
-            <button className="mt-2 px-4 py-1.5 text-xs font-semibold rounded-lg border border-brand-accent text-brand-accent">Add Evidence</button>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); if (!isUploading) triggerUploadFor('new'); }}
+              disabled={isUploading}
+              className="mt-2 px-4 py-1.5 text-xs font-semibold rounded-lg border border-brand-accent text-brand-accent disabled:opacity-50"
+            >
+              Add Evidence
+            </button>
           </div>
         </div>
       </div>

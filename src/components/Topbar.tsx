@@ -1,16 +1,26 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Menu, Search, Bell, RefreshCw, ChevronDown, Moon, Sun, Settings, User, LogOut, CheckCircle2, AlertCircle, Info, Flame } from 'lucide-react';
 import { useAppContext } from '../store/AppContext';
+import { formatShortIDR, formatDate } from '../utils/formatters';
 
 interface TopbarProps {
   onOpenMobileMenu: () => void;
 }
 
+type NotifUrgency = 'high' | 'medium' | 'success' | 'info';
+interface Notif {
+  id: string;
+  text: string;
+  time: string;
+  unread: boolean;
+  urgency: NotifUrgency;
+}
+
 export const Topbar: React.FC<TopbarProps> = ({ onOpenMobileMenu }) => {
-  const { setCurrentView, username } = useAppContext();
+  const { setCurrentView, username, tasks, expenses, guests, totalBudget } = useAppContext();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -28,14 +38,87 @@ export const Topbar: React.FC<TopbarProps> = ({ onOpenMobileMenu }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
 
-  // Dynamic notifications state
-  const [notifications, setNotifications] = useState([
-    { id: 1, text: 'Deposit paid to The Grand Estate', time: '2 hours ago', unread: true, urgency: 'success' },
-    { id: 2, text: 'Sarah RSVPed "Attending"', time: 'Yesterday', unread: true, urgency: 'info' },
-    { id: 3, text: 'Photography contract signed', time: 'Oct 05', unread: false, urgency: 'success' },
-    { id: 4, text: 'Overdue: Finalize Guest List', time: '2 days ago', unread: true, urgency: 'high' },
-    { id: 5, text: 'Budget exceeded in "Attire" category', time: '1 week ago', unread: true, urgency: 'medium' },
-  ]);
+  // Notifikasi dihitung langsung dari data asli (tasks, expenses, guests, budget) —
+  // bukan data dummy. Tidak ada log aktivitas berwaktu (butuh tabel tersendiri di DB
+  // untuk itu), jadi ini murni alert "kondisi saat ini" yang dihitung ulang tiap render.
+  const [readIds, setReadIds] = useState<Set<string>>(new Set());
+
+  const notifications: Notif[] = useMemo(() => {
+    const list: Notif[] = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Task yang lewat deadline
+    tasks.forEach((t) => {
+      if (!t.dueDate || t.status === 'Completed') return;
+      const due = new Date(t.dueDate);
+      if (isNaN(due.getTime())) return;
+      const diffDays = Math.round((due.getTime() - today.getTime()) / 86400000);
+      if (diffDays < 0) {
+        list.push({
+          id: `task-overdue-${t.id}`,
+          text: `Terlambat ${Math.abs(diffDays)} hari: ${t.title}`,
+          time: formatDate(t.dueDate),
+          unread: true,
+          urgency: 'high',
+        });
+      } else if (diffDays <= 3) {
+        list.push({
+          id: `task-soon-${t.id}`,
+          text: `Jatuh tempo segera: ${t.title}`,
+          time: diffDays === 0 ? 'Hari ini' : `${diffDays} hari lagi`,
+          unread: true,
+          urgency: 'medium',
+        });
+      }
+    });
+
+    // Pembayaran vendor yang belum lunas
+    expenses.forEach((e) => {
+      if (e.status === 'Unpaid' && e.total > 0) {
+        list.push({
+          id: `expense-unpaid-${e.id}`,
+          text: `Belum dibayar: ${e.name}${e.vendor ? ` (${e.vendor})` : ''}`,
+          time: formatShortIDR(e.total),
+          unread: true,
+          urgency: 'medium',
+        });
+      }
+    });
+
+    // Total pengeluaran melebihi budget keseluruhan
+    if (totalBudget > 0) {
+      const totalSpent = expenses.reduce((sum, e) => sum + (e.total || 0), 0);
+      if (totalSpent > totalBudget) {
+        list.push({
+          id: 'budget-overspend',
+          text: `Anggaran terlampaui sebesar ${formatShortIDR(totalSpent - totalBudget)}`,
+          time: 'Saat ini',
+          unread: true,
+          urgency: 'high',
+        });
+      }
+    }
+
+    // Tamu yang belum RSVP
+    const pendingGuests = guests.filter((g) => g.status === 'Pending').length;
+    if (pendingGuests > 0) {
+      list.push({
+        id: 'guests-pending',
+        text: `${pendingGuests} tamu belum konfirmasi kehadiran`,
+        time: 'Saat ini',
+        unread: true,
+        urgency: 'info',
+      });
+    }
+
+    return list
+      .map((n) => (readIds.has(n.id) ? { ...n, unread: false } : n))
+      .sort((a, b) => {
+        const order: Record<NotifUrgency, number> = { high: 0, medium: 1, info: 2, success: 3 };
+        return order[a.urgency] - order[b.urgency];
+      });
+  }, [tasks, expenses, guests, totalBudget, readIds]);
 
   const unreadCount = notifications.filter(n => n.unread).length;
 
@@ -76,11 +159,11 @@ export const Topbar: React.FC<TopbarProps> = ({ onOpenMobileMenu }) => {
   };
 
   const markAllRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, unread: false })));
+    setReadIds(new Set(notifications.map(n => n.id)));
   };
 
-  const markAsRead = (id: number) => {
-    setNotifications(notifications.map(n => n.id === id ? { ...n, unread: false } : n));
+  const markAsRead = (id: string) => {
+    setReadIds(prev => new Set(prev).add(id));
   };
 
   const getUrgencyIcon = (urgency: string, unread: boolean) => {
@@ -191,6 +274,11 @@ export const Topbar: React.FC<TopbarProps> = ({ onOpenMobileMenu }) => {
                 )}
               </div>
               <div className="max-h-80 overflow-y-auto">
+                {notifications.length === 0 && (
+                  <div className="p-6 text-center text-sm text-brand-text-muted">
+                    Tidak ada notifikasi saat ini.
+                  </div>
+                )}
                 {notifications.map(n => (
                   <div 
                     key={n.id} 
