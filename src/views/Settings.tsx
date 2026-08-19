@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import { useAppContext } from '../store/AppContext';
-import { Moon, Sun, Monitor, Save, User, Heart, Settings as SettingsIcon, Phone, Mail, MapPin, Users, Plus, Trash2, Edit2, Check, X } from 'lucide-react';
+import { Moon, Sun, Monitor, Save, User, Heart, Settings as SettingsIcon, Phone, Mail, MapPin, Users, Plus, Trash2, Edit2, Check, X, PlayCircle, Globe, BadgeCheck } from 'lucide-react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { tutorialCopy, type TutorialLang } from '../lib/tutorialCopy';
 
 const MEMBER_COLORS = [
   { bg: '#8b4a52', text: '#ffffff' },
@@ -14,9 +15,10 @@ const MEMBER_COLORS = [
 ];
 
 export const Settings: React.FC = () => {
-  const { theme, setTheme, weddingDate, setWeddingDate, targetGuests, setTargetGuests, totalBudget, setTotalBudget, coupleProfile, setCoupleProfile, members, addMember, setMembers, tasks, setTasks, guestGroups, setGuestGroups, guests, editGuest } = useAppContext();
+  const { theme, setTheme, weddingDate, setWeddingDate, targetGuests, setTargetGuests, totalBudget, setTotalBudget, coupleProfile, setCoupleProfile, members, addMember, setMembers, tasks, setTasks, guestGroups, setGuestGroups, guests, editGuest, enterTutorial, hasSeenTutorial, tutorialLang, setTutorialLang } = useAppContext();
   const [activeTab, setActiveTab] = useState<'profile' | 'client' | 'team' | 'categories' | 'preferences'>('client');
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showReplayConfirm, setShowReplayConfirm] = useState(false);
   const [formProfile, setFormProfile] = useState(coupleProfile);
   const [newMemberName, setNewMemberName] = useState('');
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
@@ -95,6 +97,13 @@ export const Settings: React.FC = () => {
     setCoupleProfile(formProfile);
     setShowConfirm(false);
   };
+
+  const handleReplayTutorial = () => {
+    setShowReplayConfirm(false);
+    enterTutorial('replay');
+  };
+
+  const tCopy = tutorialCopy[tutorialLang];
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500 pb-20">
@@ -431,6 +440,59 @@ export const Settings: React.FC = () => {
           {/* PREFERENCES TAB */}
           {activeTab === 'preferences' && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
+
+              {/* GETTING STARTED / TUTORIAL REPLAY */}
+              <section className="card overflow-hidden">
+                <div className="px-8 py-6 border-b border-brand-border flex items-center gap-3 bg-brand-surface-hover/50">
+                  <PlayCircle className="text-brand-primary" />
+                  <h3 className="font-headline text-2xl text-brand-primary">{tCopy.settings.title}</h3>
+                </div>
+                <div className="p-8 flex flex-col md:flex-row md:items-center gap-6">
+                  <div className="flex-1 space-y-3">
+                    <p className="text-sm text-brand-text-muted leading-relaxed max-w-lg">
+                      {tCopy.settings.description}
+                    </p>
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold ${
+                      hasSeenTutorial
+                        ? 'bg-brand-success-bg text-brand-success'
+                        : 'bg-brand-warning-bg text-brand-warning'
+                    }`}>
+                      <BadgeCheck size={13} />
+                      {hasSeenTutorial ? tCopy.settings.seenBadge : tCopy.settings.notSeenBadge}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-3 shrink-0">
+                    {/* Language selector — dipilih, bukan ditampilkan dua bahasa sekaligus */}
+                    <div className="flex items-center gap-2">
+                      <Globe size={14} className="text-brand-text-muted" />
+                      <span className="text-xs font-semibold text-brand-text-muted">{tCopy.settings.languageLabel}</span>
+                      <div className="flex bg-brand-surface-hover rounded-lg p-0.5 border border-brand-border">
+                        {(['id', 'en'] as TutorialLang[]).map((lng) => (
+                          <button
+                            key={lng}
+                            onClick={() => setTutorialLang(lng)}
+                            className={`px-2.5 py-1 rounded-md text-[11px] font-bold uppercase transition-all ${
+                              tutorialLang === lng ? 'bg-brand-primary text-white shadow-sm' : 'text-brand-text-muted hover:text-brand-text'
+                            }`}
+                          >
+                            {lng}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setShowReplayConfirm(true)}
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold text-sm shadow-md hover:bg-brand-primary-hover active:scale-95 transition-all whitespace-nowrap"
+                    >
+                      <PlayCircle size={18} />
+                      {tCopy.settings.button}
+                    </button>
+                  </div>
+                </div>
+              </section>
+
               <section className="card overflow-hidden">
                 <div className="px-8 py-6 border-b border-brand-border flex items-center gap-3 bg-brand-surface-hover/50">
                   <Monitor className="text-brand-primary" />
@@ -474,6 +536,19 @@ export const Settings: React.FC = () => {
           confirmText="Yes, Save"
           onConfirm={confirmSave}
           onCancel={() => setShowConfirm(false)}
+        />
+      )}
+
+      {showReplayConfirm && (
+        <ConfirmDialog
+          isOpen={showReplayConfirm}
+          title={tCopy.confirmReplay.title}
+          message={tCopy.confirmReplay.message}
+          type="info"
+          confirmText={tCopy.confirmReplay.confirm}
+          cancelText={tCopy.confirmReplay.cancel}
+          onConfirm={handleReplayTutorial}
+          onCancel={() => setShowReplayConfirm(false)}
         />
       )}
 
