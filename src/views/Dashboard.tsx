@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAppContext } from '../store/AppContext';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { formatIDR, formatShortIDR } from '../utils/formatters';
+import { generateSummaryPdf, downloadPdfBytes } from '../utils/exportSummaryPdf';
 
 export const Dashboard = () => {
   const { 
@@ -66,6 +67,42 @@ export const Dashboard = () => {
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [showActivityMenu, setShowActivityMenu] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+
+  const handleExportPdf = async () => {
+    setIsExportingPdf(true);
+    try {
+      const coupleTitle = (coupleProfile.groomName || coupleProfile.brideName)
+        ? `${coupleProfile.groomName || ''} & ${coupleProfile.brideName || ''}`.trim()
+        : 'EverVow Lux';
+      const weddingDateLabel = weddingDate
+        ? new Date(weddingDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+        : 'Tanggal belum diatur';
+      const daysLeftLabel = diffDays > 0 ? `${diffDays} hari lagi` : 'Hari H sudah tiba';
+
+      const bytes = await generateSummaryPdf({
+        coupleTitle,
+        weddingDateLabel,
+        daysLeftLabel,
+        totalBudget,
+        totalPaid,
+        totalAllocated: totalAllocatedExpenses,
+        totalGuests,
+        confirmedGuests,
+        pendingGuests,
+        declinedGuests,
+        totalVendors,
+        bookedVendors,
+        totalTasks,
+        completedTasks,
+      });
+      downloadPdfBytes(bytes, `EverVow_Ringkasan_${new Date().toISOString().slice(0, 10)}.pdf`);
+    } catch (err) {
+      alert('Gagal membuat PDF. Coba lagi.');
+    } finally {
+      setIsExportingPdf(false);
+    }
+  };
 
   return (
     <div className="max-w-[1440px] mx-auto space-y-6 animate-in fade-in duration-500 pb-24">
@@ -80,19 +117,8 @@ export const Dashboard = () => {
         }
       `}} />
 
-      {/* Judul khusus print — tidak tampil di layar, cuma muncul saat di-print/export PDF */}
-      <div className="hidden print:block mb-6">
-        <h1 className="font-headline text-3xl text-brand-primary mb-1">EverVow Lux — Ringkasan Pernikahan</h1>
-        <p className="text-sm text-brand-text-muted">
-          {(coupleProfile.groomName || coupleProfile.brideName) ? `${coupleProfile.groomName || ''} & ${coupleProfile.brideName || ''}` : ''}
-          {coupleProfile.weddingTitle ? ` — ${coupleProfile.weddingTitle}` : ''}
-        </p>
-        <p className="text-xs text-brand-text-muted mt-1">Dicetak pada {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-        <div className="border-b border-brand-border mt-4"></div>
-      </div>
-
       {/* Welcome Section */}
-      <section className="relative bg-brand-surface rounded-xl luxury-shadow-1 border border-brand-border p-8 overflow-hidden flex flex-col md:flex-row items-center justify-between print:hidden">
+      <section className="relative bg-brand-surface rounded-xl luxury-shadow-1 border border-brand-border p-8 overflow-hidden flex flex-col md:flex-row items-center justify-between">
         <div className="z-10 relative space-y-4 text-center md:text-left">
           <h1 className="font-headline text-4xl md:text-5xl text-brand-primary tracking-tight">
             {coupleProfile.groomName || coupleProfile.brideName ? (
@@ -117,11 +143,12 @@ export const Dashboard = () => {
               </button>
             )}
             <button 
-              onClick={() => window.print()}
-              className="px-5 py-2.5 bg-brand-primary text-white rounded-xl text-xs font-semibold hover:bg-brand-primary-hover transition-colors shadow-sm flex items-center gap-2"
+              onClick={handleExportPdf}
+              disabled={isExportingPdf}
+              className="px-5 py-2.5 bg-brand-primary text-white rounded-xl text-xs font-semibold hover:bg-brand-primary-hover transition-colors shadow-sm flex items-center gap-2 disabled:opacity-60"
             >
               <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-              Export PDF Summary
+              {isExportingPdf ? 'Membuat PDF...' : 'Export PDF Summary'}
             </button>
           </div>
         </div>

@@ -2,9 +2,8 @@
 
 import React, { useState } from 'react';
 import { useAppContext } from '../store/AppContext';
-import { Moon, Sun, Monitor, Save, User, Heart, Settings as SettingsIcon, Camera, Phone, Mail, MapPin, Users, Plus, Trash2, Edit2, Check, X } from 'lucide-react';
+import { Moon, Sun, Monitor, Save, User, Heart, Settings as SettingsIcon, Phone, Mail, MapPin, Users, Plus, Trash2, Edit2, Check, X } from 'lucide-react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
-import { UploadButton } from '../utils/uploadthing';
 
 const MEMBER_COLORS = [
   { bg: '#8b4a52', text: '#ffffff' },
@@ -170,30 +169,9 @@ export const Settings: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-8 items-start">
                   <div className="flex flex-col items-center text-center gap-4">
-                    <div className="w-32 h-32 rounded-full border-4 border-brand-surface-hover bg-[#f4ecea] overflow-hidden relative group cursor-pointer flex items-center justify-center text-brand-text-muted">
-                      {formProfile.photoUrl ? (
-                        <img src={formProfile.photoUrl} alt="Couple" className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="font-headline text-4xl text-brand-primary">{(formProfile.brideName?.[0] || '?')}&{(formProfile.groomName?.[0] || '?')}</span>
-                      )}
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Camera className="text-white" />
-                      </div>
+                    <div className="w-32 h-32 rounded-full border-4 border-brand-surface-hover bg-[#f4ecea] overflow-hidden flex items-center justify-center text-brand-text-muted">
+                      <span className="font-headline text-4xl text-brand-primary">{(formProfile.brideName?.[0] || '?')}&{(formProfile.groomName?.[0] || '?')}</span>
                     </div>
-                    <UploadButton
-                      endpoint="weddingImageUploader"
-                      onClientUploadComplete={(res) => {
-                        const url = res?.[0]?.ufsUrl;
-                        if (url) setFormProfile({ ...formProfile, photoUrl: url });
-                      }}
-                      onUploadError={(err) => alert(`Upload gagal: ${err.message}`)}
-                      appearance={{
-                        button: '!bg-transparent !text-brand-primary !text-sm !font-semibold hover:!underline !h-auto !w-auto !p-0',
-                        container: 'w-auto',
-                        allowedContent: 'hidden',
-                      }}
-                      content={{ button: formProfile.photoUrl ? 'Ganti Foto' : 'Change Photo' }}
-                    />
                   </div>
                   
                   <div className="space-y-6">
@@ -276,13 +254,9 @@ export const Settings: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-8 items-start">
                   <div className="flex flex-col items-center text-center gap-4">
-                    <div className="w-32 h-32 rounded-full border-4 border-brand-surface-hover bg-brand-primary/10 overflow-hidden relative group cursor-pointer flex items-center justify-center text-brand-primary font-headline text-4xl">
+                    <div className="w-32 h-32 rounded-full border-4 border-brand-surface-hover bg-brand-primary/10 overflow-hidden flex items-center justify-center text-brand-primary font-headline text-4xl">
                       IS
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Camera className="text-white" />
-                      </div>
                     </div>
-                    <button className="text-sm font-semibold text-brand-primary hover:underline">Upload Photo</button>
                   </div>
                   
                   <div className="space-y-6">

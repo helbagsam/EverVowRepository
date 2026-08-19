@@ -15,6 +15,7 @@ export const GuestList: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newGuest, setNewGuest] = useState<Partial<Guest>>({ status: 'Pending', group: 'Unassigned', table: 'Unassigned' });
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirmState, setConfirmState] = useState<{ isOpen: boolean, title: string, message: string, type: 'danger' | 'info', confirmText: string, onConfirm: () => void } | null>(null);
 
   // Download Excel Template — file .xlsx ASLI (bukan .csv) supaya kolom
@@ -206,6 +207,47 @@ export const GuestList: React.FC = () => {
     });
   };
 
+  const toggleSelectOne = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const allFilteredSelected = filteredGuests.length > 0 && filteredGuests.every(g => selectedIds.has(g.id));
+
+  const toggleSelectAll = () => {
+    setSelectedIds(prev => {
+      if (allFilteredSelected) {
+        // Unselect hanya yang lagi tampil (sesuai filter aktif)
+        const next = new Set(prev);
+        filteredGuests.forEach(g => next.delete(g.id));
+        return next;
+      }
+      const next = new Set(prev);
+      filteredGuests.forEach(g => next.add(g.id));
+      return next;
+    });
+  };
+
+  const handleBulkDelete = () => {
+    const count = selectedIds.size;
+    if (count === 0) return;
+    setConfirmState({
+      isOpen: true,
+      title: 'Delete Selected Guests',
+      message: `Are you sure you want to delete ${count} selected guest${count > 1 ? 's' : ''}? This action cannot be undone.`,
+      type: 'danger',
+      confirmText: `Delete ${count}`,
+      onConfirm: () => {
+        selectedIds.forEach(id => deleteGuest(id));
+        setSelectedIds(new Set());
+        setConfirmState(null);
+      }
+    });
+  };
+
   return (
     <div className="max-w-[1440px] mx-auto space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
@@ -218,8 +260,8 @@ export const GuestList: React.FC = () => {
             <FileSpreadsheet size={16} /> Excel Template
           </button>
           <label className="flex items-center gap-2 px-4 py-2.5 bg-brand-surface border border-brand-border text-brand-text rounded-xl hover:bg-brand-surface-hover transition-colors font-semibold text-xs cursor-pointer">
-            <Upload size={16} /> Import Guests (CSV)
-            <input type="file" accept=".csv" onChange={handleImportCSV} className="hidden" />
+            <Upload size={16} /> Import Guests
+            <input type="file" accept=".csv,.xlsx,.xls" onChange={handleImportCSV} className="hidden" />
           </label>
           <button onClick={handleExportGuests} className="flex items-center gap-2 px-4 py-2.5 bg-brand-surface border border-brand-border text-brand-text rounded-xl hover:bg-brand-surface-hover transition-colors font-semibold text-xs">
             <Download size={16} /> Export List
@@ -284,10 +326,32 @@ export const GuestList: React.FC = () => {
           </div>
         </div>
 
+        {selectedIds.size > 0 && (
+          <div className="px-6 py-3 bg-brand-primary/5 border-b border-brand-border flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
+            <p className="text-sm font-semibold text-brand-primary">{selectedIds.size} tamu dipilih</p>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setSelectedIds(new Set())} className="text-xs font-semibold text-brand-text-muted hover:text-brand-text">
+                Batalkan Pilihan
+              </button>
+              <button onClick={handleBulkDelete} className="flex items-center gap-2 px-3 py-1.5 bg-brand-danger text-white rounded-lg hover:bg-brand-danger/90 transition-colors font-semibold text-xs">
+                <Trash2 size={14} /> Hapus {selectedIds.size} Tamu
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-brand-surface-hover border-b border-brand-border text-xs font-semibold text-brand-text-muted uppercase tracking-wider">
+                <th className="py-4 px-6 w-10">
+                  <input
+                    type="checkbox"
+                    checked={allFilteredSelected}
+                    onChange={toggleSelectAll}
+                    className="w-4 h-4 rounded border-brand-border text-brand-primary focus:ring-brand-primary cursor-pointer"
+                  />
+                </th>
                 <th className="py-4 px-6">Guest Name</th>
                 <th className="py-4 px-6">Group</th>
                 <th className="py-4 px-6">RSVP Status</th>
@@ -298,10 +362,18 @@ export const GuestList: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-brand-border">
               {filteredGuests.length === 0 ? (
-                <tr><td colSpan={6} className="py-8 text-center text-brand-text-muted">No guests found.</td></tr>
+                <tr><td colSpan={7} className="py-8 text-center text-brand-text-muted">No guests found.</td></tr>
               ) : (
                 filteredGuests.map(guest => (
-                  <tr key={guest.id} className="hover:bg-brand-surface-hover transition-colors group">
+                  <tr key={guest.id} className={`hover:bg-brand-surface-hover transition-colors group ${selectedIds.has(guest.id) ? 'bg-brand-primary/5' : ''}`}>
+                    <td className="py-4 px-6">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(guest.id)}
+                        onChange={() => toggleSelectOne(guest.id)}
+                        className="w-4 h-4 rounded border-brand-border text-brand-primary focus:ring-brand-primary cursor-pointer"
+                      />
+                    </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-brand-surface-hover border border-brand-border flex items-center justify-center font-headline text-brand-primary">

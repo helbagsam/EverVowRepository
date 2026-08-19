@@ -237,11 +237,11 @@ export const PhotoVideo: React.FC = () => {
           </div>
           <div className="space-y-3 relative z-10">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-brand-text">Photography (Lumière)</span>
+              <span className="text-sm font-medium text-brand-text">Photography</span>
               <span className="bg-brand-surface-hover px-2.5 py-1 rounded-md text-xs font-semibold text-brand-primary">{shots.filter(s => s.type !== 'Video').length} shots</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-brand-text">Videography (CineLux)</span>
+              <span className="text-sm font-medium text-brand-text">Videography</span>
               <span className="bg-brand-surface-hover px-2.5 py-1 rounded-md text-xs font-semibold text-brand-accent">{shots.filter(s => s.type !== 'Photo').length} shots</span>
             </div>
           </div>

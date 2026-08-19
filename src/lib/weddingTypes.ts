@@ -14,7 +14,7 @@ export interface FabricSwatch { id: string; name: string; imageUrl: string; }
 export interface AttireVendorNote { id: string; vendorName: string; notes: string; dueDate: string; }
 export interface AttireItem { id: string; name: string; role: string; status: string; vendor: string; desc: string; measurements: string; imageUrl?: string; }
 export interface Task { id: string; categoryId: string; title: string; status: "Not Started" | "In Progress" | "Completed" | "On Hold"; assigneeId: string; dueDate: string; priority: "High" | "Medium" | "Low"; desc: string; }
-export interface CoupleProfile { brideName: string; groomName: string; contactEmail: string; contactPhone: string; weddingTitle: string; weddingTime: string; primaryVenue: string; photoUrl?: string; }
+export interface CoupleProfile { brideName: string; groomName: string; contactEmail: string; contactPhone: string; weddingTitle: string; weddingTime: string; primaryVenue: string; }
 
 export interface WeddingState {
   theme: "light" | "dark";
