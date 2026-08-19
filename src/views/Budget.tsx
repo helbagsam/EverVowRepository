@@ -4,7 +4,8 @@ import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../store/AppContext';
 import { Plus, Edit, Trash2, CheckCircle, Clock, AlertCircle, XCircle, Search, Edit2, Target, Wallet, BarChart3, Receipt, Lightbulb, Filter, PlusCircle, MoreVertical, FileText } from 'lucide-react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
-import { UploadButton } from '../utils/uploadthing';
+import { UploadButton, deleteUploadedFile } from '../utils/uploadthing';
+import { compressImagesBeforeUpload } from '../utils/imageCompression';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { formatIDR } from '../utils/formatters';
 
@@ -140,7 +141,9 @@ export const Budget: React.FC = () => {
       type: 'danger',
       confirmText: 'Delete',
       onConfirm: () => {
+        const target = expenses.find(e => e.id === id);
         deleteExpense(id);
+        deleteUploadedFile(target?.receiptUrl);
         setConfirmState(null);
       }
     });
@@ -524,11 +527,14 @@ export const Budget: React.FC = () => {
                   <div className="flex justify-between gap-3 items-center">
                     <UploadButton
                       endpoint="weddingImageUploader"
+                      onBeforeUploadBegin={compressImagesBeforeUpload}
                       onClientUploadComplete={(res) => {
                         const url = res?.[0]?.ufsUrl;
                         if (url) {
+                          const oldUrl = receiptExpense.receiptUrl;
                           editExpense({ ...receiptExpense, receiptUrl: url });
                           setReceiptExpense({ ...receiptExpense, receiptUrl: url });
+                          deleteUploadedFile(oldUrl);
                         }
                       }}
                       onUploadError={(err) => alert(`Upload gagal: ${err.message}`)}
@@ -540,8 +546,10 @@ export const Budget: React.FC = () => {
                       content={{ button: 'Ganti Kuitansi' }}
                     />
                     <button onClick={() => {
+                       const oldUrl = receiptExpense.receiptUrl;
                        editExpense({ ...receiptExpense, receiptUrl: undefined });
                        setReceiptExpense({ ...receiptExpense, receiptUrl: undefined });
+                       deleteUploadedFile(oldUrl);
                     }} className="flex-1 px-4 py-2 bg-brand-danger-bg text-brand-danger rounded-xl font-semibold text-sm hover:bg-brand-danger/20 transition-colors">
                       Hapus
                     </button>
@@ -556,6 +564,7 @@ export const Budget: React.FC = () => {
                   <span className="text-xs text-brand-text-muted block mb-4">JPG atau PNG, maksimal 4MB</span>
                   <UploadButton
                     endpoint="weddingImageUploader"
+                    onBeforeUploadBegin={compressImagesBeforeUpload}
                     onClientUploadComplete={(res) => {
                       const url = res?.[0]?.ufsUrl;
                       if (url) {

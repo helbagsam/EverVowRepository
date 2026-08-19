@@ -60,6 +60,17 @@
   }
 }
 
+/* Fix untuk bug Chrome Android: browser otomatis "membesarkan" ukuran teks
+   tertentu (text autosizing / font boosting) di kolom sempit, yang bisa
+   bikin label saling tumpang tindih di layar HP — persis kasus label
+   "Bride's/Groom's Full Name" yang overlap. text-size-adjust: 100% mematikan
+   auto-inflate itu supaya ukuran teks selalu sesuai CSS, konsisten di semua
+   device. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   @apply bg-brand-bg text-brand-text font-body antialiased transition-colors duration-300;
 }

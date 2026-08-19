@@ -4,7 +4,8 @@ import React, { useRef, useState } from 'react';
 import { FileText, Plus, Search, Filter, Edit, Eye, Trash2, Upload, Paperclip, X, Loader2 } from 'lucide-react';
 import { useAppContext, Requirement } from '../store/AppContext';
 import { ConfirmDialog } from '../components/ConfirmDialog';
-import { useUploadThing } from '../utils/uploadthing';
+import { useUploadThing, deleteUploadedFile } from '../utils/uploadthing';
+import { compressImagesBeforeUpload } from '../utils/imageCompression';
 
 export const Administration: React.FC = () => {
   const { requirements, addRequirement, deleteRequirement, editRequirement } = useAppContext();
@@ -23,6 +24,7 @@ export const Administration: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { startUpload, isUploading } = useUploadThing('weddingImageUploader', {
+    onBeforeUploadBegin: compressImagesBeforeUpload,
     onClientUploadComplete: (res) => {
       const url = res?.[0]?.ufsUrl;
       const fileName = res?.[0]?.name;
@@ -37,7 +39,11 @@ export const Administration: React.FC = () => {
         });
       } else if (url && uploadTargetId) {
         const target = requirements.find(r => r.id === uploadTargetId);
-        if (target) editRequirement({ ...target, file: url, status: 'Selesai' });
+        if (target) {
+          const oldUrl = target.file;
+          editRequirement({ ...target, file: url, status: 'Selesai' });
+          deleteUploadedFile(oldUrl);
+        }
       }
       setUploadTargetId(null);
     },
@@ -132,7 +138,9 @@ export const Administration: React.FC = () => {
       type: 'danger',
       confirmText: 'Delete',
       onConfirm: () => {
+        const target = requirements.find(r => r.id === id);
         deleteRequirement(id);
+        deleteUploadedFile(target?.file);
         setConfirmState(null);
       }
     });

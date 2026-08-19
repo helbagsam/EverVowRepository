@@ -5,7 +5,8 @@ import { useAppContext, AttireItem, AttireVendorNote } from '../store/AppContext
 import { Shirt, Plus, Edit, UserPlus, Trash2, X, CheckCircle, Clock, AlertCircle, Camera, Calendar, FileText } from 'lucide-react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { formatDate } from '../utils/formatters';
-import { UploadButton } from '../utils/uploadthing';
+import { UploadButton, deleteUploadedFile } from '../utils/uploadthing';
+import { compressImagesBeforeUpload } from '../utils/imageCompression';
 
 
 export const Attire: React.FC = () => {
@@ -88,7 +89,9 @@ export const Attire: React.FC = () => {
       type: 'danger',
       confirmText: 'Delete',
       onConfirm: () => {
+        const target = attireItems.find(a => a.id === id);
         deleteAttireItem(id);
+        deleteUploadedFile(target?.imageUrl);
         setConfirmState(null);
       }
     });
@@ -348,9 +351,16 @@ export const Attire: React.FC = () => {
                   <div className="mt-3 flex justify-center">
                     <UploadButton
                       endpoint="weddingImageUploader"
+                      onBeforeUploadBegin={compressImagesBeforeUpload}
                       onClientUploadComplete={(res) => {
                         const url = res?.[0]?.ufsUrl;
-                        if (url) setNewItem({ ...newItem, imageUrl: url });
+                        if (url) {
+                          const oldUrl = newItem.imageUrl;
+                          setNewItem({ ...newItem, imageUrl: url });
+                          // Cuma hapus versi lama kalau memang sebelumnya sudah ada foto
+                          // ter-upload (bukan URL manual yang ditempel user).
+                          if (oldUrl) deleteUploadedFile(oldUrl);
+                        }
                       }}
                       onUploadError={(err) => alert(`Upload gagal: ${err.message}`)}
                       appearance={{
