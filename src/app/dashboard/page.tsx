@@ -16,7 +16,7 @@ import { PhotoVideo } from '@/views/PhotoVideo';
 import { Timeline } from '@/views/Timeline';
 import { HelpCenter } from '@/views/HelpCenter';
 import { Vendors } from '@/views/Vendors';
-import { TutorialBanner } from '@/components/TutorialBanner';
+import { OnboardingGuide } from '@/components/OnboardingGuide';
 
 function LoadingSkeleton() {
   return (
@@ -30,7 +30,7 @@ function LoadingSkeleton() {
 }
 
 function AppContent() {
-  const { currentView, setCurrentView, loading, isTutorialMode } = useAppContext();
+  const { currentView, setCurrentView, loading } = useAppContext();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   if (loading) return <LoadingSkeleton />;
@@ -62,6 +62,7 @@ function AppContent() {
 
   return (
     <div className="flex h-dvh overflow-hidden bg-brand-bg text-brand-text font-body transition-colors duration-300 print:block print:h-auto print:overflow-visible">
+      <OnboardingGuide />
       <Sidebar
         currentView={currentView}
         setCurrentView={setCurrentView}
@@ -72,12 +73,7 @@ function AppContent() {
       <div className="flex-1 md:ml-64 flex flex-col h-dvh overflow-hidden print:ml-0 print:h-auto print:overflow-visible print:block">
         <Topbar onOpenMobileMenu={() => setMobileMenuOpen(true)} />
 
-        <main
-          className={`flex-1 overflow-y-auto hide-scrollbar print:overflow-visible print:p-0 transition-shadow duration-500 ${
-            isTutorialMode ? 'ring-1 ring-inset ring-brand-accent/30' : ''
-          }`}
-        >
-          <TutorialBanner />
+        <main className="flex-1 overflow-y-auto hide-scrollbar print:overflow-visible print:p-0">
           <div id="print-area" className="p-6 md:p-8 lg:p-10 print:p-0">
             {renderView()}
           </div>

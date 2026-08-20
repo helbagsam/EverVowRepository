@@ -479,23 +479,22 @@ export const Timeline: React.FC = () => {
                       const assignee = members.find(m => m.id === task.assigneeId);
                       const isTaskDone = task.status === 'Completed';
                       return (
-                        <div key={task.id} className="group flex flex-col md:flex-row md:items-center justify-between px-6 py-4 hover:bg-brand-surface-hover/50 transition-colors gap-4">
-                          <div className="flex items-start md:items-center gap-4 flex-1">
-                            <button onClick={() => toggleTaskStatus(task)} className="mt-1 md:mt-0 shrink-0">
-                               <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${isTaskDone ? 'bg-brand-primary border-brand-primary text-white' : 'border-brand-border bg-brand-surface hover:border-brand-primary'}`}>
-                                  {isTaskDone && <CheckCircle size={14} strokeWidth={4} />}
-                               </div>
-                            </button>
-                            <div className="flex-1">
-                              <p className={`font-semibold text-sm transition-all ${isTaskDone ? 'text-brand-text-muted line-through opacity-70' : 'text-brand-text'}`}>{task.title}</p>
-                              {task.desc && <p className={`text-xs mt-0.5 ${isTaskDone ? 'text-brand-text-muted/50' : 'text-brand-text-muted'}`}>{task.desc}</p>}
-                            </div>
+                        <div key={task.id} className="group flex flex-wrap items-center gap-x-4 gap-y-2 px-6 py-4 hover:bg-brand-surface-hover/50 transition-colors">
+                          <button onClick={() => toggleTaskStatus(task)} className="shrink-0">
+                             <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${isTaskDone ? 'bg-brand-primary border-brand-primary text-white' : 'border-brand-border bg-brand-surface hover:border-brand-primary'}`}>
+                                {isTaskDone && <CheckCircle size={14} strokeWidth={4} />}
+                             </div>
+                          </button>
+
+                          <div className="flex-1 min-w-[200px]">
+                            <p className={`font-semibold text-sm transition-all ${isTaskDone ? 'text-brand-text-muted line-through opacity-70' : 'text-brand-text'}`}>{task.title}</p>
+                            {task.desc && <p className={`text-xs mt-0.5 ${isTaskDone ? 'text-brand-text-muted/50' : 'text-brand-text-muted'}`}>{task.desc}</p>}
                           </div>
-                          
-                          <div className="flex items-center justify-between md:justify-end gap-4 md:w-auto pl-9 md:pl-0">
+
+                          <div className="flex items-center gap-3 ml-auto shrink-0">
                             {/* Due Date Display (Readonly in list for cleaner UI, editable in Modal) */}
                             {task.dueDate && (
-                               <div className={`text-xs font-medium px-2 py-1 rounded bg-brand-surface border border-brand-border ${isTaskDone ? 'text-brand-text-muted/50' : 'text-brand-text-muted'}`}>
+                               <div className={`text-xs font-medium px-2 py-1 rounded bg-brand-surface border border-brand-border whitespace-nowrap ${isTaskDone ? 'text-brand-text-muted/50' : 'text-brand-text-muted'}`}>
                                  {formatDate(task.dueDate)}
                                </div>
                             )}
@@ -503,17 +502,17 @@ export const Timeline: React.FC = () => {
                             {/* Assignee Display */}
                             {assignee ? (
                               <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[10px] border border-brand-border" style={{ backgroundColor: assignee.bgColor, color: assignee.color }}>
+                                <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[10px] border border-brand-border shrink-0" style={{ backgroundColor: assignee.bgColor, color: assignee.color }}>
                                   {assignee.initials}
                                 </div>
-                                <span className={`text-xs font-medium hidden sm:block ${isTaskDone ? 'text-brand-text-muted/50' : 'text-brand-text-muted'}`}>{assignee.name}</span>
+                                <span className={`text-xs font-medium hidden sm:block whitespace-nowrap ${isTaskDone ? 'text-brand-text-muted/50' : 'text-brand-text-muted'}`}>{assignee.name}</span>
                               </div>
                             ) : (
-                              <span className="text-xs text-brand-text-muted/50 italic hidden sm:block">Unassigned</span>
+                              <span className="text-xs text-brand-text-muted/50 italic hidden sm:block whitespace-nowrap">Unassigned</span>
                             )}
-                            
+
                             {/* Priority Badge */}
-                            <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded
+                            <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded whitespace-nowrap
                                 ${task.priority === 'High' ? 'bg-brand-danger-bg text-brand-danger' : 
                                   task.priority === 'Medium' ? 'bg-brand-warning-bg text-brand-warning' : 
                                   'bg-brand-border/50 text-brand-text-muted'}
@@ -521,7 +520,7 @@ export const Timeline: React.FC = () => {
                             `}>
                               {task.priority}
                             </span>
-                            
+
                             {/* Actions */}
                             <div className="flex gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                               <button onClick={() => openEditTask(task)} className="p-1.5 text-brand-text-muted hover:text-brand-primary rounded"><Edit2 size={16} /></button>

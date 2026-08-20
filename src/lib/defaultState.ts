@@ -1,12 +1,41 @@
 import type { WeddingState } from "./weddingTypes";
 
+// ---------- Helper tanggal relatif ----------
+// Supaya demo state selalu terasa "hidup" kapan pun preview ini dibuka
+// (bukan cuma pas Agustus 2026), seluruh tanggal dihitung RELATIF terhadap
+// hari ini, bukan string statis. weddingDate = hari ini + 6 bulan (sesuai
+// permintaan: dashboard baru dibuka tidak boleh langsung "0 Days to go").
+function pad(n: number): string {
+  return String(n).padStart(2, "0");
+}
+function toISODate(d: Date): string {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+function addDays(base: Date, days: number): Date {
+  const d = new Date(base);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+function addMonths(base: Date, months: number): Date {
+  const d = new Date(base);
+  d.setMonth(d.getMonth() + months);
+  return d;
+}
+// dueDate helper: offset dalam hari dari HARI INI dashboard dibuka.
+// Negatif = sudah lewat (masuk akal untuk task Completed), positif = akan datang.
+function relDate(offsetDays: number): string {
+  return toISODate(addDays(new Date(), offsetDays));
+}
+
 // Nilai DEMO — dipakai untuk keperluan testing/preview internal saja
 // (bukan untuk akun pembeli sungguhan). Berisi contoh data seperti yang
 // dulu tampil di mockup desain awal.
 export function demoWeddingState(): WeddingState {
+  const weddingDate = toISODate(addMonths(new Date(), 6));
+
   return {
     theme: "light",
-    weddingDate: "2024-10-24",
+    weddingDate,
     coupleProfile: {
       brideName: "Siti Aminah",
       groomName: "Budi Santoso",
@@ -27,14 +56,14 @@ export function demoWeddingState(): WeddingState {
       { id: "8", name: "Helena Ashworth", phone: "+6281556677889", group: "VIP", status: "Confirmed", table: "T-01" },
     ],
     expenses: [
-      { id: "1", name: "Grand Ballroom Rental", vendor: "The Ritz-Carlton", total: 25000000, paid: 25000000, status: "Lunas", category: "Venue & Catering" },
-      { id: "2", name: "Plated Dinner & Bar", vendor: "Gourmet Luxe Catering", total: 18500000, paid: 9250000, status: "DP", category: "Venue & Catering" },
-      { id: "3", name: "Ceremony Arch & Aisles", vendor: "Botanica Atelier", total: 8200000, paid: 2000000, status: "DP", category: "Florals & Decor" },
+      { id: "1", name: "Grand Ballroom Rental", vendor: "The Ritz-Carlton", total: 25000000, paid: 25000000, status: "Lunas", category: "Venue & Catering", receiptUrl: "https://images.unsplash.com/photo-1545941962-1b6654eb8072?w=500&h=650&fit=crop" },
+      { id: "2", name: "Plated Dinner & Bar", vendor: "Gourmet Luxe Catering", total: 18500000, paid: 9250000, status: "DP", category: "Venue & Catering", receiptUrl: "https://images.unsplash.com/photo-1731686602391-7484df33a03c?w=500&h=650&fit=crop" },
+      { id: "3", name: "Ceremony Arch & Aisles", vendor: "Botanica Atelier", total: 8200000, paid: 2000000, status: "DP", category: "Florals & Decor", receiptUrl: "https://images.unsplash.com/photo-1634733988138-bf2c3a2a13fa?w=500&h=650&fit=crop" },
       { id: "4", name: "Custom Lighting Setup", vendor: "Lumina Events", total: 3500000, paid: 0, status: "Unpaid", category: "Florals & Decor" },
     ],
     requirements: [
-      { id: "1", name: "Surat Pengantar RT/RW", desc: "Surat asli dari domisili asal", status: "Selesai", file: "surat_rt_rw.pdf", category: "CPP" },
-      { id: "2", name: "Fotokopi KTP, KK, Akta", desc: "Identitas dasar calon pengantin", status: "Proses", file: null, category: "CPP" },
+      { id: "1", name: "Surat Pengantar RT/RW", desc: "Surat asli dari domisili asal", status: "Selesai", file: "https://images.unsplash.com/photo-1725656469709-4d0bcb828bcf?w=500&h=650&fit=crop", category: "CPP" },
+      { id: "2", name: "Fotokopi KTP, KK, Akta", desc: "Identitas dasar calon pengantin", status: "Proses", file: "https://images.unsplash.com/photo-1670261197418-40e922b570d2?w=500&h=650&fit=crop", category: "CPP" },
       { id: "3", name: "Ijazah Terakhir", desc: "Fotokopi ijazah pendidikan terakhir", status: "Belum Diunggah", file: null, category: "CPW" },
       { id: "4", name: "Pas Foto 2x3 & 4x6", desc: "Latar belakang biru (4 lembar)", status: "Belum Diunggah", file: null, category: "Joint" },
     ],
@@ -44,20 +73,20 @@ export function demoWeddingState(): WeddingState {
       { id: "3", title: "First Dance & Live Band Set", category: "Reception", status: "Confirmed", duration: 30, needs: "7-Piece Live Band, Dance Floor Lighting", desc: "Opening dance followed by a live set to bring guests to the dance floor." },
     ],
     attireItems: [
-      { id: "1", name: "Eleanor V.", role: "Bride", status: "Final Fitting", vendor: "Maison de Blanc", desc: "Custom Ivory Silk Gown", measurements: 'Bust: 34", Waist: 26", Hips: 36", Hollow to Hem: 58"', imageUrl: "https://images.unsplash.com/photo-1596450514735-111a2fe02935?w=200&h=200&fit=crop" },
-      { id: "2", name: "James T.", role: "Groom", status: "In Progress", vendor: "Savile Row Bespoke", desc: "Midnight Blue Tuxedo", measurements: 'Chest: 40", Waist: 32", Inseam: 30", Sleeve: 34"', imageUrl: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200&h=200&fit=crop" },
-      { id: "3", name: "Sarah C.", role: "Maid of Honor", status: "In Progress", vendor: "Maison de Blanc", desc: "Burgundy Velvet Gown", measurements: 'Bust: 36", Waist: 28", Hips: 38"', imageUrl: "https://images.unsplash.com/photo-1583391733958-d259779e5d6c?w=200&h=200&fit=crop" },
-      { id: "4", name: "Vincent V.", role: "Best Man", status: "Not Started", vendor: "Savile Row Bespoke", desc: "Midnight Blue Wool Suit", measurements: 'Chest: 42", Waist: 34", Inseam: 32"', imageUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop" },
-      { id: "5", name: "Helena V.", role: "Mother of the Bride", status: "Final Fitting", vendor: "Maison de Blanc", desc: "Champagne Lace Gown", measurements: 'Bust: 38", Waist: 30"' },
+      { id: "1", name: "Eleanor V.", role: "Bride", status: "Final Fitting", vendor: "Maison de Blanc", desc: "Custom Ivory Silk Gown", measurements: 'Bust: 34", Waist: 26", Hips: 36", Hollow to Hem: 58"', imageUrl: "https://images.unsplash.com/photo-1749550056692-2e3c5483c21c?w=200&h=200&fit=crop" },
+      { id: "2", name: "James T.", role: "Groom", status: "In Progress", vendor: "Savile Row Bespoke", desc: "Midnight Blue Tuxedo", measurements: 'Chest: 40", Waist: 32", Inseam: 30", Sleeve: 34"', imageUrl: "https://images.unsplash.com/photo-1604531826248-f0eca8eeb896?w=200&h=200&fit=crop" },
+      { id: "3", name: "Sarah C.", role: "Maid of Honor", status: "In Progress", vendor: "Maison de Blanc", desc: "Burgundy Velvet Gown", measurements: 'Bust: 36", Waist: 28", Hips: 38"', imageUrl: "https://images.unsplash.com/photo-1749550657899-fe214ea4da84?w=200&h=200&fit=crop" },
+      { id: "4", name: "Vincent V.", role: "Best Man", status: "Not Started", vendor: "Savile Row Bespoke", desc: "Midnight Blue Wool Suit", measurements: 'Chest: 42", Waist: 34", Inseam: 32"', imageUrl: "https://images.unsplash.com/photo-1603394151492-5e9b974b090b?w=200&h=200&fit=crop" },
+      { id: "5", name: "Helena V.", role: "Mother of the Bride", status: "Final Fitting", vendor: "Maison de Blanc", desc: "Champagne Lace Gown", measurements: 'Bust: 38", Waist: 30"', imageUrl: "https://images.unsplash.com/photo-1749550243004-9f8fc8f87aa9?w=200&h=200&fit=crop" },
     ],
     attireVendorNotes: [
-      { id: "1", vendorName: "Maison de Blanc (Bridal)", notes: "Ensure train is bustled discreetly. Extra lace requested for veil detailing.", dueDate: "2024-10-15" },
-      { id: "2", vendorName: "Savile Row Bespoke (Groom)", notes: "Monogram inside jacket pocket: E & J 2024. Cuff break should be minimal.", dueDate: "2024-09-20" },
+      { id: "1", vendorName: "Maison de Blanc (Bridal)", notes: "Ensure train is bustled discreetly. Extra lace requested for veil detailing.", dueDate: relDate(30) },
+      { id: "2", vendorName: "Savile Row Bespoke (Groom)", notes: "Monogram inside jacket pocket initials. Cuff break should be minimal.", dueDate: relDate(25) },
     ],
     fabricSwatches: [
-      { id: "1", name: "Bridesmaid Velvet", imageUrl: "https://images.unsplash.com/photo-1596450514735-111a2fe02935?w=400&h=400&fit=crop" },
-      { id: "2", name: "Accent Silk", imageUrl: "https://images.unsplash.com/photo-1583391733958-d259779e5d6c?w=400&h=400&fit=crop" },
-      { id: "3", name: "Groomsmen Wool", imageUrl: "https://images.unsplash.com/photo-1612423259837-772eb62a4fa9?w=400&h=400&fit=crop" },
+      { id: "1", name: "Bridesmaid Velvet", imageUrl: "https://images.unsplash.com/photo-1749550657899-fe214ea4da84?w=400&h=400&fit=crop" },
+      { id: "2", name: "Accent Silk", imageUrl: "https://images.unsplash.com/photo-1749550056692-2e3c5483c21c?w=400&h=400&fit=crop" },
+      { id: "3", name: "Groomsmen Wool", imageUrl: "https://images.unsplash.com/photo-1603394151492-5e9b974b090b?w=400&h=400&fit=crop" },
     ],
     logistics: [
       { id: "1", name: "Chiavari Chairs - Gold", category: "Rentals", supplier: "Luxe Event Rentals Co.", cost: 12000000, status: "Confirmed", percent: 9.6 },
@@ -66,39 +95,39 @@ export function demoWeddingState(): WeddingState {
     ],
     tasks: [
       // Venue & Catering
-      { id: "t1", categoryId: "cat1", title: "Finalize ballroom contract with The Grand Estate", status: "Completed", assigneeId: "m3", dueDate: "2024-06-15", priority: "High", desc: "Signed contract for full evening use, deposit paid." },
-      { id: "t2", categoryId: "cat1", title: "Confirm final headcount with catering team", status: "Completed", assigneeId: "m3", dueDate: "2024-09-20", priority: "High", desc: "Locked plated dinner count at 180 guests." },
-      { id: "t3", categoryId: "cat1", title: "Schedule final venue walkthrough", status: "Not Started", assigneeId: "m1", dueDate: "2024-10-10", priority: "Medium", desc: "Walk the full floor plan with the wedding planner two weeks before the big day." },
+      { id: "t1", categoryId: "cat1", title: "Finalize ballroom contract with The Grand Estate", status: "Completed", assigneeId: "m3", dueDate: relDate(-90), priority: "High", desc: "Signed contract for full evening use, deposit paid." },
+      { id: "t2", categoryId: "cat1", title: "Confirm final headcount with catering team", status: "Completed", assigneeId: "m3", dueDate: relDate(-80), priority: "High", desc: "Locked plated dinner count at 180 guests." },
+      { id: "t3", categoryId: "cat1", title: "Schedule final venue walkthrough", status: "Not Started", assigneeId: "m1", dueDate: relDate(40), priority: "Medium", desc: "Walk the full floor plan with the wedding planner two weeks before the big day." },
       // Design & Decor
-      { id: "t4", categoryId: "cat2", title: "Approve floral moodboard with Botanica Atelier", status: "Completed", assigneeId: "m2", dueDate: "2024-07-01", priority: "Medium", desc: "Ivory and blush palette approved, sample arrangement confirmed." },
-      { id: "t5", categoryId: "cat2", title: "Finalize table centerpiece design", status: "In Progress", assigneeId: "m2", dueDate: "2024-09-05", priority: "Medium", desc: "Comparing crystal vs. botanical centerpiece options for 20 tables." },
-      { id: "t6", categoryId: "cat2", title: "Order ceremony arch installation", status: "Not Started", assigneeId: "m3", dueDate: "2024-10-05", priority: "High", desc: "Confirm delivery and setup time with Botanica Atelier crew." },
+      { id: "t4", categoryId: "cat2", title: "Approve floral moodboard with Botanica Atelier", status: "Completed", assigneeId: "m2", dueDate: relDate(-70), priority: "Medium", desc: "Ivory and blush palette approved, sample arrangement confirmed." },
+      { id: "t5", categoryId: "cat2", title: "Finalize table centerpiece design", status: "In Progress", assigneeId: "m2", dueDate: relDate(-5), priority: "Medium", desc: "Comparing crystal vs. botanical centerpiece options for 20 tables." },
+      { id: "t6", categoryId: "cat2", title: "Order ceremony arch installation", status: "Not Started", assigneeId: "m3", dueDate: relDate(45), priority: "High", desc: "Confirm delivery and setup time with Botanica Atelier crew." },
       // Attire
-      { id: "t7", categoryId: "cat3", title: "Bride's final gown fitting", status: "Completed", assigneeId: "m1", dueDate: "2024-09-25", priority: "High", desc: "Final alterations completed at Maison de Blanc." },
-      { id: "t8", categoryId: "cat3", title: "Groom's tuxedo alterations", status: "Completed", assigneeId: "m2", dueDate: "2024-09-20", priority: "Medium", desc: "Midnight blue tuxedo tailored, ready for pickup." },
-      { id: "t9", categoryId: "cat3", title: "Bridal party attire delivery confirmation", status: "Not Started", assigneeId: "m4", dueDate: "2024-10-08", priority: "Low", desc: "Confirm all bridesmaid and groomsmen outfits arrive on time." },
+      { id: "t7", categoryId: "cat3", title: "Bride's final gown fitting", status: "Completed", assigneeId: "m1", dueDate: relDate(-20), priority: "High", desc: "Final alterations completed at Maison de Blanc." },
+      { id: "t8", categoryId: "cat3", title: "Groom's tuxedo alterations", status: "Completed", assigneeId: "m2", dueDate: relDate(-18), priority: "Medium", desc: "Midnight blue tuxedo tailored, ready for pickup." },
+      { id: "t9", categoryId: "cat3", title: "Bridal party attire delivery confirmation", status: "Not Started", assigneeId: "m4", dueDate: relDate(50), priority: "Low", desc: "Confirm all bridesmaid and groomsmen outfits arrive on time." },
       // Photo & Video
-      { id: "t10", categoryId: "cat4", title: "Book pre-wedding photoshoot session", status: "Completed", assigneeId: "m1", dueDate: "2024-05-10", priority: "Medium", desc: "Golden hour session at the venue gardens, completed and delivered." },
-      { id: "t11", categoryId: "cat4", title: "Finalize shot list with photographer", status: "In Progress", assigneeId: "m5", dueDate: "2024-10-01", priority: "High", desc: "Cross-referencing must-have family combinations with the family list." },
-      { id: "t12", categoryId: "cat4", title: "Confirm videographer drone permit", status: "On Hold", assigneeId: "m5", dueDate: "2024-09-15", priority: "Low", desc: "Waiting on venue management approval for aerial shots." },
+      { id: "t10", categoryId: "cat4", title: "Book pre-wedding photoshoot session", status: "Completed", assigneeId: "m1", dueDate: relDate(-100), priority: "Medium", desc: "Golden hour session at the venue gardens, completed and delivered." },
+      { id: "t11", categoryId: "cat4", title: "Finalize shot list with photographer", status: "In Progress", assigneeId: "m5", dueDate: relDate(10), priority: "High", desc: "Cross-referencing must-have family combinations with the family list." },
+      { id: "t12", categoryId: "cat4", title: "Confirm videographer drone permit", status: "On Hold", assigneeId: "m5", dueDate: relDate(20), priority: "Low", desc: "Waiting on venue management approval for aerial shots." },
       // Entertainment
-      { id: "t13", categoryId: "cat5", title: "Book live band for reception", status: "Completed", assigneeId: "m3", dueDate: "2024-06-01", priority: "Medium", desc: "7-piece band booked, setlist review scheduled." },
-      { id: "t14", categoryId: "cat5", title: "Finalize first dance song selection", status: "Not Started", assigneeId: "m1", dueDate: "2024-10-12", priority: "Low", desc: "Still deciding between two favorite songs." },
-      { id: "t15", categoryId: "cat5", title: "Confirm MC run-of-show script", status: "In Progress", assigneeId: "m3", dueDate: "2024-10-02", priority: "Medium", desc: "Draft timeline shared with MC for review and timing adjustments." },
+      { id: "t13", categoryId: "cat5", title: "Book live band for reception", status: "Completed", assigneeId: "m3", dueDate: relDate(-85), priority: "Medium", desc: "7-piece band booked, setlist review scheduled." },
+      { id: "t14", categoryId: "cat5", title: "Finalize first dance song selection", status: "Not Started", assigneeId: "m1", dueDate: relDate(150), priority: "Low", desc: "Still deciding between two favorite songs." },
+      { id: "t15", categoryId: "cat5", title: "Confirm MC run-of-show script", status: "In Progress", assigneeId: "m3", dueDate: relDate(7), priority: "Medium", desc: "Draft timeline shared with MC for review and timing adjustments." },
       // Logistics
-      { id: "t16", categoryId: "cat6", title: "Confirm chair & centerpiece rental delivery schedule", status: "Completed", assigneeId: "m5", dueDate: "2024-08-20", priority: "Medium", desc: "Delivery locked for the morning of the event." },
-      { id: "t17", categoryId: "cat6", title: "Arrange guest transportation (Alphard fleet)", status: "In Progress", assigneeId: "m5", dueDate: "2024-10-15", priority: "High", desc: "Coordinating pickup routes for VIP guests and family." },
-      { id: "t18", categoryId: "cat6", title: "Book presidential suite for wedding night", status: "Completed", assigneeId: "m1", dueDate: "2024-07-15", priority: "Low", desc: "Reservation confirmed with early check-in at 14:00." },
+      { id: "t16", categoryId: "cat6", title: "Confirm chair & centerpiece rental delivery schedule", status: "Completed", assigneeId: "m5", dueDate: relDate(-40), priority: "Medium", desc: "Delivery locked for the morning of the event." },
+      { id: "t17", categoryId: "cat6", title: "Arrange guest transportation (Alphard fleet)", status: "In Progress", assigneeId: "m5", dueDate: relDate(12), priority: "High", desc: "Coordinating pickup routes for VIP guests and family." },
+      { id: "t18", categoryId: "cat6", title: "Book presidential suite for wedding night", status: "Completed", assigneeId: "m1", dueDate: relDate(-65), priority: "Low", desc: "Reservation confirmed with early check-in at 14:00." },
       // Administration
-      { id: "t19", categoryId: "cat7", title: "Submit surat pengantar RT/RW", status: "Completed", assigneeId: "m1", dueDate: "2024-06-10", priority: "High", desc: "Document collected and filed with the marriage registration folder." },
-      { id: "t20", categoryId: "cat7", title: "Complete KUA marriage registration documents", status: "Completed", assigneeId: "m2", dueDate: "2024-09-30", priority: "High", desc: "All required documents submitted, awaiting confirmation letter." },
+      { id: "t19", categoryId: "cat7", title: "Submit surat pengantar RT/RW", status: "Completed", assigneeId: "m1", dueDate: relDate(-95), priority: "High", desc: "Document collected and filed with the marriage registration folder." },
+      { id: "t20", categoryId: "cat7", title: "Complete KUA marriage registration documents", status: "Completed", assigneeId: "m2", dueDate: relDate(-15), priority: "High", desc: "All required documents submitted, awaiting confirmation letter." },
       // Guests & Invitations
-      { id: "t21", categoryId: "cat8", title: "Send digital save-the-dates", status: "Completed", assigneeId: "m1", dueDate: "2024-05-01", priority: "Medium", desc: "Sent to all 180 guests via WhatsApp and email." },
-      { id: "t22", categoryId: "cat8", title: "Follow up RSVP for pending guests", status: "In Progress", assigneeId: "m1", dueDate: "2024-09-28", priority: "Medium", desc: "Reaching out to guests who haven't responded yet." },
-      { id: "t23", categoryId: "cat8", title: "Finalize seating chart", status: "Not Started", assigneeId: "m2", dueDate: "2024-10-14", priority: "High", desc: "Waiting on final RSVP count before locking table assignments." },
+      { id: "t21", categoryId: "cat8", title: "Send digital save-the-dates", status: "Completed", assigneeId: "m1", dueDate: relDate(-110), priority: "Medium", desc: "Sent to all 180 guests via WhatsApp and email." },
+      { id: "t22", categoryId: "cat8", title: "Follow up RSVP for pending guests", status: "In Progress", assigneeId: "m1", dueDate: relDate(-3), priority: "Medium", desc: "Reaching out to guests who haven't responded yet." },
+      { id: "t23", categoryId: "cat8", title: "Finalize seating chart", status: "Not Started", assigneeId: "m2", dueDate: relDate(60), priority: "High", desc: "Waiting on final RSVP count before locking table assignments." },
       // Budget & Finance
-      { id: "t24", categoryId: "cat9", title: "Pay vendor down payments (DP)", status: "Completed", assigneeId: "m2", dueDate: "2024-07-01", priority: "High", desc: "All major vendor deposits paid on schedule." },
-      { id: "t25", categoryId: "cat9", title: "Reconcile final catering invoice", status: "In Progress", assigneeId: "m2", dueDate: "2024-10-01", priority: "Medium", desc: "Cross-checking final headcount against the last invoice from Gourmet Luxe." },
+      { id: "t24", categoryId: "cat9", title: "Pay vendor down payments (DP)", status: "Completed", assigneeId: "m2", dueDate: relDate(-75), priority: "High", desc: "All major vendor deposits paid on schedule." },
+      { id: "t25", categoryId: "cat9", title: "Reconcile final catering invoice", status: "In Progress", assigneeId: "m2", dueDate: relDate(5), priority: "Medium", desc: "Cross-checking final headcount against the last invoice from Gourmet Luxe." },
     ],
     categories: [
       { id: "cat1", name: "Venue & Catering", icon: "home", colorClass: "text-brand-primary", bgClass: "bg-brand-primary" },
@@ -144,8 +173,22 @@ export function demoWeddingState(): WeddingState {
     // Slot tambahan yang dulunya localStorage terpisah di 3 view
     // (PhotoVideo, Entertainment) — sekarang ikut dalam 1 blob ini.
     misc: {
-      evervow_shots: [],
-      evervow_tech_notes: [],
+      evervow_shots: [
+        { id: "s1", category: "Getting Ready", title: "Bride's gown hanging by the window", priority: "High", type: "Photo", done: true },
+        { id: "s2", category: "Getting Ready", title: "Groom straightening his tie", priority: "Medium", type: "Photo", done: true },
+        { id: "s3", category: "Getting Ready", title: "Bridesmaids helping with the veil", priority: "Medium", type: "Both", done: false },
+        { id: "s4", category: "Ceremony", title: "First look between the couple", priority: "High", type: "Both", done: false },
+        { id: "s5", category: "Ceremony", title: "Exchange of vows, close-up", priority: "High", type: "Both", done: false },
+        { id: "s6", category: "Ceremony", title: "Ring exchange detail shot", priority: "High", type: "Photo", done: false },
+        { id: "s7", category: "Reception", title: "Grand entrance of the newlyweds", priority: "High", type: "Video", done: false },
+        { id: "s8", category: "Reception", title: "First dance, wide shot", priority: "Medium", type: "Both", done: false },
+        { id: "s9", category: "Reception", title: "Cake cutting moment", priority: "Medium", type: "Photo", done: false },
+        { id: "s10", category: "Portraits", title: "Full bridal party group photo", priority: "Medium", type: "Photo", done: true },
+      ],
+      evervow_tech_notes: [
+        { id: "n1", title: "Lighting Restriction", note: "Ballroom does not allow additional flash rigs — use bounce flash only during the reception." },
+        { id: "n2", title: "Drone Permit", note: "Aerial shots require venue approval; confirm with events@thegrandestate.id before flying." },
+      ],
       evervow_flow_slots: [],
     },
     guestGroups: ["Bride's Family", "Groom's Family", 'Work Colleagues', 'VIP', 'Unassigned'],

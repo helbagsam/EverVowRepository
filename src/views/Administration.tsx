@@ -234,9 +234,16 @@ export const Administration: React.FC = () => {
                       <td className="px-6 py-4 text-sm text-brand-text-muted">{req.desc}</td>
                       <td className="px-6 py-4">
                         {req.file ? (
-                          <div className="flex items-center gap-2 text-xs text-brand-text-muted font-medium">
-                            <Paperclip size={14} /> {req.file}
-                          </div>
+                          /\.(jpg|jpeg|png|webp)(\?|$)/i.test(req.file) ? (
+                            <div className="flex items-center gap-2">
+                              <img src={req.file} alt={req.name} className="w-9 h-9 rounded-lg object-cover border border-brand-border shrink-0" />
+                              <span className="text-xs text-brand-text-muted font-medium">Lihat dokumen</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 text-xs text-brand-text-muted font-medium">
+                              <Paperclip size={14} /> {req.file}
+                            </div>
+                          )
                         ) : (
                           <span className="text-xs text-brand-text-muted/50 italic">No file</span>
                         )}
