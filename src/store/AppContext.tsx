@@ -1,7 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
-import { emptyWeddingState } from "@/lib/defaultState";
+import React, { createContext, useContext, useState, useEffect, useRef, useMemo, ReactNode } from "react";
+import { emptyWeddingState, demoWeddingState } from "@/lib/defaultState";
+import type { TutorialLang } from "@/lib/tutorialCopy";
 import type { WeddingState, Guest, Expense, Requirement, Activity, LogisticItem, Member, Category, Vendor, RentalItem, HandoverItem, LogisticsTimeline, TransportStay, FabricSwatch, AttireVendorNote, AttireItem, Task, CoupleProfile } from "@/lib/weddingTypes";
 
 export type { Guest, Expense, Requirement, Activity, LogisticItem, Member, Category, Vendor, RentalItem, HandoverItem, LogisticsTimeline, TransportStay, FabricSwatch, AttireVendorNote, AttireItem, Task };
@@ -35,6 +36,19 @@ interface AppState {
   username: string;
   // Kompatibilitas untuk 3 slot yang dulu localStorage langsung di PhotoVideo/Entertainment:
   misc: Record<string, any>; setMiscItem: (key: string, value: any) => void;
+
+  // ------- Getting Started / Tutorial mode -------
+  // Saat isTutorialMode true, SEMUA field data di atas (guests, expenses,
+  // vendors, dst.) sedang menampilkan dummyData (read-only sandbox) —
+  // BUKAN data asli user. realData tetap utuh di state internal dan tidak
+  // pernah tertimpa maupun tercampur oleh dummyData.
+  isTutorialMode: boolean;
+  tutorialTrigger: "first-time" | "replay" | null;
+  hasSeenTutorial: boolean;
+  enterTutorial: (trigger?: "first-time" | "replay") => void;
+  exitTutorial: () => void;
+  tutorialLang: TutorialLang;
+  setTutorialLang: (lang: TutorialLang) => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -47,6 +61,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const hydrated = useRef(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [isTutorialMode, setIsTutorialMode] = useState(false);
+  const [tutorialTrigger, setTutorialTrigger] = useState<"first-time" | "replay" | null>(null);
+  // dummyData dibuat SEKALI saja dan tidak pernah berubah — dia bukan bagian
+  // dari `data`/`setData`, sehingga tidak mungkin termutasi oleh fungsi CRUD
+  // manapun. Ini defense-in-depth di atas guard `update()` di bawah.
+  const dummyData = useMemo(() => demoWeddingState(), []);
+
   // Ambil state awal dari server (NeonDB) saat pertama kali render.
   useEffect(() => {
     fetch("/api/state")
@@ -55,10 +76,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         return res.json();
       })
       .then((json) => {
-        setData({ ...emptyWeddingState(), ...json.state });
+        const mergedState = { ...emptyWeddingState(), ...json.state };
+        setData(mergedState);
         setUsername(json.username || "");
         hydrated.current = true;
         setLoading(false);
+
+        // Getting Started otomatis tampil HANYA untuk akun yang belum pernah
+        // menuntaskan/menutup tutorial (misc.tutorialSeenAt kosong). Dicek
+        // dari data REAL yang baru saja di-fetch dari NeonDB — bukan dummy —
+        // supaya user lama yang sudah punya data asli tidak pernah
+        // ke-interupsi lagi di kunjungan berikutnya.
+        if (!mergedState.misc?.tutorialSeenAt) {
+          setTutorialTrigger("first-time");
+          setIsTutorialMode(true);
+        }
       })
       .catch(() => {
         // Jika gagal (mis. belum login), biarkan middleware yang redirect.
@@ -90,97 +122,146 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     else document.documentElement.classList.remove("dark");
   }, [data.theme]);
 
-  const update = (patch: (s: WeddingState) => WeddingState) => setData((s) => patch(s));
+  // TITIK GUARD TUNGGAL: semua fungsi CRUD di bawah (addGuest, updateBudget,
+  // editVendor, dst.) selalu lewat update(). Dengan guard di sini saja, kita
+  // menjamin: selama isTutorialMode aktif, TIDAK ADA satupun interaksi user
+  // yang bisa menyentuh realData. dummyData yang sedang ditampilkan murni
+  // read-only sandbox — realData disembunyikan sementara, bukan dihapus.
+  const update = (patch: (s: WeddingState) => WeddingState) => {
+    if (isTutorialMode) return;
+    setData((s) => patch(s));
+  };
+
+  // activeData: sumber tunggal yang dibaca oleh seluruh `value` di bawah.
+  // Ini murni computed value (bukan state terpisah) — jadi tidak mungkin
+  // dummyData dan realData "nyampur", karena keduanya tidak pernah ditulis
+  // ke variabel yang sama.
+  const activeData = isTutorialMode ? dummyData : data;
+
+  const enterTutorial = (trigger: "first-time" | "replay" = "replay") => {
+    setTutorialTrigger(trigger);
+    setIsTutorialMode(true);
+  };
+
+  const exitTutorial = () => {
+    setIsTutorialMode(false);
+    setTutorialTrigger(null);
+    // Tandai sudah pernah dilihat — hanya ditulis kalau BELUM ada, supaya
+    // replay berulang kali dari Settings tidak terus menimpa timestamp asli.
+    // Ini setData langsung (bukan lewat update()) karena flag ini adalah
+    // metadata tutorial, bukan konten wedding yang perlu di-guard.
+    setData((s) =>
+      s.misc?.tutorialSeenAt
+        ? s
+        : { ...s, misc: { ...s.misc, tutorialSeenAt: new Date().toISOString() } }
+    );
+  };
+
+  const tutorialLang: TutorialLang = data.misc?.tutorialLang === "en" ? "en" : "id";
+  const setTutorialLang = (lang: TutorialLang) => {
+    // Preferensi bahasa tur murni pengaturan UI, bukan konten wedding —
+    // sengaja lewat setData langsung supaya tetap bisa diganti walau
+    // isTutorialMode sedang aktif (user boleh switch bahasa saat touring).
+    setData((s) => ({ ...s, misc: { ...s.misc, tutorialLang: lang } }));
+  };
 
   const value: AppState = {
     loading,
     theme: data.theme, setTheme: (t) => update((s) => ({ ...s, theme: t })),
-    weddingDate: data.weddingDate, setWeddingDate: (d) => update((s) => ({ ...s, weddingDate: d })),
-    coupleProfile: data.coupleProfile, setCoupleProfile: (p) => update((s) => ({ ...s, coupleProfile: p })),
+    weddingDate: activeData.weddingDate, setWeddingDate: (d) => update((s) => ({ ...s, weddingDate: d })),
+    coupleProfile: activeData.coupleProfile, setCoupleProfile: (p) => update((s) => ({ ...s, coupleProfile: p })),
 
-    guests: data.guests,
+    guests: activeData.guests,
     addGuest: (g) => update((s) => ({ ...s, guests: [...s.guests, g] })),
     deleteGuest: (id) => update((s) => ({ ...s, guests: s.guests.filter((x) => x.id !== id) })),
     editGuest: (g) => update((s) => ({ ...s, guests: s.guests.map((x) => (x.id === g.id ? g : x)) })),
 
-    expenses: data.expenses,
+    expenses: activeData.expenses,
     addExpense: (e) => update((s) => ({ ...s, expenses: [...s.expenses, e] })),
     deleteExpense: (id) => update((s) => ({ ...s, expenses: s.expenses.filter((x) => x.id !== id) })),
     editExpense: (e) => update((s) => ({ ...s, expenses: s.expenses.map((x) => (x.id === e.id ? e : x)) })),
 
-    requirements: data.requirements,
+    requirements: activeData.requirements,
     addRequirement: (r) => update((s) => ({ ...s, requirements: [...s.requirements, r] })),
     deleteRequirement: (id) => update((s) => ({ ...s, requirements: s.requirements.filter((x) => x.id !== id) })),
     editRequirement: (r) => update((s) => ({ ...s, requirements: s.requirements.map((x) => (x.id === r.id ? r : x)) })),
 
-    activities: data.activities,
+    activities: activeData.activities,
     addActivity: (a) => update((s) => ({ ...s, activities: [...s.activities, a] })),
     deleteActivity: (id) => update((s) => ({ ...s, activities: s.activities.filter((x) => x.id !== id) })),
     editActivity: (a) => update((s) => ({ ...s, activities: s.activities.map((x) => (x.id === a.id ? a : x)) })),
 
-    attireItems: data.attireItems,
+    attireItems: activeData.attireItems,
     addAttireItem: (i) => update((s) => ({ ...s, attireItems: [...s.attireItems, i] })),
     deleteAttireItem: (id) => update((s) => ({ ...s, attireItems: s.attireItems.filter((x) => x.id !== id) })),
     editAttireItem: (i) => update((s) => ({ ...s, attireItems: s.attireItems.map((x) => (x.id === i.id ? i : x)) })),
 
-    attireVendorNotes: data.attireVendorNotes,
+    attireVendorNotes: activeData.attireVendorNotes,
     addAttireVendorNote: (n) => update((s) => ({ ...s, attireVendorNotes: [...s.attireVendorNotes, n] })),
     deleteAttireVendorNote: (id) => update((s) => ({ ...s, attireVendorNotes: s.attireVendorNotes.filter((x) => x.id !== id) })),
     editAttireVendorNote: (n) => update((s) => ({ ...s, attireVendorNotes: s.attireVendorNotes.map((x) => (x.id === n.id ? n : x)) })),
 
-    fabricSwatches: data.fabricSwatches,
+    fabricSwatches: activeData.fabricSwatches,
     addFabricSwatch: (f) => update((s) => ({ ...s, fabricSwatches: [...s.fabricSwatches, f] })),
     deleteFabricSwatch: (id) => update((s) => ({ ...s, fabricSwatches: s.fabricSwatches.filter((x) => x.id !== id) })),
 
-    logistics: data.logistics,
+    logistics: activeData.logistics,
     addLogisticItem: (i) => update((s) => ({ ...s, logistics: [...s.logistics, i] })),
     deleteLogisticItem: (id) => update((s) => ({ ...s, logistics: s.logistics.filter((x) => x.id !== id) })),
     editLogisticItem: (i) => update((s) => ({ ...s, logistics: s.logistics.map((x) => (x.id === i.id ? i : x)) })),
 
-    tasks: data.tasks,
+    tasks: activeData.tasks,
     addTask: (t) => update((s) => ({ ...s, tasks: [...s.tasks, t] })),
     deleteTask: (id) => update((s) => ({ ...s, tasks: s.tasks.filter((x) => x.id !== id) })),
     editTask: (t) => update((s) => ({ ...s, tasks: s.tasks.map((x) => (x.id === t.id ? t : x)) })),
     setTasks: (t) => update((s) => ({ ...s, tasks: t })),
 
-    categories: data.categories,
+    categories: activeData.categories,
     addCategory: (c) => update((s) => ({ ...s, categories: [...s.categories, c] })),
     setCategories: (c) => update((s) => ({ ...s, categories: c })),
 
-    members: data.members,
+    members: activeData.members,
     addMember: (m) => update((s) => ({ ...s, members: [...s.members, m] })),
     setMembers: (m) => update((s) => ({ ...s, members: m })),
 
-    targetGuests: data.targetGuests, setTargetGuests: (n) => update((s) => ({ ...s, targetGuests: n })),
-    guestGroups: data.guestGroups, setGuestGroups: (g) => update((s) => ({ ...s, guestGroups: g })),
-    totalBudget: data.totalBudget, setTotalBudget: (n) => update((s) => ({ ...s, totalBudget: n })),
+    targetGuests: activeData.targetGuests, setTargetGuests: (n) => update((s) => ({ ...s, targetGuests: n })),
+    guestGroups: activeData.guestGroups, setGuestGroups: (g) => update((s) => ({ ...s, guestGroups: g })),
+    totalBudget: activeData.totalBudget, setTotalBudget: (n) => update((s) => ({ ...s, totalBudget: n })),
 
-    vendors: data.vendors,
+    vendors: activeData.vendors,
     addVendor: (v) => update((s) => ({ ...s, vendors: [...s.vendors, v] })),
     editVendor: (v) => update((s) => ({ ...s, vendors: s.vendors.map((x) => (x.id === v.id ? v : x)) })),
     deleteVendor: (id) => update((s) => ({ ...s, vendors: s.vendors.filter((x) => x.id !== id) })),
 
-    rentals: data.rentals,
+    rentals: activeData.rentals,
     addRental: (r) => update((s) => ({ ...s, rentals: [...s.rentals, r] })),
     editRental: (r) => update((s) => ({ ...s, rentals: s.rentals.map((x) => (x.id === r.id ? r : x)) })),
 
-    handovers: data.handovers,
+    handovers: activeData.handovers,
     addHandover: (h) => update((s) => ({ ...s, handovers: [...s.handovers, h] })),
     editHandover: (h) => update((s) => ({ ...s, handovers: s.handovers.map((x) => (x.id === h.id ? h : x)) })),
 
-    logisticsTimelines: data.logisticsTimelines,
+    logisticsTimelines: activeData.logisticsTimelines,
     addLogisticsTimeline: (l) => update((s) => ({ ...s, logisticsTimelines: [...s.logisticsTimelines, l] })),
     editLogisticsTimeline: (l) => update((s) => ({ ...s, logisticsTimelines: s.logisticsTimelines.map((x) => (x.id === l.id ? l : x)) })),
 
-    transportStays: data.transportStays,
+    transportStays: activeData.transportStays,
     addTransportStay: (t) => update((s) => ({ ...s, transportStays: [...s.transportStays, t] })),
     editTransportStay: (t) => update((s) => ({ ...s, transportStays: s.transportStays.map((x) => (x.id === t.id ? t : x)) })),
 
     currentView, setCurrentView,
     username,
 
-    misc: data.misc,
+    misc: activeData.misc,
     setMiscItem: (key, val) => update((s) => ({ ...s, misc: { ...s.misc, [key]: val } })),
+
+    isTutorialMode,
+    tutorialTrigger,
+    hasSeenTutorial: !!data.misc?.tutorialSeenAt,
+    enterTutorial,
+    exitTutorial,
+    tutorialLang,
+    setTutorialLang,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
