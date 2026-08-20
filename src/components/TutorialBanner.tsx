@@ -24,7 +24,13 @@ export const TutorialBanner: React.FC = () => {
   const ctaLabel = isReplay ? copy.replay.exitCta : copy.firstTime.cta;
 
   return (
-    <div className="sticky top-0 z-[120] px-4 pt-4 md:px-6 md:pt-6 print:hidden animate-in fade-in slide-in-from-top-4 duration-500">
+    // Sengaja TIDAK sticky — banner ini murni block pertama di setiap panel
+    // (ikut scroll normal bersama konten). Kombinasi `position: sticky` +
+    // animasi berbasis transform sempat menyebabkan glitch stacking dengan
+    // header halaman (contoh: judul & subjudul Timeline "Master Timeline"
+    // ter-render seolah menembus banner). Fade-in murni (tanpa transform)
+    // aman dipakai bersama posisi apapun.
+    <div className="px-4 pt-4 md:px-6 md:pt-6 print:hidden animate-in fade-in duration-500">
       <div className="max-w-[1440px] mx-auto">
         <div className="relative overflow-hidden rounded-2xl border border-brand-accent/40 shadow-xl"
           style={{
