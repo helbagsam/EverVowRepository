@@ -19,22 +19,40 @@ const MODULE_ICONS = [LayoutDashboard, Wallet, Users, Store, CalendarDays, Shirt
 // (isTutorialMode masih true); menutup modal dengan cara APAPUN (X, "Tutup
 // Panduan", atau CTA utama) mengembalikan user ke data asli mereka.
 export const OnboardingGuide: React.FC = () => {
-  const { isTutorialMode, exitTutorial, tutorialLang, setTutorialLang, setCurrentView } = useAppContext();
+  const { tutorialStage, tutorialSessionId, goToPreviewStage, exitTutorial, tutorialLang, setTutorialLang, setCurrentView } = useAppContext();
   const [step, setStep] = useState(0);
+  const [stepSessionId, setStepSessionId] = useState(tutorialSessionId);
 
-  if (!isTutorialMode) return null;
+  // Reset ke langkah 1 setiap kali SESI tutorial baru dimulai (replay dari
+  // Settings menaikkan tutorialSessionId), tanpa memakai useEffect —
+  // menghitungnya saat render menghindari cascading render sekaligus
+  // mencegah modal sempat "berkedip" di step lama sebelum ter-reset.
+  // Transisi guide <-> preview TIDAK menaikkan sessionId, jadi posisi step
+  // tetap terjaga saat user klik "Buka Panduan" dari strip preview.
+  let activeStep = step;
+  if (stepSessionId !== tutorialSessionId) {
+    activeStep = 0;
+    setStepSessionId(tutorialSessionId);
+    setStep(0);
+  }
+
+  if (tutorialStage !== 'guide') return null;
 
   const copy = tutorialCopy[tutorialLang];
   const g = copy.guide;
   const total = g.steps.length;
-  const current = g.steps[step];
+  const current = g.steps[activeStep];
 
+  // "Buka menu X" — lompat ke panel terkait DAN masuk tahap preview,
+  // supaya user langsung melihat panel itu terisi contoh data. Bukan
+  // exitTutorial, karena user belum selesai belajar di titik ini.
   const goToStepView = () => {
     setCurrentView(current.view);
-    exitTutorial();
+    goToPreviewStage();
   };
 
   const finish = () => exitTutorial();
+  const seeExample = () => goToPreviewStage();
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-3 md:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 print:hidden">
@@ -98,20 +116,20 @@ export const OnboardingGuide: React.FC = () => {
                   key={i}
                   onClick={() => setStep(i)}
                   className={`text-left p-4 rounded-xl border-2 transition-all ${
-                    i === step
+                    i === activeStep
                       ? 'border-brand-primary bg-brand-primary/5 shadow-sm'
                       : 'border-brand-border hover:border-brand-primary/40'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                      i === step ? 'bg-brand-primary text-white' : 'bg-brand-surface-hover text-brand-text-muted'
+                      i === activeStep ? 'bg-brand-primary text-white' : 'bg-brand-surface-hover text-brand-text-muted'
                     }`}>
                       {i + 1}
                     </span>
-                    {i < step && <CheckCircle2 size={16} className="text-brand-success" />}
+                    {i < activeStep && <CheckCircle2 size={16} className="text-brand-success" />}
                   </div>
-                  <p className={`text-sm font-semibold leading-snug ${i === step ? 'text-brand-primary' : 'text-brand-text'}`}>
+                  <p className={`text-sm font-semibold leading-snug ${i === activeStep ? 'text-brand-primary' : 'text-brand-text'}`}>
                     {s.title}
                   </p>
                 </button>
@@ -124,7 +142,7 @@ export const OnboardingGuide: React.FC = () => {
             <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 bg-brand-surface-hover/50 border-b border-brand-border">
               <div className="flex items-center gap-3">
                 <span className="px-2 py-1 rounded-md bg-brand-primary/10 text-brand-primary text-[11px] font-bold uppercase tracking-wide shrink-0">
-                  {g.stepLabel.replace('{n}', String(step + 1)).replace('{total}', String(total))}
+                  {g.stepLabel.replace('{n}', String(activeStep + 1)).replace('{total}', String(total))}
                 </span>
                 <h3 className="font-headline text-lg text-brand-text">{current.title}</h3>
               </div>
@@ -157,19 +175,19 @@ export const OnboardingGuide: React.FC = () => {
             <div className="flex items-center justify-between px-5 py-3 border-t border-brand-border bg-brand-surface-hover/30">
               <button
                 onClick={() => setStep((s) => Math.max(0, s - 1))}
-                disabled={step === 0}
+                disabled={activeStep === 0}
                 className="flex items-center gap-1 text-xs font-semibold text-brand-text-muted hover:text-brand-primary disabled:opacity-30 disabled:pointer-events-none transition-colors"
               >
                 <ChevronLeft size={14} /> {tutorialLang === 'id' ? 'Sebelumnya' : 'Previous'}
               </button>
               <div className="flex items-center gap-1.5">
                 {g.steps.map((_, i) => (
-                  <span key={i} className={`w-1.5 h-1.5 rounded-full transition-colors ${i === step ? 'bg-brand-primary' : 'bg-brand-border'}`} />
+                  <span key={i} className={`w-1.5 h-1.5 rounded-full transition-colors ${i === activeStep ? 'bg-brand-primary' : 'bg-brand-border'}`} />
                 ))}
               </div>
               <button
                 onClick={() => setStep((s) => Math.min(total - 1, s + 1))}
-                disabled={step === total - 1}
+                disabled={activeStep === total - 1}
                 className="flex items-center gap-1 text-xs font-semibold text-brand-text-muted hover:text-brand-primary disabled:opacity-30 disabled:pointer-events-none transition-colors"
               >
                 {tutorialLang === 'id' ? 'Berikutnya' : 'Next'} <ChevronRight size={14} />
@@ -212,7 +230,7 @@ export const OnboardingGuide: React.FC = () => {
               {g.secondaryCta}
             </button>
             <button
-              onClick={finish}
+              onClick={seeExample}
               className="flex items-center gap-2 px-5 py-2.5 bg-brand-primary text-white rounded-lg text-sm font-semibold shadow-md hover:bg-brand-primary-hover active:scale-95 transition-all"
             >
               <Sparkles size={15} />

@@ -41,6 +41,24 @@ export interface TutorialCopySet {
   };
   // Label kecil "read-only preview" yang menempel di elemen saat tutorial aktif.
   previewTag: string;
+  // Tahap 1: splash sambutan (hanya first-time, di-skip saat replay).
+  welcome: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    points: { title: string; desc: string }[];
+    primaryCta: string;
+    skipCta: string;
+    langLabel: string;
+  };
+  // Tahap 3: strip tipis saat user menjelajah dummy data.
+  preview: {
+    badge: string;
+    title: string;
+    hint: string;
+    reopenGuide: string;
+    exitCta: string;
+  };
   // Konten modal "Getting Started Guide" (lihat OnboardingGuide.tsx).
   guide: {
     eyebrow: string;
@@ -93,6 +111,27 @@ export const tutorialCopy: Record<TutorialLang, TutorialCopySet> = {
       notSeenBadge: "Belum pernah dilihat",
     },
     previewTag: "Pratinjau — bukan data Anda",
+    welcome: {
+      eyebrow: "Selamat Datang",
+      title: "Mari Mulai Merencanakan Hari Bahagia Anda",
+      subtitle:
+        "Sebelum mulai mengisi data, kami akan mengajak Anda berkeliling sebentar — supaya Anda tahu persis apa yang bisa dilakukan di setiap panel.",
+      points: [
+        { title: "Pahami Alurnya", desc: "Panduan singkat 3 langkah tentang cara kerja dashboard ini." },
+        { title: "Lihat Contohnya", desc: "Jelajahi dashboard berisi contoh pernikahan lengkap, bebas diklik-klik." },
+        { title: "Mulai Isi Data Anda", desc: "Setelah paham, dashboard dikosongkan dan siap Anda isi sendiri." },
+      ],
+      primaryCta: "Mulai Panduan",
+      skipCta: "Lewati, saya langsung isi data",
+      langLabel: "Bahasa",
+    },
+    preview: {
+      badge: "Mode Contoh",
+      title: "Ini contoh pernikahan — silakan jelajahi setiap panel di menu kiri",
+      hint: "Semua yang Anda lihat hanya ilustrasi. Perubahan apa pun di mode ini tidak akan tersimpan.",
+      reopenGuide: "Buka Panduan",
+      exitCta: "Selesai, Mulai Isi Data Saya",
+    },
     guide: {
       eyebrow: "Getting Started",
       title: "Panduan Memulai EverVow Lux",
@@ -105,7 +144,7 @@ export const tutorialCopy: Record<TutorialLang, TutorialCopySet> = {
       steps: [
         {
           title: "Atur Profil & Target Utama",
-          openMenu: "Buka Client Profile",
+          openMenu: "Lihat Contoh Profil",
           view: "settings",
           bullets: [
             "Isi nama pasangan, tanggal pernikahan, dan venue utama",
@@ -117,7 +156,7 @@ export const tutorialCopy: Record<TutorialLang, TutorialCopySet> = {
         },
         {
           title: "Lengkapi Modul Perencanaan",
-          openMenu: "Buka Budget",
+          openMenu: "Lihat Contoh Budget",
           view: "budget",
           bullets: [
             "Tambahkan vendor dan catat setiap pembayaran di Budget",
@@ -129,7 +168,7 @@ export const tutorialCopy: Record<TutorialLang, TutorialCopySet> = {
         },
         {
           title: "Pantau & Selesaikan Administrasi",
-          openMenu: "Buka Dashboard",
+          openMenu: "Lihat Contoh Dashboard",
           view: "dashboard",
           bullets: [
             "Cek ringkasan progress keseluruhan di Dashboard",
@@ -154,8 +193,8 @@ export const tutorialCopy: Record<TutorialLang, TutorialCopySet> = {
         { name: "Administration", desc: "Dokumen pernikahan resmi dan status pengurusannya." },
       ],
       footerNote: "Data Anda tersimpan otomatis dan bersifat privat.",
-      primaryCta: "Mulai Isi Data Pernikahan Saya",
-      secondaryCta: "Tutup Panduan",
+      primaryCta: "Lihat Contoh Dashboard",
+      secondaryCta: "Lewati, langsung isi data saya",
     },
   },
   en: {
@@ -191,6 +230,27 @@ export const tutorialCopy: Record<TutorialLang, TutorialCopySet> = {
       notSeenBadge: "Not viewed yet",
     },
     previewTag: "Preview — not your data",
+    welcome: {
+      eyebrow: "Welcome",
+      title: "Let's Start Planning Your Big Day",
+      subtitle:
+        "Before you start entering data, we'll take you on a short tour — so you know exactly what each panel can do for you.",
+      points: [
+        { title: "Learn the Flow", desc: "A quick 3-step guide to how this dashboard works." },
+        { title: "Explore an Example", desc: "Browse a fully filled-in sample wedding, click around freely." },
+        { title: "Enter Your Own Data", desc: "Once you're comfortable, the dashboard clears and it's all yours." },
+      ],
+      primaryCta: "Start the Guide",
+      skipCta: "Skip, I'll enter my data now",
+      langLabel: "Language",
+    },
+    preview: {
+      badge: "Sample Mode",
+      title: "This is a sample wedding — feel free to explore any panel on the left",
+      hint: "Everything you see is illustrative only. Any changes made in this mode won't be saved.",
+      reopenGuide: "Open Guide",
+      exitCta: "Done, Let Me Enter My Data",
+    },
     guide: {
       eyebrow: "Getting Started",
       title: "Your Guide to EverVow Lux",
@@ -203,7 +263,7 @@ export const tutorialCopy: Record<TutorialLang, TutorialCopySet> = {
       steps: [
         {
           title: "Set Up Your Profile & Key Targets",
-          openMenu: "Open Client Profile",
+          openMenu: "See Profile Example",
           view: "settings",
           bullets: [
             "Enter the couple's names, wedding date, and main venue",
@@ -215,7 +275,7 @@ export const tutorialCopy: Record<TutorialLang, TutorialCopySet> = {
         },
         {
           title: "Fill In Your Planning Modules",
-          openMenu: "Open Budget",
+          openMenu: "See Budget Example",
           view: "budget",
           bullets: [
             "Add vendors and log every payment in Budget",
@@ -227,7 +287,7 @@ export const tutorialCopy: Record<TutorialLang, TutorialCopySet> = {
         },
         {
           title: "Track Progress & Handle Admin",
-          openMenu: "Open Dashboard",
+          openMenu: "See Dashboard Example",
           view: "dashboard",
           bullets: [
             "Check your overall progress summary on the Dashboard",
@@ -252,8 +312,8 @@ export const tutorialCopy: Record<TutorialLang, TutorialCopySet> = {
         { name: "Administration", desc: "Official wedding documents and their processing status." },
       ],
       footerNote: "Your data is saved automatically and stays private.",
-      primaryCta: "Start My Real Wedding Plan",
-      secondaryCta: "Close Guide",
+      primaryCta: "Show Me the Example",
+      secondaryCta: "Skip, let me enter my data",
     },
   },
 };
