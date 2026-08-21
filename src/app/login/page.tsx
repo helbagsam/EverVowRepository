@@ -66,7 +66,7 @@ export default function LoginPage() {
               type="text"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="mis. EVLX-XXXX-XXXX"
+              placeholder="mis. EVLX-MELATI-CINTA-2847"
               className="w-full px-4 py-3 bg-brand-bg border border-brand-border rounded-xl text-sm text-brand-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all uppercase tracking-wider"
               autoComplete="off"
             />

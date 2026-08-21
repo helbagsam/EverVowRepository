@@ -6,7 +6,7 @@ import { pgTable, uuid, text, timestamp, jsonb, boolean, integer } from "drizzle
  */
 export const licenses = pgTable("licenses", {
   id: uuid("id").defaultRandom().primaryKey(),
-  code: text("code").notNull().unique(), // kode lisensi unik, mis. EVLX-XXXX-XXXX
+  code: text("code").notNull().unique(), // kode lisensi unik, mis. EVLX-MELATI-CINTA-2847
   buyerName: text("buyer_name").notNull(),
   orderRef: text("order_ref"),
   platform: text("platform"), // Tokopedia / Shopee / TikTok Shop / dst

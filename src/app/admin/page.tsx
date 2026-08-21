@@ -288,7 +288,7 @@ export default function AdminPage() {
             <h2 className="font-headline text-xl text-brand-primary mb-2">Verifikasi Kode</h2>
             <p className="text-sm text-brand-text-muted mb-4">Cek apakah sebuah kode lisensi valid dan milik siapa.</p>
             <form onSubmit={handleVerify} className="flex gap-2 mb-4">
-              <input value={verifyCode} onChange={e => setVerifyCode(e.target.value)} placeholder="EVLX-XXXX-XXXX" className="flex-1 px-4 py-2.5 bg-brand-bg border border-brand-border rounded-xl text-sm font-mono focus:outline-none focus:border-brand-primary uppercase" />
+              <input value={verifyCode} onChange={e => setVerifyCode(e.target.value)} placeholder="EVLX-MELATI-CINTA-2847" className="flex-1 px-4 py-2.5 bg-brand-bg border border-brand-border rounded-xl text-sm font-mono focus:outline-none focus:border-brand-primary uppercase" />
               <button type="submit" disabled={verifying} className="px-5 py-2.5 bg-brand-primary text-white rounded-xl text-sm font-semibold hover:bg-brand-primary-hover transition-colors disabled:opacity-60">
                 {verifying ? '...' : 'Cek'}
               </button>

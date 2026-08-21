@@ -28,6 +28,23 @@ export async function POST(req: NextRequest) {
   const normalizedUsername = String(username).trim().toLowerCase();
   const normalizedCode = String(code).trim().toUpperCase();
 
+  // Rate limit KEDUA, di-key pada username (bukan IP). Rate limit per-IP di
+  // atas bisa dilewati penyerang yang merotasi IP; kunci per-username ini
+  // membuat brute-force terhadap satu akun tertentu tetap terhambat berapa
+  // pun jumlah IP yang dipakai. Penting karena kode lisensi kini memakai
+  // format berbasis kata yang lebih mudah diingat (entropi lebih rendah
+  // dari format acak lama).
+  const userRateLimit = await checkRateLimit(`login-user:${normalizedUsername}`, {
+    maxAttempts: 10,
+    windowMinutes: 15,
+  });
+  if (userRateLimit.blocked) {
+    return NextResponse.json(
+      { error: "Terlalu banyak percobaan login untuk akun ini. Coba lagi dalam beberapa menit." },
+      { status: 429 }
+    );
+  }
+
   const license = await db.query.licenses.findFirst({
     where: eq(licenses.code, normalizedCode),
   });
