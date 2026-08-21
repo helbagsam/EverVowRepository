@@ -31,7 +31,12 @@ import {
  */
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
-  const rateLimit = await checkRateLimit(`claim:${ip}`, { maxAttempts: 10, windowMinutes: 15 });
+  // Ambang per-IP longgar — lihat catatan yang sama di /api/auth/login.
+  // Ini jalur MASUK UTAMA pembeli (dari link Lynk.id), jadi risiko CGNAT
+  // operator seluler membuat pembeli tak bersalah saling mengunci di sini
+  // justru lebih berbahaya daripada di /login. Perlindungan brute-force
+  // yang berarti ada di rate limit per-No.-Order (claim-ref) di bawah.
+  const rateLimit = await checkRateLimit(`claim:${ip}`, { maxAttempts: 30, windowMinutes: 15 });
   if (rateLimit.blocked) {
     return NextResponse.json(
       { error: "Terlalu banyak percobaan. Coba lagi dalam beberapa menit." },

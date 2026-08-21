@@ -25,7 +25,14 @@ import {
  */
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
-  const rateLimit = await checkRateLimit(`login:${ip}`, { maxAttempts: 10, windowMinutes: 15 });
+  // Ambang per-IP sengaja jauh lebih longgar daripada per-akun di bawah.
+  // Operator seluler Indonesia umumnya pakai CGNAT — ratusan pembeli tak
+  // saling kenal bisa tampil sebagai SATU alamat IP di mata server ini.
+  // Kalau ambang ini seketat per-akun, satu pembeli yang salah ketik
+  // berkali-kali bisa ikut mengunci pembeli lain di operator yang sama.
+  // Perlindungan utama terhadap brute-force tetap di rate limit per-akun
+  // (login-user di bawah), yang tidak punya masalah berbagi IP ini.
+  const rateLimit = await checkRateLimit(`login:${ip}`, { maxAttempts: 30, windowMinutes: 15 });
   if (rateLimit.blocked) {
     return NextResponse.json(
       { error: "Terlalu banyak percobaan login. Coba lagi dalam beberapa menit." },
