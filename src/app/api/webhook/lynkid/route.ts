@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createHash } from "crypto";
 import { db } from "@/db";
 import { licenses } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -10,66 +11,60 @@ import { sendLicenseEmail } from "@/lib/notify";
  *
  * Setup di Lynk.id: Settings → Integrations → Webhooks →
  *   - URL: https://<domain-kamu>/api/webhook/lynkid
- *   - Event: order.paid / order.completed (nama persis bisa beda,
- *     pilih yang berarti "pembayaran sudah lunas")
- *   - Method: POST
- * Lynk.id akan memberi sebuah "Merchant Key" saat webhook disimpan —
- * isi ke env var LYNKID_WEBHOOK_SECRET (di Vercel & .env.local).
+ *   - Merchant Key muncul setelah URL disimpan — isi persis ke
+ *     LYNKID_WEBHOOK_SECRET (di Vercel & .env.local).
  *
- * =========================================================================
- * PENTING — BACA SEBELUM GO-LIVE:
- * Nama field payload & cara verifikasi di bawah ini disusun dari pola umum
- * webhook Lynk.id (integrasi resmi Lynk.id×StarSender memakai variable
- * template {name}, {product_title}, {grand_total}, {ref_id}) — BUKAN dari
- * dokumentasi resmi yang sudah terverifikasi terhadap payload asli.
+ * Payload & skema autentikasi diverifikasi langsung dari dokumentasi resmi
+ * Lynk.id (Postman collection, tautan "See Webhook Documentations" di
+ * halaman setting webhook Lynk.id) — bukan tebakan:
  *
- * Sebelum dipakai sungguhan:
- * 1. Pasang webhook ini di Lynk.id, lalu pakai fitur "Test Webhook" bawaan
- *    Lynk.id (ada di halaman yang sama tempat kamu pasang URL webhook).
- * 2. Lihat log request yang masuk (Vercel → project → Logs) untuk lihat
- *    payload ASLI yang dikirim Lynk.id.
- * 3. Sesuaikan `extractField()` di bawah kalau nama field/cara verifikasi
- *    beda dari yang diasumsikan di sini.
- * =========================================================================
+ * - Event yang relevan: "payment.received".
+ * - Header X-Lynk-Signature berisi SHA256 hex dari
+ *   `grandTotal + refId + message_id + merchantKey` (string concat, bukan
+ *   dipisah delimiter apapun).
+ * - refId, message_id, dan totals.grandTotal ada di dalam data.message_data.
+ * - Info pembeli ada di data.message_data.customer (email, name, phone).
+ *
+ * Lynk.id juga mengirim event lain lewat tombol "Test URL" di dashboard
+ * mereka ({"event":"test_event",...}) TANPA X-Lynk-Signature sama sekali —
+ * itu murni ping konektivitas, bukan payload yang perlu diautentikasi.
+ * Endpoint ini membalas 200 untuk event non-"payment.received" tanpa
+ * memproses apa pun, supaya tombol Test URL Lynk.id berhasil; validasi
+ * signature SHA256 di atas tetap wajib & ketat untuk "payment.received".
  */
 
 type JsonPayload = Record<string, unknown>;
 
-function extractField(payload: JsonPayload, paths: string[]): string {
-  for (const path of paths) {
-    const parts = path.split(".");
-    let value: unknown = payload;
-    for (const part of parts) {
-      if (value && typeof value === "object") {
-        value = (value as JsonPayload)[part];
-      } else {
-        value = undefined;
-      }
-    }
-    if (value !== undefined && value !== null && String(value).trim() !== "") {
-      return String(value).trim();
+function getPath(payload: JsonPayload, path: string[]): unknown {
+  let value: unknown = payload;
+  for (const part of path) {
+    if (value && typeof value === "object") {
+      value = (value as JsonPayload)[part];
+    } else {
+      return undefined;
     }
   }
-  return "";
+  return value;
 }
 
-function verifySecret(req: NextRequest, payload: JsonPayload): boolean {
-  const expected = process.env.LYNKID_WEBHOOK_SECRET;
-  if (!expected) {
+function asString(value: unknown): string {
+  if (value === undefined || value === null) return "";
+  return String(value).trim();
+}
+
+function verifySignature(req: NextRequest, refId: string, grandTotal: string, messageId: string): boolean {
+  const secret = process.env.LYNKID_WEBHOOK_SECRET;
+  if (!secret) {
     // Belum dikonfigurasi sama sekali — tolak demi keamanan (jangan biarkan
     // endpoint ini terbuka tanpa proteksi apapun di production).
     return false;
   }
 
-  const candidates = [
-    req.headers.get("x-lynk-signature"),
-    req.headers.get("x-merchant-key"),
-    req.headers.get("x-webhook-secret"),
-    req.headers.get("authorization")?.replace(/^Bearer\s+/i, ""),
-    extractField(payload, ["merchant_key", "secret", "signature", "webhook_secret"]),
-  ];
+  const signature = req.headers.get("x-lynk-signature");
+  if (!signature) return false;
 
-  return candidates.some((c) => c && c === expected);
+  const expected = createHash("sha256").update(grandTotal + refId + messageId + secret).digest("hex");
+  return signature === expected;
 }
 
 export async function POST(req: NextRequest) {
@@ -80,43 +75,49 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Body bukan JSON valid." }, { status: 400 });
   }
 
-  if (!verifySecret(req, payload)) {
-    console.error("[webhook/lynkid][DEBUG] auth failed. headers:", JSON.stringify(Object.fromEntries(req.headers.entries())), "payload:", JSON.stringify(payload));
-    return NextResponse.json({ error: "Unauthorized — merchant key tidak cocok." }, { status: 401 });
+  const event = asString(payload.event);
+
+  // Ping konektivitas dari tombol "Test URL" Lynk.id (event lain selain
+  // payment.received) — tidak bawa signature, tidak perlu diproses.
+  if (event !== "payment.received") {
+    return NextResponse.json({ ok: true, ignored: true, event });
   }
 
-  const buyerName = extractField(payload, ["name", "customer_name", "customer.name", "buyer_name", "full_name"]) || "Pembeli Lynk.id";
-  const buyerEmail = extractField(payload, ["email", "customer_email", "customer.email", "buyer_email"]);
-  const buyerPhone = extractField(payload, ["phone", "whatsapp", "customer_phone", "customer.phone", "buyer_phone"]);
-  const orderRef = extractField(payload, ["ref_id", "order_id", "id", "transaction_id", "invoice_id"]);
-  const productTitle = extractField(payload, ["product_title", "product_name", "item_title"]);
-  const grandTotalRaw = extractField(payload, ["grand_total", "total", "amount"]);
-  const grandTotal = grandTotalRaw ? Number(grandTotalRaw.replace(/[^0-9.-]/g, "")) : null;
+  const messageData = getPath(payload, ["data", "message_data"]) as JsonPayload | undefined;
+  const refId = asString(messageData?.refId);
+  const messageId = asString(getPath(payload, ["data", "message_id"]));
+  const grandTotalRaw = getPath(messageData ?? {}, ["totals", "grandTotal"]);
+  const grandTotal = asString(grandTotalRaw);
+
+  if (!verifySignature(req, refId, grandTotal, messageId)) {
+    return NextResponse.json({ error: "Unauthorized — signature tidak cocok." }, { status: 401 });
+  }
+
+  const buyerName = asString(getPath(messageData ?? {}, ["customer", "name"])) || "Pembeli Lynk.id";
+  const buyerEmail = asString(getPath(messageData ?? {}, ["customer", "email"]));
+  const buyerPhone = asString(getPath(messageData ?? {}, ["customer", "phone"]));
+  const grandTotalNumber = grandTotalRaw !== undefined ? Number(grandTotalRaw) : null;
 
   // Idempotensi: webhook bisa terkirim lebih dari sekali untuk order yang
-  // sama (retry Lynk.id kalau respons kita bukan 2xx, dsb). Kalau orderRef
+  // sama (retry Lynk.id kalau respons kita bukan 2xx, dsb). Kalau refId
   // ini sudah punya lisensi, JANGAN buat lisensi baru / kirim email lagi.
-  if (orderRef) {
-    const existing = await db.query.licenses.findFirst({ where: eq(licenses.orderRef, orderRef) });
+  if (refId) {
+    const existing = await db.query.licenses.findFirst({ where: eq(licenses.orderRef, refId) });
     if (existing) {
       return NextResponse.json({ ok: true, alreadyProcessed: true, code: existing.code });
     }
   }
 
-  // buyerEmail jadi username login pembeli (sama seperti generator manual
-  // di /admin) — kalau payload Lynk.id tidak punya email, lisensi tetap
-  // dibuat (order tidak boleh hilang) tapi pembeli harus dilayani manual
-  // dari /admin karena tidak ada cara aman menetapkan username otomatis.
   let created;
   try {
     created = await createLicenseWithUniqueCode({
       buyerName,
       buyerEmail: buyerEmail || null,
       buyerPhone: buyerPhone || null,
-      orderRef: orderRef || null,
+      orderRef: refId || null,
       platform: "Lynk.id",
-      price: grandTotal,
-      notes: productTitle ? `Produk: ${productTitle}` : null,
+      price: grandTotalNumber !== null && Number.isFinite(grandTotalNumber) ? grandTotalNumber : null,
+      notes: null,
     });
   } catch (err) {
     if (err instanceof LicenseCodeCollisionError) {
@@ -136,7 +137,7 @@ export async function POST(req: NextRequest) {
     // manual dari /admin, atau lewat /claim kalau emailnya sempat kecatat
     // tapi pengiriman yang gagal (mis. quota Resend habis).
     console.error("[webhook/lynkid] Lisensi dibuat tapi email gagal dikirim:", {
-      orderRef,
+      refId,
       buyerEmail,
       error: emailResult.error,
     });
