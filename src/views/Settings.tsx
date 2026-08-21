@@ -5,6 +5,7 @@ import { useAppContext } from '../store/AppContext';
 import { Moon, Sun, Monitor, Save, Heart, Settings as SettingsIcon, Phone, Mail, MapPin, Users, Plus, Trash2, Edit2, Check, X, PlayCircle, Globe, BadgeCheck } from 'lucide-react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { tutorialCopy, type TutorialLang } from '../lib/tutorialCopy';
+import { generateTimelineFromWeddingDate, GENERATED_ID_PREFIX } from '../lib/timelineGenerator';
 
 const MEMBER_COLORS = [
   { bg: '#8b4a52', text: '#ffffff' },
@@ -15,10 +16,12 @@ const MEMBER_COLORS = [
 ];
 
 export const Settings: React.FC = () => {
-  const { theme, setTheme, weddingDate, setWeddingDate, targetGuests, setTargetGuests, totalBudget, setTotalBudget, coupleProfile, setCoupleProfile, members, addMember, setMembers, tasks, setTasks, guestGroups, setGuestGroups, guests, editGuest, enterTutorial, hasSeenTutorial, tutorialLang, setTutorialLang } = useAppContext();
+  const { theme, setTheme, weddingDate, setWeddingDate, targetGuests, setTargetGuests, totalBudget, setTotalBudget, coupleProfile, setCoupleProfile, members, addMember, setMembers, tasks, setTasks, categories, setCategories, guestGroups, setGuestGroups, guests, editGuest, enterTutorial, hasSeenTutorial, tutorialLang, setTutorialLang } = useAppContext();
   const [activeTab, setActiveTab] = useState<'client' | 'team' | 'categories' | 'getting-started' | 'preferences'>('client');
   const [showConfirm, setShowConfirm] = useState(false);
   const [showReplayConfirm, setShowReplayConfirm] = useState(false);
+  const [showTimelineConfirm, setShowTimelineConfirm] = useState(false);
+  const [timelineResultMsg, setTimelineResultMsg] = useState('');
   const [formProfile, setFormProfile] = useState(coupleProfile);
   const [newMemberName, setNewMemberName] = useState('');
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
@@ -30,6 +33,26 @@ export const Settings: React.FC = () => {
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
 
   const getInitials = (name: string) => name.trim().split(/\s+/).map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+  // "Buat ulang timeline" — dipakai kalau tanggal nikah belum ada saat akun
+  // pertama aktif (lisensi dibuat manual, tidak lewat checkout Lynk.id) atau
+  // kalau tanggalnya berubah setelahnya. Hanya mengganti kategori/tugas yang
+  // PERNAH dibuat generator ini (id berprefix GENERATED_ID_PREFIX) — apa pun
+  // yang sudah ditambah/diedit sendiri oleh pengantin tidak disentuh.
+  const confirmGenerateTimeline = () => {
+    const generated = generateTimelineFromWeddingDate(weddingDate);
+    if (!generated) {
+      setTimelineResultMsg('Tanggal pernikahan sudah lewat — tidak ada waktu tersisa untuk dijadwalkan.');
+      setShowTimelineConfirm(false);
+      return;
+    }
+    const keptCategories = categories.filter(c => !c.id.startsWith(GENERATED_ID_PREFIX));
+    const keptTasks = tasks.filter(t => !t.id.startsWith(GENERATED_ID_PREFIX));
+    setCategories([...generated.categories, ...keptCategories]);
+    setTasks([...generated.tasks, ...keptTasks]);
+    setTimelineResultMsg(`Timeline dibuat: ${generated.tasks.length} tugas` + (generated.flaggedCount > 0 ? `, ${generated.flaggedCount} di antaranya ditandai mendesak karena waktu mepet.` : '.'));
+    setShowTimelineConfirm(false);
+  };
 
   const handleAddMember = () => {
     const name = newMemberName.trim();
@@ -247,6 +270,20 @@ export const Settings: React.FC = () => {
                       <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Target Budget (IDR)</label>
                       <input type="number" value={totalBudget} onChange={(e) => setTotalBudget(parseInt(e.target.value) || 0)} className="w-full bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
                     </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-brand-border space-y-2">
+                    <p className="text-xs text-brand-text-muted">Buat checklist persiapan otomatis di modul Timeline, dijadwalkan sesuai sisa waktu ke tanggal pernikahan di atas.</p>
+                    <button
+                      type="button"
+                      disabled={!weddingDate}
+                      onClick={() => setShowTimelineConfirm(true)}
+                      className="px-4 py-2.5 bg-brand-primary/10 text-brand-primary rounded-xl text-sm font-semibold hover:bg-brand-primary/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      ✨ Buat/Perbarui Timeline Otomatis
+                    </button>
+                    {!weddingDate && <p className="text-xs text-brand-danger">Isi tanggal pernikahan dulu di atas.</p>}
+                    {timelineResultMsg && <p className="text-xs text-brand-success">{timelineResultMsg}</p>}
                   </div>
                 </div>
               </section>
@@ -502,6 +539,18 @@ export const Settings: React.FC = () => {
           confirmText="Yes, Save"
           onConfirm={confirmSave}
           onCancel={() => setShowConfirm(false)}
+        />
+      )}
+
+      {showTimelineConfirm && (
+        <ConfirmDialog
+          isOpen={showTimelineConfirm}
+          title="Buat/Perbarui Timeline Otomatis"
+          message="Kategori & tugas hasil generate sebelumnya akan diganti dengan jadwal baru. Kategori/tugas yang kamu tambah atau edit sendiri tidak akan tersentuh. Lanjutkan?"
+          type="info"
+          confirmText="Ya, Buat Timeline"
+          onConfirm={confirmGenerateTimeline}
+          onCancel={() => setShowTimelineConfirm(false)}
         />
       )}
 

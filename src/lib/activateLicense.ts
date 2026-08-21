@@ -3,6 +3,7 @@ import { accounts, licenses, weddingState } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { emptyWeddingState } from "@/lib/defaultState";
 import type { WeddingState } from "@/lib/weddingTypes";
+import { generateTimelineFromWeddingDate } from "@/lib/timelineGenerator";
 
 /**
  * Satu-satunya tempat logika "tukarkan lisensi jadi akun aktif" hidup.
@@ -98,6 +99,18 @@ export function seedStateFromAnswers(answers: CheckoutAnswers | null | undefined
     ...(answers.contactEmail ? { contactEmail: answers.contactEmail } : {}),
     ...(answers.contactPhone ? { contactPhone: answers.contactPhone } : {}),
   };
+
+  // Fitur pembeda utama: begitu tanggal nikah diketahui, Timeline langsung
+  // terisi checklist persiapan yang jadwalnya disesuaikan dengan sisa waktu
+  // yang ada — bukan modul kosong yang membingungkan pengantin baru soal
+  // "harus mulai dari mana". Lihat lib/timelineGenerator.ts untuk logikanya.
+  if (state.weddingDate) {
+    const generated = generateTimelineFromWeddingDate(state.weddingDate);
+    if (generated) {
+      state.categories = generated.categories;
+      state.tasks = generated.tasks;
+    }
+  }
 
   return state;
 }
