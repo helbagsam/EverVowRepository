@@ -9,56 +9,53 @@ async function requireAdmin() {
   return session.isAdmin === true;
 }
 
-// Daftar kata bertema pernikahan/romantis. Dipilih yang: mudah dieja lewat
-// telepon/WhatsApp, tidak ambigu bunyinya, dan tidak ada yang mirip satu
-// sama lain (mis. tidak ada "MAWAR" sekaligus "MAWARNYA").
-const CODE_WORDS = [
-  "MELATI", "MAWAR", "ANGGREK", "TULIP", "SERUNI", "KENANGA", "CEMPAKA", "TERATAI",
-  "PERMATA", "MUTIARA", "BERLIAN", "ZAMRUD", "SAFIR", "INTAN", "EMAS", "PERAK",
-  "CINTA", "KASIH", "SETIA", "BAHAGIA", "HARMONI", "JANJI", "RESTU", "SYUKUR",
-  "PELANGI", "MENTARI", "REMBULAN", "BINTANG", "FAJAR", "SENJA", "CAKRAWALA", "SAMUDRA",
-  "PUSPA", "SEKAR", "CANDRA", "KIRANA", "LARAS", "GITA", "IRAMA", "SANJUNG",
-  "ANGGUN", "JELITA", "PESONA", "AURA", "KEMILAU", "CAHAYA", "SINAR", "KILAU",
-  "SUTERA", "BELUDRU", "SATIN", "RENDA", "KEBAYA", "SONGKET", "BATIK", "TENUN",
-  "MADU", "GULA", "SANTAN", "VANILA", "KAYU", "CENGKEH", "PANDAN", "KELAPA",
-  "ISTANA", "PURI", "TAMAN", "PENDOPO", "BALAI", "PELAMINAN", "SINGGASANA", "MAHLIGAI",
-  "MERPATI", "CENDRAWASIH", "KUTILANG", "MURAI", "RAJAWALI", "CAMAR", "KENARI", "PIPIT",
-  "SAMUDERA", "TELAGA", "EMBUN", "GERIMIS", "BAYU", "AWAN", "KABUT", "SALJU",
-  "MUSIM", "PUSAKA", "WARISAN", "SEJATI", "ABADI", "SELAMANYA", "SEMESTA", "CAKRA",
-  "RAGAM", "INDAH", "MOLEK", "AYU", "RUPAWAN", "GEMILANG", "CEMERLANG", "MEGAH",
-  "DAMAI", "TENTRAM", "SENTOSA", "MAKMUR", "SEJAHTERA", "BERKAH", "RAHMAT", "ANUGERAH",
-  "NUSA", "BANGSA", "PERTIWI", "NIRWANA", "KAYANGAN", "SURGA", "ARUNA", "SASMITA",
-  "WIJAYA", "KUSUMA", "PRATAMA", "UTAMA", "PERKASA", "JAYA", "MULIA", "AGUNG",
-];
+// Fallback kalau nama pembeli tidak menghasilkan huruf sama sekali setelah
+// disaring (mis. nama cuma berisi emoji/simbol) — sangat jarang, tapi kode
+// tetap harus valid dan tidak kosong.
+const FALLBACK_WORDS = ["MELATI", "MAWAR", "PERMATA", "CINTA", "BERKAH", "PELANGI", "ISTANA", "KUSUMA"];
 
 /**
- * Kode lisensi format: EVLX-MELATI-CINTA-2847
- *
- * Dibanding format acak lama (EVLX-GQ27-6VEL), format ini jauh lebih mudah
- * diingat, dieja lewat telepon, dan terasa personal/sesuai tema produk.
- *
- * CATATAN KEAMANAN (trade-off yang disengaja):
- * Format lama punya ~1,1 triliun kemungkinan (32^8). Format ini punya
- * ~164 juta (128 x 128 x 10.000) — memang lebih kecil. Kompensasinya:
- * (1) penyerang tetap harus menebak username yang cocok juga,
- * (2) rate limit per-IP (10 percobaan / 15 menit) DAN per-username
- *     (lihat login route) membuat brute-force tidak praktis.
- * Kalau suatu saat butuh entropi lebih tinggi tanpa mengorbankan
- * keterbacaan, cukup naikkan digit dari 4 ke 6 di bawah.
- *
- * Prefix EVLX dipertahankan supaya kode tetap terlihat sebagai milik
- * EverVow Lux, dan kode-kode LAMA yang sudah beredar tetap valid karena
- * login hanya mencocokkan string persis, tanpa validasi format.
+ * Ambil bagian yang bisa dipakai sebagai kode dari nama pembeli:
+ * huruf A-Z saja (tanda baca, spasi, angka, emoji dibuang), diakritik
+ * dilepas (é -> e), diseragamkan huruf besar, dibatasi 14 karakter supaya
+ * kode tidak jadi panjang sekali untuk nama seperti "PT Wedding Organizer
+ * Sejahtera Abadi".
  */
-function generateCode(): string {
-  const word = () => CODE_WORDS[Math.floor(Math.random() * CODE_WORDS.length)];
-  const first = word();
-  let second = word();
-  // Hindari kata kembar (mis. EVLX-CINTA-CINTA-1234) yang terlihat seperti bug.
-  while (second === first) second = word();
-  const digits = String(Math.floor(Math.random() * 10000)).padStart(4, "0");
-  return `EVLX-${first}-${second}-${digits}`;
+function slugifyName(name: string): string {
+  const cleaned = name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // lepas diakritik
+    .toUpperCase()
+    .replace(/[^A-Z]/g, ""); // sisakan huruf saja
+  return cleaned.slice(0, 14);
 }
+
+/**
+ * Kode lisensi format: EVLX-BUDI-2847
+ *
+ * Dibangun dari nama pembeli asli (bukan kata acak) supaya kode terasa
+ * personal dan lebih mudah dikonfirmasi pembeli ("oh iya ini nama saya").
+ * Kalau nama berisi beberapa kata (mis. "Budi & Siti"), dipakai kata
+ * PERTAMA saja supaya kode tetap ringkas.
+ *
+ * CATATAN KEAMANAN: karena bagian nama bisa ditebak (nama pembeli kadang
+ * publik), jangan andalkan kode ini sendirian sebagai satu-satunya lapis
+ * keamanan — pastikan rate limiting di login route (per-IP DAN
+ * per-username) tetap aktif. 4 digit acak di akhir + rate limit membuat
+ * brute-force tetap tidak praktis.
+ */
+function generateCode(buyerName: string): string {
+  const firstWord = buyerName.trim().split(/\s+/)[0] || "";
+  let namePart = slugifyName(firstWord);
+  if (namePart.length < 2) {
+    // Nama tidak menghasilkan huruf yang cukup — pakai fallback acak.
+    namePart = FALLBACK_WORDS[Math.floor(Math.random() * FALLBACK_WORDS.length)];
+  }
+  const digits = String(Math.floor(Math.random() * 10000)).padStart(4, "0");
+  return `EVLX-${namePart}-${digits}`;
+}
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function GET() {
   if (!(await requireAdmin())) {
@@ -70,6 +67,7 @@ export async function GET() {
       id: licenses.id,
       code: licenses.code,
       buyerName: licenses.buyerName,
+      buyerEmail: licenses.buyerEmail,
       orderRef: licenses.orderRef,
       platform: licenses.platform,
       price: licenses.price,
@@ -97,12 +95,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Nama pembeli wajib diisi." }, { status: 400 });
   }
 
+  // Email WAJIB diisi untuk lisensi baru — ini yang akan jadi username
+  // login pembeli (lihat login route). Lisensi lama tanpa email tetap
+  // valid (kolom nullable di DB), tapi semua lisensi BARU harus punya ini.
+  const buyerEmail = String(body.buyerEmail || "").trim().toLowerCase();
+  if (!buyerEmail) {
+    return NextResponse.json({ error: "Email pembeli wajib diisi." }, { status: 400 });
+  }
+  if (!EMAIL_REGEX.test(buyerEmail)) {
+    return NextResponse.json({ error: "Format email pembeli tidak valid." }, { status: 400 });
+  }
+
   // Generate kode unik, coba ulang kalau tabrakan (sangat jarang terjadi).
-  let code = generateCode();
+  let code = generateCode(buyerName);
   for (let attempt = 0; attempt < 5; attempt++) {
     const existing = await db.query.licenses.findFirst({ where: eq(licenses.code, code) });
     if (!existing) break;
-    code = generateCode();
+    code = generateCode(buyerName);
   }
 
   const [created] = await db
@@ -110,6 +119,7 @@ export async function POST(req: NextRequest) {
     .values({
       code,
       buyerName,
+      buyerEmail,
       orderRef: body.orderRef || null,
       platform: body.platform || null,
       price: body.price ? Number(body.price) : null,

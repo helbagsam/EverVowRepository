@@ -8,6 +8,7 @@ interface License {
   id: string;
   code: string;
   buyerName: string;
+  buyerEmail: string | null;
   orderRef: string | null;
   platform: string | null;
   price: number | null;
@@ -26,7 +27,7 @@ export default function AdminPage() {
   const [licenses, setLicenses] = useState<License[]>([]);
   const [loadingList, setLoadingList] = useState(true);
 
-  const [form, setForm] = useState({ buyerName: "", orderRef: "", platform: "Tokopedia", price: "", notes: "" });
+  const [form, setForm] = useState({ buyerName: "", buyerEmail: "", orderRef: "", platform: "Tokopedia", price: "", notes: "" });
   const [generatedCode, setGeneratedCode] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -59,7 +60,7 @@ export default function AdminPage() {
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.buyerName.trim()) return;
+    if (!form.buyerName.trim() || !form.buyerEmail.trim()) return;
     setGenerating(true);
     const res = await fetch("/api/admin/licenses", {
       method: "POST",
@@ -70,7 +71,7 @@ export default function AdminPage() {
     setGenerating(false);
     if (res.ok) {
       setGeneratedCode(json.license.code);
-      setForm({ buyerName: "", orderRef: "", platform: "Tokopedia", price: "", notes: "" });
+      setForm({ buyerName: "", buyerEmail: "", orderRef: "", platform: "Tokopedia", price: "", notes: "" });
       fetchLicenses();
     } else {
       alert(json.error || "Gagal membuat lisensi.");
@@ -85,7 +86,7 @@ export default function AdminPage() {
 
   const handleCopyMessage = () => {
     if (!generatedCode) return;
-    const msg = `Halo! Terima kasih sudah membeli EverVow Lux 🎉\n\nBerikut kode lisensi kamu:\nKode: ${generatedCode}\n\nCara masuk:\n1. Buka dashboard EverVow Lux\n2. Isi Username bebas (buat sendiri)\n3. Isi Kode Lisensi di atas\n4. Klik "Masuk ke Dashboard"\n\nSelamat merencanakan pernikahan impian kamu! 💍`;
+    const msg = `Halo! Terima kasih sudah membeli EverVow Lux 🎉\n\nBerikut kode lisensi kamu:\nKode: ${generatedCode}\n\nCara masuk:\n1. Buka dashboard EverVow Lux\n2. Isi Email (harus sama dengan email saat pembelian)\n3. Isi Kode Lisensi di atas\n4. Klik "Masuk ke Dashboard"\n\nSelamat merencanakan pernikahan impian kamu! 💍`;
     navigator.clipboard.writeText(msg);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
@@ -185,6 +186,11 @@ export default function AdminPage() {
                 <input required value={form.buyerName} onChange={e => setForm({ ...form, buyerName: e.target.value })} className="w-full px-4 py-2.5 bg-brand-bg border border-brand-border rounded-xl text-sm focus:outline-none focus:border-brand-primary" placeholder="mis. Budi & Siti" />
               </div>
               <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-brand-text-muted uppercase">Email Pembeli *</label>
+                <input required type="email" value={form.buyerEmail} onChange={e => setForm({ ...form, buyerEmail: e.target.value })} className="w-full px-4 py-2.5 bg-brand-bg border border-brand-border rounded-xl text-sm focus:outline-none focus:border-brand-primary" placeholder="mis. budi.siti@email.com" />
+                <p className="text-[11px] text-brand-text-muted">Email ini otomatis jadi username login pembeli — pastikan sama dengan yang dipakai saat checkout.</p>
+              </div>
+              <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-brand-text-muted uppercase">No. Order / Invoice</label>
                 <input value={form.orderRef} onChange={e => setForm({ ...form, orderRef: e.target.value })} className="w-full px-4 py-2.5 bg-brand-bg border border-brand-border rounded-xl text-sm focus:outline-none focus:border-brand-primary" placeholder="mis. INV-00123" />
               </div>
@@ -246,6 +252,7 @@ export default function AdminPage() {
                   <tr className="text-left text-xs text-brand-text-muted uppercase border-b border-brand-border">
                     <th className="px-4 py-3">Kode</th>
                     <th className="px-4 py-3">Pembeli</th>
+                    <th className="px-4 py-3">Email</th>
                     <th className="px-4 py-3">Platform</th>
                     <th className="px-4 py-3">Status</th>
                     <th className="px-4 py-3">Username</th>
@@ -254,15 +261,16 @@ export default function AdminPage() {
                 </thead>
                 <tbody>
                   {loadingList && (
-                    <tr><td colSpan={6} className="px-4 py-8 text-center text-brand-text-muted">Memuat...</td></tr>
+                    <tr><td colSpan={7} className="px-4 py-8 text-center text-brand-text-muted">Memuat...</td></tr>
                   )}
                   {!loadingList && licenses.length === 0 && (
-                    <tr><td colSpan={6} className="px-4 py-8 text-center text-brand-text-muted">Belum ada riwayat lisensi.</td></tr>
+                    <tr><td colSpan={7} className="px-4 py-8 text-center text-brand-text-muted">Belum ada riwayat lisensi.</td></tr>
                   )}
                   {licenses.map(l => (
                     <tr key={l.id} className="border-b border-brand-border last:border-0 hover:bg-brand-surface-hover/50">
                       <td className="px-4 py-3 font-mono text-xs">{l.code}</td>
                       <td className="px-4 py-3 font-medium">{l.buyerName}</td>
+                      <td className="px-4 py-3 text-brand-text-muted text-xs">{l.buyerEmail || '—'}</td>
                       <td className="px-4 py-3 text-brand-text-muted">{l.platform || '—'}</td>
                       <td className="px-4 py-3">
                         <span className={`text-xs font-semibold px-2 py-1 rounded-full ${l.isActive ? 'bg-brand-success-bg text-brand-success' : 'bg-brand-danger-bg text-brand-danger'}`}>
@@ -288,7 +296,7 @@ export default function AdminPage() {
             <h2 className="font-headline text-xl text-brand-primary mb-2">Verifikasi Kode</h2>
             <p className="text-sm text-brand-text-muted mb-4">Cek apakah sebuah kode lisensi valid dan milik siapa.</p>
             <form onSubmit={handleVerify} className="flex gap-2 mb-4">
-              <input value={verifyCode} onChange={e => setVerifyCode(e.target.value)} placeholder="EVLX-MELATI-CINTA-2847" className="flex-1 px-4 py-2.5 bg-brand-bg border border-brand-border rounded-xl text-sm font-mono focus:outline-none focus:border-brand-primary uppercase" />
+              <input value={verifyCode} onChange={e => setVerifyCode(e.target.value)} placeholder="EVLX-BUDI-2847" className="flex-1 px-4 py-2.5 bg-brand-bg border border-brand-border rounded-xl text-sm font-mono focus:outline-none focus:border-brand-primary uppercase" />
               <button type="submit" disabled={verifying} className="px-5 py-2.5 bg-brand-primary text-white rounded-xl text-sm font-semibold hover:bg-brand-primary-hover transition-colors disabled:opacity-60">
                 {verifying ? '...' : 'Cek'}
               </button>
@@ -297,6 +305,7 @@ export default function AdminPage() {
               verifyResult.found ? (
                 <div className="p-4 rounded-xl bg-brand-success-bg text-sm space-y-1">
                   <p><span className="font-semibold">Pembeli:</span> {verifyResult.license.buyerName}</p>
+                  <p><span className="font-semibold">Email:</span> {verifyResult.license.buyerEmail || '—'}</p>
                   <p><span className="font-semibold">Status:</span> {verifyResult.license.isActive ? 'Aktif' : 'Nonaktif'}</p>
                   <p><span className="font-semibold">Dipakai oleh:</span> {verifyResult.activatedBy || 'Belum diaktivasi'}</p>
                 </div>

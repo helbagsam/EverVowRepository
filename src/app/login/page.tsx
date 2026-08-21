@@ -43,20 +43,20 @@ export default function LoginPage() {
             <Heart size={28} />
           </div>
           <h1 className="font-headline text-4xl text-brand-primary">EverVow Lux</h1>
-          <p className="text-sm text-brand-text-muted mt-2">Masuk dengan username dan kode lisensi kamu</p>
+          <p className="text-sm text-brand-text-muted mt-2">Masuk dengan email dan kode lisensi kamu</p>
         </div>
 
         <form onSubmit={handleSubmit} className="card p-8 space-y-5">
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wide">Username</label>
+            <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wide">Email</label>
             <input
               required
-              type="text"
+              type="email"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="mis. budisiti"
+              placeholder="mis. budi.siti@email.com"
               className="w-full px-4 py-3 bg-brand-bg border border-brand-border rounded-xl text-sm text-brand-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all"
-              autoComplete="username"
+              autoComplete="email"
             />
           </div>
           <div className="space-y-1.5">
@@ -66,7 +66,7 @@ export default function LoginPage() {
               type="text"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="mis. EVLX-MELATI-CINTA-2847"
+              placeholder="mis. EVLX-BUDI-2847"
               className="w-full px-4 py-3 bg-brand-bg border border-brand-border rounded-xl text-sm text-brand-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all uppercase tracking-wider"
               autoComplete="off"
             />

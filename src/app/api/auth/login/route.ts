@@ -65,18 +65,34 @@ export async function POST(req: NextRequest) {
     // Lisensi sudah pernah dipakai — username harus cocok.
     if (account.username !== normalizedUsername) {
       return NextResponse.json(
-        { error: "Username tidak cocok dengan kode lisensi ini." },
+        { error: "Username/email tidak cocok dengan kode lisensi ini." },
         { status: 401 }
       );
     }
   } else {
-    // Aktivasi pertama kali: pastikan username belum dipakai akun lain.
+    // Aktivasi pertama kali.
+    //
+    // Lisensi BARU (punya buyerEmail): username WAJIB persis sama dengan
+    // email yang dicatat admin saat lisensi dibuat — ini jadi lapis
+    // verifikasi tambahan ("benar pembeli yang sah") sekaligus bikin
+    // username otomatis konsisten (selalu email, bukan bebas ketik).
+    //
+    // Lisensi LAMA (buyerEmail kosong, dibuat sebelum kolom ini ada):
+    // tetap pakai perilaku lama — username bebas asal belum dipakai akun
+    // lain — supaya kode yang sudah beredar ke pembeli lama tidak rusak.
+    if (license.buyerEmail && license.buyerEmail.toLowerCase() !== normalizedUsername) {
+      return NextResponse.json(
+        { error: "Email tidak cocok dengan kode lisensi ini. Gunakan email yang sama dengan saat pembelian." },
+        { status: 401 }
+      );
+    }
+
     const usernameTaken = await db.query.accounts.findFirst({
       where: eq(accounts.username, normalizedUsername),
     });
     if (usernameTaken) {
       return NextResponse.json(
-        { error: "Username sudah dipakai. Pilih username lain." },
+        { error: license.buyerEmail ? "Email ini sudah terdaftar pada akun lain." : "Username sudah dipakai. Pilih username lain." },
         { status: 409 }
       );
     }

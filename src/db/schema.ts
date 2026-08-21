@@ -6,8 +6,13 @@ import { pgTable, uuid, text, timestamp, jsonb, boolean, integer } from "drizzle
  */
 export const licenses = pgTable("licenses", {
   id: uuid("id").defaultRandom().primaryKey(),
-  code: text("code").notNull().unique(), // kode lisensi unik, mis. EVLX-MELATI-CINTA-2847
+  code: text("code").notNull().unique(), // kode lisensi unik, mis. EVLX-BUDI-2847
   buyerName: text("buyer_name").notNull(),
+  // Nullable demi backward compat: lisensi lama (sebelum kolom ini ada)
+  // tidak punya email, dan tetap harus terus bisa dipakai. Untuk lisensi
+  // BARU, kolom ini WAJIB diisi lewat validasi di API (bukan di level DB)
+  // karena inilah yang akan jadi username login pembeli.
+  buyerEmail: text("buyer_email"),
   orderRef: text("order_ref"),
   platform: text("platform"), // Tokopedia / Shopee / TikTok Shop / dst
   price: integer("price"),
