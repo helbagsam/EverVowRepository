@@ -3,56 +3,11 @@ import { db } from "@/db";
 import { licenses, accounts } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { getAdminSession } from "@/lib/adminSession";
+import { createLicenseWithUniqueCode, LicenseCodeCollisionError } from "@/lib/licenseCode";
 
 async function requireAdmin() {
   const session = await getAdminSession();
   return session.isAdmin === true;
-}
-
-// Fallback kalau nama pembeli tidak menghasilkan huruf sama sekali setelah
-// disaring (mis. nama cuma berisi emoji/simbol) — sangat jarang, tapi kode
-// tetap harus valid dan tidak kosong.
-const FALLBACK_WORDS = ["MELATI", "MAWAR", "PERMATA", "CINTA", "BERKAH", "PELANGI", "ISTANA", "KUSUMA"];
-
-/**
- * Ambil bagian yang bisa dipakai sebagai kode dari nama pembeli:
- * huruf A-Z saja (tanda baca, spasi, angka, emoji dibuang), diakritik
- * dilepas (é -> e), diseragamkan huruf besar, dibatasi 14 karakter supaya
- * kode tidak jadi panjang sekali untuk nama seperti "PT Wedding Organizer
- * Sejahtera Abadi".
- */
-function slugifyName(name: string): string {
-  const cleaned = name
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // lepas diakritik
-    .toUpperCase()
-    .replace(/[^A-Z]/g, ""); // sisakan huruf saja
-  return cleaned.slice(0, 14);
-}
-
-/**
- * Kode lisensi format: EVLX-BUDI-2847
- *
- * Dibangun dari nama pembeli asli (bukan kata acak) supaya kode terasa
- * personal dan lebih mudah dikonfirmasi pembeli ("oh iya ini nama saya").
- * Kalau nama berisi beberapa kata (mis. "Budi & Siti"), dipakai kata
- * PERTAMA saja supaya kode tetap ringkas.
- *
- * CATATAN KEAMANAN: karena bagian nama bisa ditebak (nama pembeli kadang
- * publik), jangan andalkan kode ini sendirian sebagai satu-satunya lapis
- * keamanan — pastikan rate limiting di login route (per-IP DAN
- * per-username) tetap aktif. 4 digit acak di akhir + rate limit membuat
- * brute-force tetap tidak praktis.
- */
-function generateCode(buyerName: string): string {
-  const firstWord = buyerName.trim().split(/\s+/)[0] || "";
-  let namePart = slugifyName(firstWord);
-  if (namePart.length < 2) {
-    // Nama tidak menghasilkan huruf yang cukup — pakai fallback acak.
-    namePart = FALLBACK_WORDS[Math.floor(Math.random() * FALLBACK_WORDS.length)];
-  }
-  const digits = String(Math.floor(Math.random() * 10000)).padStart(4, "0");
-  return `EVLX-${namePart}-${digits}`;
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -117,43 +72,26 @@ export async function POST(req: NextRequest) {
     expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
   }
 
-  // Generate kode unik, coba ulang kalau tabrakan (sangat jarang terjadi).
-  let code = generateCode(buyerName);
-  let unique = false;
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const existing = await db.query.licenses.findFirst({ where: eq(licenses.code, code) });
-    if (!existing) {
-      unique = true;
-      break;
-    }
-    code = generateCode(buyerName);
-  }
-
-  // Kalau 5 percobaan tetap tabrakan (harusnya nyaris mustahil dengan 10000
-  // kombinasi digit), jangan lanjut insert buta — itu akan gagal dengan raw
-  // DB unique-constraint error. Kembalikan error yang jelas supaya admin
-  // tinggal coba submit lagi.
-  if (!unique) {
-    return NextResponse.json(
-      { error: "Gagal membuat kode unik, coba submit lagi." },
-      { status: 409 }
-    );
-  }
-
-  const [created] = await db
-    .insert(licenses)
-    .values({
-      code,
+  // Kode dibuat lewat lib bersama supaya generator manual ini dan webhook
+  // otomatis Lynk.id (/api/webhook/lynkid) memakai SATU logika yang sama.
+  try {
+    const created = await createLicenseWithUniqueCode({
       buyerName,
       buyerEmail,
       orderRef: body.orderRef || null,
       platform: body.platform || null,
       price: body.price ? Number(body.price) : null,
       notes: body.notes || null,
-      isActive: true,
       expiresAt,
-    })
-    .returning();
-
-  return NextResponse.json({ license: created });
+    });
+    return NextResponse.json({ license: created });
+  } catch (err) {
+    if (err instanceof LicenseCodeCollisionError) {
+      return NextResponse.json(
+        { error: "Gagal membuat kode unik, coba submit lagi." },
+        { status: 409 }
+      );
+    }
+    throw err;
+  }
 }

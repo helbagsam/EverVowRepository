@@ -15,6 +15,7 @@ Keduanya connect ke **1 NeonDB yang sama**, dan **1 project Vercel** untuk semua
    - `ADMIN_SESSION_SECRET` — string acak LAIN, beda dari `SESSION_SECRET`
    - `ADMIN_PASSWORD` — password kamu sendiri untuk masuk ke `/admin`
    - `UPLOADTHING_TOKEN` — dari uploadthing.com > API Keys (lihat bagian UploadThing di bawah)
+   - (opsional) `LYNKID_WEBHOOK_SECRET`, `RESEND_API_KEY`, `NOTIFY_FROM_EMAIL`, `NEXT_PUBLIC_APP_URL` — cuma dibutuhkan kalau pakai automasi jual lewat Lynk.id, lihat bagian "Automasi jual lewat Lynk.id" di bawah.
 3. Buat tabel di database:
    ```
    npx drizzle-kit push
@@ -40,6 +41,10 @@ Keduanya connect ke **1 NeonDB yang sama**, dan **1 project Vercel** untuk semua
 - `src/proxy.ts` — proteksi route (pembeli & admin punya sesi terpisah, sama sekali tidak bisa saling akses).
 - `src/views/*` — 12 modul dashboard pembeli.
 - `src/app/admin/*` — halaman generator lisensi (pengganti `admin.html`).
+- `src/lib/licenseCode.ts` — logika generate + insert kode lisensi unik, dipakai bersama oleh `/admin` dan webhook Lynk.id.
+- `src/app/api/webhook/lynkid/*` — terima notifikasi pembayaran sukses dari Lynk.id, auto-generate lisensi.
+- `src/lib/notify.ts` — kirim email kode lisensi (Resend).
+- `src/app/claim/*`, `src/app/api/claim/*` — halaman "ambil ulang kode" untuk pembeli, jaga-jaga email otomatis tidak sampai.
 
 ## Deploy ke Vercel
 
@@ -47,6 +52,30 @@ Keduanya connect ke **1 NeonDB yang sama**, dan **1 project Vercel** untuk semua
 2. Import ke Vercel sebagai project baru — akan otomatis terdeteksi sebagai Next.js.
 3. Isi semua environment variables di atas di Project Settings > Environment Variables.
 4. Deploy. Setelah online, `/admin` adalah tempat kamu generate kode, dan `/login` adalah tempat pembeli login.
+
+## Automasi jual lewat Lynk.id (kode lisensi otomatis)
+
+Sebelumnya, tiap ada pembeli, admin harus buka `/admin` dan generate kode lisensi manual satu-satu. Sekarang ada jalur otomatis lewat webhook Lynk.id — kode lisensi dibuat & dikirim ke pembeli otomatis begitu pembayaran sukses, tanpa admin buka `/admin` sama sekali (tapi `/admin` tetap ada untuk kasus manual/di luar Lynk.id).
+
+### Cara kerja singkat
+
+1. Pembeli checkout & bayar di Lynk.id.
+2. Lynk.id kirim webhook (event pembayaran sukses) ke `POST /api/webhook/lynkid` di app ini.
+3. Endpoint itu generate kode lisensi unik (fungsi yang sama persis dengan yang dipakai `/admin`, lihat `src/lib/licenseCode.ts`), simpan ke database (`platform: "Lynk.id"`), lalu kirim email ke pembeli berisi kode + link login (lewat Resend, `src/lib/notify.ts`).
+4. Pembeli buka `/login`, isi **Email** (harus sama persis dengan email saat checkout — ini yang jadi username-nya, bukan bebas ketik, lihat login route) + masukkan kode dari email → akun aktif.
+5. Kalau email tidak sampai (masuk spam, dll), pembeli bisa ambil ulang kodenya sendiri di `/claim` (masukkan No. Order + email yang dipakai saat beli).
+
+### Setup
+
+1. **Resend** (pengirim email): daftar di [resend.com](https://resend.com), ambil API key, isi ke `RESEND_API_KEY`. Verifikasi domain kamu sendiri di sana untuk `NOTIFY_FROM_EMAIL` — kalau belum, fallback ke alamat testing `resend.dev` yang cuma bisa kirim ke email pemilik akun Resend (tidak cocok untuk pembeli asli).
+2. Isi `NEXT_PUBLIC_APP_URL` dengan URL production kamu (mis. `https://evervowlux.vercel.app`, tanpa `/` di akhir).
+3. **Lynk.id**: masuk ke Settings → Integrations → Webhooks di dashboard Lynk.id kamu, pasang URL `https://<domain-kamu>/api/webhook/lynkid`, pilih event pembayaran sukses (biasanya `order.paid`/`order.completed`), method POST. Lynk.id akan kasih **Merchant Key** — isi persis ke `LYNKID_WEBHOOK_SECRET`.
+4. Sebelum jual ke pembeli asli: pakai fitur **"Test Webhook"** bawaan Lynk.id, lalu cek log request yang masuk (Vercel → project kamu → Logs). **Penting**: nama field payload di `src/app/api/webhook/lynkid/route.ts` (`name`, `email`, `phone`, `ref_id`, dst) disusun dari pola umum webhook Lynk.id, BUKAN dari dokumentasi resmi yang terverifikasi terhadap payload asli. Kalau payload asli beda nama field-nya, sesuaikan daftar di fungsi `extractField(...)` pada file itu.
+5. Ini semua sudah lolos `npx drizzle-kit push` (kolom `buyer_email`, `buyer_phone`, `expires_at` di tabel `licenses` sudah ada) — kalau kamu clone di mesin lain, jalankan `npx drizzle-kit push` sekali sebelum `npm run dev`.
+
+### Catatan keamanan
+
+Endpoint webhook menolak (401) semua request kalau `LYNKID_WEBHOOK_SECRET` kosong atau tidak cocok — jadi wajib diisi sebelum dipasang di Lynk.id. Endpoint juga idempotent: kalau Lynk.id kirim webhook dobel untuk order yang sama (retry), tidak akan membuat lisensi dobel atau kirim email dobel. Sudah diverifikasi lewat test manual (buat lisensi via webhook → retry webhook sama → cek `/claim` → login pakai email+kode) — lihat riwayat commit untuk detail.
 
 ## Catatan build
 

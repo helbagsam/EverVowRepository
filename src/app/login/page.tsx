@@ -88,6 +88,11 @@ export default function LoginPage() {
 
           <p className="text-xs text-center text-brand-text-muted pt-2">
             Belum punya kode lisensi? Hubungi wedding planner kamu untuk mendapatkannya.
+            <br />
+            Sudah beli tapi kode belum masuk email?{" "}
+            <a href="/claim" className="text-brand-primary font-semibold hover:underline">
+              Ambil ulang kode
+            </a>
           </p>
         </form>
       </div>

@@ -20,7 +20,7 @@ interface License {
   username: string | null;
 }
 
-const PLATFORMS = ["Tokopedia", "Shopee", "TikTok Shop", "Instagram/WA", "Lainnya"];
+const PLATFORMS = ["Tokopedia", "Shopee", "TikTok Shop", "Lynk.id", "Instagram/WA", "Lainnya"];
 
 export default function AdminPage() {
   const router = useRouter();

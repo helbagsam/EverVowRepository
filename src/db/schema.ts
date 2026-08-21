@@ -13,6 +13,9 @@ export const licenses = pgTable("licenses", {
   // BARU, kolom ini WAJIB diisi lewat validasi di API (bukan di level DB)
   // karena inilah yang akan jadi username login pembeli.
   buyerEmail: text("buyer_email"),
+  // Opsional — dipakai untuk pengiriman WhatsApp kalau nanti diaktifkan;
+  // saat ini cuma disimpan kalau tersedia di payload webhook Lynk.id.
+  buyerPhone: text("buyer_phone"),
   orderRef: text("order_ref"),
   platform: text("platform"), // Tokopedia / Shopee / TikTok Shop / dst
   price: integer("price"),
