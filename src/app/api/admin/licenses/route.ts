@@ -23,6 +23,7 @@ export async function GET() {
       code: licenses.code,
       buyerName: licenses.buyerName,
       buyerEmail: licenses.buyerEmail,
+      buyerPhone: licenses.buyerPhone,
       orderRef: licenses.orderRef,
       platform: licenses.platform,
       price: licenses.price,

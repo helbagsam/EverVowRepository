@@ -61,6 +61,8 @@ export interface CreateLicenseInput {
   price?: number | null;
   notes?: string | null;
   expiresAt?: Date | null;
+  /** Jawaban "Question for Customer" dari checkout Lynk.id, sudah dinormalkan. */
+  checkoutAnswers?: Record<string, unknown> | null;
 }
 
 export class LicenseCodeCollisionError extends Error {
@@ -105,6 +107,7 @@ export async function createLicenseWithUniqueCode(input: CreateLicenseInput) {
       notes: input.notes || null,
       isActive: true,
       expiresAt: input.expiresAt ?? null,
+      checkoutAnswers: input.checkoutAnswers ?? null,
     })
     .returning();
 

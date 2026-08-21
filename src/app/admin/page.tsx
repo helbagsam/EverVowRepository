@@ -9,6 +9,7 @@ interface License {
   code: string;
   buyerName: string;
   buyerEmail: string | null;
+  buyerPhone: string | null;
   orderRef: string | null;
   platform: string | null;
   price: number | null;
@@ -124,6 +125,38 @@ export default function AdminPage() {
   };
 
   const isExpired = (lic: License) => !!lic.expiresAt && new Date(lic.expiresAt).getTime() < Date.now();
+
+  /**
+   * Kirim ulang kode lewat WhatsApp untuk pembeli yang tidak menerima /
+   * kehilangan pesan otomatis dari Lynk.id. Membuka wa.me dengan pesan sudah
+   * terisi — admin tinggal menekan kirim, tidak perlu mengetik atau menyalin
+   * apa pun. Cukup untuk volume awal; otomatisasi penuh baru perlu kalau
+   * sudah puluhan order per hari.
+   */
+  const sendWhatsApp = (lic: License) => {
+    if (!lic.buyerPhone) {
+      alert("Nomor WhatsApp pembeli tidak tersedia untuk lisensi ini.");
+      return;
+    }
+    // wa.me butuh format internasional tanpa +, spasi, atau tanda hubung.
+    let phone = lic.buyerPhone.replace(/[^0-9]/g, "");
+    if (phone.startsWith("0")) phone = "62" + phone.slice(1);
+    else if (phone.startsWith("620")) phone = "62" + phone.slice(3);
+
+    const appUrl = typeof window !== "undefined" ? window.location.origin : "";
+    const firstName = lic.buyerName.trim().split(/\s+/)[0] || "Kak";
+    const msg =
+      `Halo ${firstName}! Terima kasih sudah membeli EverVow Lux 🎉\n\n` +
+      `Ini kode lisensi kamu:\n${lic.code}\n\n` +
+      `Cara masuk:\n` +
+      `1. Buka ${appUrl}/login\n` +
+      `2. Isi Email: ${lic.buyerEmail || "(email saat pembelian)"}\n` +
+      `3. Isi Kode Lisensi di atas\n\n` +
+      `Simpan pesan ini ya — kodenya dipakai kalau kamu mau masuk dari HP atau laptop lain. ` +
+      `Selamat merencanakan hari bahagia kalian! 💍`;
+
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+  };
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -318,6 +351,11 @@ export default function AdminPage() {
                           <button onClick={() => editExpiry(l)} className="text-xs font-semibold text-brand-text-muted hover:text-brand-primary transition-colors">
                             Atur Masa Berlaku
                           </button>
+                          {l.buyerPhone && (
+                            <button onClick={() => sendWhatsApp(l)} className="text-xs font-semibold text-brand-text-muted hover:text-brand-success transition-colors">
+                              💬 Kirim WA
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

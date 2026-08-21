@@ -17,7 +17,11 @@ export const licenses = pgTable("licenses", {
   // saat ini cuma disimpan kalau tersedia di payload webhook Lynk.id.
   buyerPhone: text("buyer_phone"),
   orderRef: text("order_ref"),
-  platform: text("platform"), // Tokopedia / Shopee / TikTok Shop / dst
+  // Jawaban "Question for Customer" dari checkout Lynk.id (nama mempelai,
+  // tanggal nikah, estimasi budget). Dipakai sekali saat aktivasi untuk
+  // mengisi awal dashboard supaya pembeli tidak membuka form kosong.
+  checkoutAnswers: jsonb("checkout_answers"),
+  platform: text("platform"), // Tokopedia / Shopee / TikTok Shop / Lynk.id / dst
   price: integer("price"),
   notes: text("notes"),
   isActive: boolean("is_active").notNull().default(true),
