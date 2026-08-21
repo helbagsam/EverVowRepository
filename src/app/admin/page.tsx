@@ -14,6 +14,7 @@ interface License {
   price: number | null;
   notes: string | null;
   isActive: boolean;
+  expiresAt: string | null;
   createdAt: string;
   activatedAt: string | null;
   username: string | null;
@@ -27,7 +28,7 @@ export default function AdminPage() {
   const [licenses, setLicenses] = useState<License[]>([]);
   const [loadingList, setLoadingList] = useState(true);
 
-  const [form, setForm] = useState({ buyerName: "", buyerEmail: "", orderRef: "", platform: "Tokopedia", price: "", notes: "" });
+  const [form, setForm] = useState({ buyerName: "", buyerEmail: "", orderRef: "", platform: "Tokopedia", price: "", notes: "", expiresInDays: "" });
   const [generatedCode, setGeneratedCode] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -71,7 +72,7 @@ export default function AdminPage() {
     setGenerating(false);
     if (res.ok) {
       setGeneratedCode(json.license.code);
-      setForm({ buyerName: "", buyerEmail: "", orderRef: "", platform: "Tokopedia", price: "", notes: "" });
+      setForm({ buyerName: "", buyerEmail: "", orderRef: "", platform: "Tokopedia", price: "", notes: "", expiresInDays: "" });
       fetchLicenses();
     } else {
       alert(json.error || "Gagal membuat lisensi.");
@@ -100,6 +101,29 @@ export default function AdminPage() {
     });
     if (res.ok) fetchLicenses();
   };
+
+  const editExpiry = async (lic: License) => {
+    const current = lic.expiresAt ? new Date(lic.expiresAt).toISOString().slice(0, 10) : "";
+    const input = window.prompt(
+      "Tanggal kadaluarsa baru (YYYY-MM-DD). Kosongkan untuk menghapus masa berlaku (jadi lifetime).",
+      current
+    );
+    if (input === null) return; // dibatalkan
+    const trimmed = input.trim();
+    if (trimmed && Number.isNaN(new Date(trimmed).getTime())) {
+      alert("Format tanggal tidak valid.");
+      return;
+    }
+    const res = await fetch(`/api/admin/licenses/${lic.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ expiresAt: trimmed || null }),
+    });
+    if (res.ok) fetchLicenses();
+    else alert("Gagal mengubah masa berlaku.");
+  };
+
+  const isExpired = (lic: License) => !!lic.expiresAt && new Date(lic.expiresAt).getTime() < Date.now();
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,6 +231,10 @@ export default function AdminPage() {
                 </div>
               </div>
               <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-brand-text-muted uppercase">Masa Berlaku (hari, opsional)</label>
+                <input type="number" min={1} value={form.expiresInDays} onChange={e => setForm({ ...form, expiresInDays: e.target.value })} className="w-full px-4 py-2.5 bg-brand-bg border border-brand-border rounded-xl text-sm focus:outline-none focus:border-brand-primary" placeholder="Kosongkan = lifetime" />
+              </div>
+              <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-brand-text-muted uppercase">Catatan (opsional)</label>
                 <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={2} className="w-full px-4 py-2.5 bg-brand-bg border border-brand-border rounded-xl text-sm focus:outline-none focus:border-brand-primary resize-none" />
               </div>
@@ -255,16 +283,17 @@ export default function AdminPage() {
                     <th className="px-4 py-3">Email</th>
                     <th className="px-4 py-3">Platform</th>
                     <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Berlaku s/d</th>
                     <th className="px-4 py-3">Username</th>
                     <th className="px-4 py-3">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   {loadingList && (
-                    <tr><td colSpan={7} className="px-4 py-8 text-center text-brand-text-muted">Memuat...</td></tr>
+                    <tr><td colSpan={8} className="px-4 py-8 text-center text-brand-text-muted">Memuat...</td></tr>
                   )}
                   {!loadingList && licenses.length === 0 && (
-                    <tr><td colSpan={7} className="px-4 py-8 text-center text-brand-text-muted">Belum ada riwayat lisensi.</td></tr>
+                    <tr><td colSpan={8} className="px-4 py-8 text-center text-brand-text-muted">Belum ada riwayat lisensi.</td></tr>
                   )}
                   {licenses.map(l => (
                     <tr key={l.id} className="border-b border-brand-border last:border-0 hover:bg-brand-surface-hover/50">
@@ -273,15 +302,23 @@ export default function AdminPage() {
                       <td className="px-4 py-3 text-brand-text-muted text-xs">{l.buyerEmail || '—'}</td>
                       <td className="px-4 py-3 text-brand-text-muted">{l.platform || '—'}</td>
                       <td className="px-4 py-3">
-                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${l.isActive ? 'bg-brand-success-bg text-brand-success' : 'bg-brand-danger-bg text-brand-danger'}`}>
-                          {l.isActive ? 'Aktif' : 'Nonaktif'}
+                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${isExpired(l) ? 'bg-brand-danger-bg text-brand-danger' : l.isActive ? 'bg-brand-success-bg text-brand-success' : 'bg-brand-danger-bg text-brand-danger'}`}>
+                          {isExpired(l) ? 'Kadaluarsa' : l.isActive ? 'Aktif' : 'Nonaktif'}
                         </span>
+                      </td>
+                      <td className="px-4 py-3 text-brand-text-muted text-xs">
+                        {l.expiresAt ? new Date(l.expiresAt).toLocaleDateString('id-ID') : <span className="italic">lifetime</span>}
                       </td>
                       <td className="px-4 py-3 text-brand-text-muted">{l.username || <span className="italic">belum dipakai</span>}</td>
                       <td className="px-4 py-3">
-                        <button onClick={() => toggleActive(l)} className="text-xs font-semibold text-brand-text-muted hover:text-brand-primary transition-colors flex items-center gap-1">
-                          {l.isActive ? <><Ban size={12} /> Nonaktifkan</> : <><CheckCircle2 size={12} /> Aktifkan</>}
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <button onClick={() => toggleActive(l)} className="text-xs font-semibold text-brand-text-muted hover:text-brand-primary transition-colors flex items-center gap-1">
+                            {l.isActive ? <><Ban size={12} /> Nonaktifkan</> : <><CheckCircle2 size={12} /> Aktifkan</>}
+                          </button>
+                          <button onClick={() => editExpiry(l)} className="text-xs font-semibold text-brand-text-muted hover:text-brand-primary transition-colors">
+                            Atur Masa Berlaku
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

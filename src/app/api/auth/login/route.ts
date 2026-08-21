@@ -56,6 +56,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  if (license.expiresAt && license.expiresAt.getTime() < Date.now()) {
+    return NextResponse.json(
+      { error: "Kode lisensi sudah kadaluarsa. Hubungi penjual untuk perpanjangan." },
+      { status: 401 }
+    );
+  }
+
   // Cari akun yang sudah pernah dibuat untuk lisensi ini.
   let account = await db.query.accounts.findFirst({
     where: eq(accounts.licenseId, license.id),

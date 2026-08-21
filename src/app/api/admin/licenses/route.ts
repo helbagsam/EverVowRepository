@@ -73,6 +73,7 @@ export async function GET() {
       price: licenses.price,
       notes: licenses.notes,
       isActive: licenses.isActive,
+      expiresAt: licenses.expiresAt,
       createdAt: licenses.createdAt,
       activatedAt: licenses.activatedAt,
       username: accounts.username,
@@ -106,12 +107,37 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Format email pembeli tidak valid." }, { status: 400 });
   }
 
+  // Masa berlaku opsional (mis. lisensi trial/langganan). Kosong = lifetime.
+  let expiresAt: Date | null = null;
+  if (body.expiresInDays !== undefined && body.expiresInDays !== null && body.expiresInDays !== "") {
+    const days = Number(body.expiresInDays);
+    if (!Number.isFinite(days) || days <= 0) {
+      return NextResponse.json({ error: "Masa berlaku harus berupa jumlah hari yang valid." }, { status: 400 });
+    }
+    expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+  }
+
   // Generate kode unik, coba ulang kalau tabrakan (sangat jarang terjadi).
   let code = generateCode(buyerName);
+  let unique = false;
   for (let attempt = 0; attempt < 5; attempt++) {
     const existing = await db.query.licenses.findFirst({ where: eq(licenses.code, code) });
-    if (!existing) break;
+    if (!existing) {
+      unique = true;
+      break;
+    }
     code = generateCode(buyerName);
+  }
+
+  // Kalau 5 percobaan tetap tabrakan (harusnya nyaris mustahil dengan 10000
+  // kombinasi digit), jangan lanjut insert buta — itu akan gagal dengan raw
+  // DB unique-constraint error. Kembalikan error yang jelas supaya admin
+  // tinggal coba submit lagi.
+  if (!unique) {
+    return NextResponse.json(
+      { error: "Gagal membuat kode unik, coba submit lagi." },
+      { status: 409 }
+    );
   }
 
   const [created] = await db
@@ -125,6 +151,7 @@ export async function POST(req: NextRequest) {
       price: body.price ? Number(body.price) : null,
       notes: body.notes || null,
       isActive: true,
+      expiresAt,
     })
     .returning();
 

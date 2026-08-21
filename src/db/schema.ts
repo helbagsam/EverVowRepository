@@ -18,6 +18,10 @@ export const licenses = pgTable("licenses", {
   price: integer("price"),
   notes: text("notes"),
   isActive: boolean("is_active").notNull().default(true),
+  // Nullable = tidak pernah kadaluarsa (default untuk lisensi lifetime).
+  // Kalau diisi, login route menolak kode ini setelah tanggal ini lewat,
+  // terlepas dari isActive.
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   activatedAt: timestamp("activated_at", { withTimezone: true }),
 });

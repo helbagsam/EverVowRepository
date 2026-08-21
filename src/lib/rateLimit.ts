@@ -1,7 +1,15 @@
 import { db } from "@/db";
 import { loginAttempts } from "@/db/schema";
-import { eq, and, gte, sql } from "drizzle-orm";
+import { eq, and, gte, lt, sql } from "drizzle-orm";
 import { NextRequest } from "next/server";
+
+// Retensi baris login_attempts jauh di atas window rate-limit terpanjang
+// yang dipakai (15 menit), supaya tidak menghapus baris yang masih relevan
+// untuk penghitungan window aktif.
+const RETENTION_HOURS = 24;
+// Hanya 1 dari N pemanggilan yang memicu cleanup, supaya tidak menambah
+// query DELETE di setiap request login.
+const CLEANUP_PROBABILITY = 1 / 50;
 
 /**
  * Ambil IP client dari header (Vercel selalu mengisi x-forwarded-for).
@@ -42,6 +50,13 @@ export async function checkRateLimit(
   // Catat percobaan ini (dipanggil SEBELUM memvalidasi kredensial, supaya
   // percobaan yang gagal maupun berhasil tetap terhitung — mencegah bypass).
   await db.insert(loginAttempts).values({ attemptKey: key });
+
+  // Bersihkan baris lama sesekali supaya tabel tidak tumbuh tanpa batas
+  // (tidak ada cron job terpisah untuk ini).
+  if (Math.random() < CLEANUP_PROBABILITY) {
+    const cutoff = new Date(Date.now() - RETENTION_HOURS * 60 * 60 * 1000);
+    await db.delete(loginAttempts).where(lt(loginAttempts.createdAt, cutoff));
+  }
 
   return { blocked: false };
 }
