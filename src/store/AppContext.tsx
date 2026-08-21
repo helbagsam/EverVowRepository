@@ -42,10 +42,25 @@ interface AppState {
   // vendors, dst.) sedang menampilkan dummyData (read-only sandbox) —
   // BUKAN data asli user. realData tetap utuh di state internal dan tidak
   // pernah tertimpa maupun tercampur oleh dummyData.
+  //
+  // Alurnya bertahap (state machine), bukan satu layar besar sekaligus:
+  //   'welcome' -> 'guide' -> 'preview' -> 'off'
+  // - welcome: splash sambutan, HANYA untuk first-time (skip saat replay)
+  // - guide  : modal panduan alur kerja + peta modul
+  // - preview: strip tipis "sedang lihat contoh", user bebas jelajah semua
+  //            panel dengan dummy data (read-only)
+  // - off    : tutorial selesai, activeData kembali ke data asli
   isTutorialMode: boolean;
+  tutorialStage: "welcome" | "guide" | "preview" | "off";
+  // Dinaikkan setiap kali SESI tutorial baru dimulai (bukan saat pindah
+  // antar tahap). Dipakai komponen untuk mereset state internalnya —
+  // mis. OnboardingGuide kembali ke langkah 1 pada replay baru.
+  tutorialSessionId: number;
   tutorialTrigger: "first-time" | "replay" | null;
   hasSeenTutorial: boolean;
   enterTutorial: (trigger?: "first-time" | "replay") => void;
+  goToGuideStage: () => void;
+  goToPreviewStage: () => void;
   exitTutorial: () => void;
   tutorialLang: TutorialLang;
   setTutorialLang: (lang: TutorialLang) => void;
@@ -60,9 +75,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [username, setUsername] = useState("");
   const hydrated = useRef(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Panel yang sedang dibuka user tepat SEBELUM tutorial dimulai, supaya
+  // bisa dikembalikan saat tutorial selesai (lihat enterTutorial/exitTutorial).
+  const viewBeforeTutorial = useRef("dashboard");
 
-  const [isTutorialMode, setIsTutorialMode] = useState(false);
+  const [tutorialStage, setTutorialStage] = useState<"welcome" | "guide" | "preview" | "off">("off");
   const [tutorialTrigger, setTutorialTrigger] = useState<"first-time" | "replay" | null>(null);
+  const [tutorialSessionId, setTutorialSessionId] = useState(0);
+  const isTutorialMode = tutorialStage !== "off";
   // dummyData dibuat SEKALI saja dan tidak pernah berubah — dia bukan bagian
   // dari `data`/`setData`, sehingga tidak mungkin termutasi oleh fungsi CRUD
   // manapun. Ini defense-in-depth di atas guard `update()` di bawah.
@@ -86,10 +106,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         // menuntaskan/menutup tutorial (misc.tutorialSeenAt kosong). Dicek
         // dari data REAL yang baru saja di-fetch dari NeonDB — bukan dummy —
         // supaya user lama yang sudah punya data asli tidak pernah
-        // ke-interupsi lagi di kunjungan berikutnya.
+        // ke-interupsi lagi di kunjungan berikutnya. Mulai dari tahap
+        // "welcome" (splash sambutan) karena ini benar-benar pertama kali.
         if (!mergedState.misc?.tutorialSeenAt) {
           setTutorialTrigger("first-time");
-          setIsTutorialMode(true);
+          setTutorialStage("welcome");
+          setTutorialSessionId((n) => n + 1);
+          setTutorialSessionId((n) => n + 1);
         }
       })
       .catch(() => {
@@ -138,14 +161,35 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // ke variabel yang sama.
   const activeData = isTutorialMode ? dummyData : data;
 
+  // enterTutorial: titik masuk tunggal untuk MEMULAI tutorial.
+  // - "first-time" (auto-trigger login pertama) -> mulai dari 'welcome'
+  //   (splash sambutan penuh, cocok untuk pembeli yang benar-benar baru).
+  // - "replay" (dipanggil dari Settings) -> LOMPAT ke 'guide' langsung,
+  //   skip welcome splash — user yang replay bukan orang baru lagi, jadi
+  //   sambutan "Selamat Datang" di sini justru terasa aneh/berulang.
   const enterTutorial = (trigger: "first-time" | "replay" = "replay") => {
+    // Ingat user tadi sedang di panel mana. Tombol "Lihat Contoh X" di
+    // dalam guide akan memindahkan currentView, jadi tanpa ini user yang
+    // tadinya sedang kerja di Guest List bisa terdampar di Budget setelah
+    // menutup tutorial.
+    viewBeforeTutorial.current = trigger === "first-time" ? "dashboard" : currentView;
     setTutorialTrigger(trigger);
-    setIsTutorialMode(true);
+    setTutorialStage(trigger === "first-time" ? "welcome" : "guide");
+    setTutorialSessionId((n) => n + 1);
+    setTutorialSessionId((n) => n + 1);
   };
 
+  // Transisi antar tahap — dipanggil dari tombol CTA masing-masing
+  // komponen (WelcomeScreen -> guide, OnboardingGuide -> preview).
+  const goToGuideStage = () => setTutorialStage("guide");
+  const goToPreviewStage = () => setTutorialStage("preview");
+
   const exitTutorial = () => {
-    setIsTutorialMode(false);
+    setTutorialStage("off");
     setTutorialTrigger(null);
+    // Kembalikan ke panel asal (atau dashboard untuk user baru) supaya
+    // tidak terdampar di panel yang dipindahkan oleh tombol guide.
+    setCurrentView(viewBeforeTutorial.current);
     // Tandai sudah pernah dilihat — hanya ditulis kalau BELUM ada, supaya
     // replay berulang kali dari Settings tidak terus menimpa timestamp asli.
     // Ini setData langsung (bukan lewat update()) karena flag ini adalah
@@ -167,7 +211,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const value: AppState = {
     loading,
-    theme: data.theme, setTheme: (t) => update((s) => ({ ...s, theme: t })),
+    // CATATAN: setTheme sengaja TIDAK lewat update(). Theme adalah preferensi
+    // UI (sama kategorinya dengan tutorialLang), bukan konten wedding — kalau
+    // ikut ter-guard, tombol dark/light mode akan mati total selama tutorial
+    // berjalan, yang jelas bukan yang diinginkan. Membaca dari `data.theme`
+    // (real), bukan activeData, supaya preferensi user tidak "berkedip" ke
+    // theme milik dummy data saat masuk/keluar tutorial.
+    theme: data.theme, setTheme: (t) => setData((s) => ({ ...s, theme: t })),
     weddingDate: activeData.weddingDate, setWeddingDate: (d) => update((s) => ({ ...s, weddingDate: d })),
     coupleProfile: activeData.coupleProfile, setCoupleProfile: (p) => update((s) => ({ ...s, coupleProfile: p })),
 
@@ -256,9 +306,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setMiscItem: (key, val) => update((s) => ({ ...s, misc: { ...s.misc, [key]: val } })),
 
     isTutorialMode,
+    tutorialStage,
+    tutorialSessionId,
     tutorialTrigger,
     hasSeenTutorial: !!data.misc?.tutorialSeenAt,
     enterTutorial,
+    goToGuideStage,
+    goToPreviewStage,
     exitTutorial,
     tutorialLang,
     setTutorialLang,
