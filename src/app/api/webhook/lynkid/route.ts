@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!verifySecret(req, payload)) {
+    console.error("[webhook/lynkid][DEBUG] auth failed. headers:", JSON.stringify(Object.fromEntries(req.headers.entries())), "payload:", JSON.stringify(payload));
     return NextResponse.json({ error: "Unauthorized — merchant key tidak cocok." }, { status: 401 });
   }
 
