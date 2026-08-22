@@ -5,6 +5,7 @@ import { useAppContext } from '../store/AppContext';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { formatIDR, formatShortIDR } from '../utils/formatters';
 import { generateSummaryPdf, downloadPdfBytes } from '../utils/exportSummaryPdf';
+import { vendorStatusLabel, taskPriorityLabel } from '../lib/labels';
 
 export const Dashboard = () => {
   const { 
@@ -122,14 +123,14 @@ export const Dashboard = () => {
         <div className="z-10 relative space-y-4 text-center md:text-left">
           <h1 className="font-headline text-4xl md:text-5xl text-brand-primary tracking-tight">
             {coupleProfile.groomName || coupleProfile.brideName ? (
-              <>Welcome back, <br/><span className="text-gradient-primary">{coupleProfile.groomName?.split(' ')[0] || 'Partner'} & {coupleProfile.brideName?.split(' ')[0] || 'Partner'}</span></>
+              <>Selamat datang kembali, <br/><span className="text-gradient-primary">{coupleProfile.groomName?.split(' ')[0] || 'Partner'} & {coupleProfile.brideName?.split(' ')[0] || 'Partner'}</span></>
             ) : (
-              <>Welcome to <br/><span className="text-gradient-primary">EverVow Lux</span></>
+              <>Selamat Datang di <br/><span className="text-gradient-primary">EverVow Lux</span></>
             )}
           </h1>
           <p className="font-body text-lg text-brand-text-muted max-w-lg">
             {coupleProfile.groomName || coupleProfile.brideName
-              ? 'Your journey to the perfect day is unfolding beautifully. Here is where we stand today.'
+              ? 'Perjalanan menuju hari sempurna kalian sedang berlangsung dengan indah. Berikut posisi persiapan kalian saat ini.'
               : 'Mulai dengan mengisi nama pasangan di Settings > Client Profile untuk personalisasi dashboard kamu.'}
           </p>
           <div className="pt-2 flex flex-wrap justify-center md:justify-start gap-3">
@@ -148,7 +149,7 @@ export const Dashboard = () => {
               className="px-5 py-2.5 bg-brand-primary text-white rounded-xl text-xs font-semibold hover:bg-brand-primary-hover transition-colors shadow-sm flex items-center gap-2 disabled:opacity-60"
             >
               <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-              {isExportingPdf ? 'Membuat PDF...' : 'Export PDF Summary'}
+              {isExportingPdf ? 'Membuat PDF...' : 'Ekspor Ringkasan PDF'}
             </button>
           </div>
         </div>
@@ -162,12 +163,12 @@ export const Dashboard = () => {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="font-headline text-2xl text-brand-primary">{overallProgress}%</span>
-                <span className="font-semibold text-[10px] uppercase tracking-widest text-brand-text-muted">Overall</span>
+                <span className="font-semibold text-[10px] uppercase tracking-widest text-brand-text-muted">Keseluruhan</span>
               </div>
             </div>
             <div className="w-full max-w-[120px] space-y-2">
               <div className="flex justify-between font-semibold text-[10px] uppercase tracking-wider text-brand-text-muted">
-                <span>Milestones</span>
+                <span>Milestone</span>
                 <span className="font-bold text-brand-primary">{completedTasks}/{totalTasks}</span>
               </div>
               <div className="h-1.5 w-full bg-brand-surface-hover rounded-full overflow-hidden">
@@ -180,12 +181,12 @@ export const Dashboard = () => {
         <div className="z-10 relative mt-8 md:mt-0 flex gap-4 md:gap-8 items-center justify-center">
           <div className="text-center">
             <span className="block font-headline text-5xl text-brand-accent">{String(diffDays).padStart(2, '0')}</span>
-            <span className="font-semibold text-xs text-brand-text-muted uppercase tracking-widest">Days</span>
+            <span className="font-semibold text-xs text-brand-text-muted uppercase tracking-widest">Hari</span>
           </div>
           <div className="text-brand-text-muted font-headline text-5xl opacity-30">:</div>
           <div className="text-center">
             <span className="block font-headline text-5xl text-brand-accent">{String(diffHrs).padStart(2, '0')}</span>
-            <span className="font-semibold text-xs text-brand-text-muted uppercase tracking-widest">Hrs</span>
+            <span className="font-semibold text-xs text-brand-text-muted uppercase tracking-widest">Jam</span>
           </div>
         </div>
         
@@ -202,22 +203,22 @@ export const Dashboard = () => {
               <span className="material-symbols-outlined">storefront</span>
             </div>
             <span className="font-semibold text-xs text-brand-primary bg-brand-primary/10 px-3 py-1 rounded-full border border-brand-primary/20 group-hover:bg-brand-primary group-hover:text-white transition-colors">
-              Vendor Hub
+              Pusat Vendor
             </span>
           </div>
 
           <div>
-            <span className="font-semibold text-[10px] text-brand-text-muted uppercase tracking-widest">Partner Network</span>
-            <h3 className="font-headline text-3xl text-brand-primary mb-3">{bookedVendors} / {totalVendors} Booked</h3>
-            
+            <span className="font-semibold text-[10px] text-brand-text-muted uppercase tracking-widest">Jaringan Partner</span>
+            <h3 className="font-headline text-3xl text-brand-primary mb-3">{bookedVendors} / {totalVendors} Dipesan</h3>
+
             <div className="grid grid-cols-2 gap-3 pt-2 border-t border-brand-border">
               <div>
-                <span className="text-[10px] text-brand-text-muted uppercase block">Contract Value</span>
+                <span className="text-[10px] text-brand-text-muted uppercase block">Nilai Kontrak</span>
                 <span className="font-bold text-sm text-brand-text whitespace-nowrap" title={formatIDR(vendorContractValue)}>{formatShortIDR(vendorContractValue)}</span>
               </div>
               <div>
-                <span className="text-[10px] text-brand-text-muted uppercase block">Negotiating</span>
-                <span className="font-bold text-sm text-brand-accent">{vendors.filter(v => v.status === 'NEGOTIATING').length} Vendors</span>
+                <span className="text-[10px] text-brand-text-muted uppercase block">Negosiasi</span>
+                <span className="font-bold text-sm text-brand-accent">{vendors.filter(v => v.status === 'NEGOTIATING').length} Vendor</span>
               </div>
             </div>
           </div>
@@ -230,22 +231,22 @@ export const Dashboard = () => {
               <span className="material-symbols-outlined">local_shipping</span>
             </div>
             <span className="font-semibold text-xs text-brand-accent bg-brand-accent/10 px-3 py-1 rounded-full border border-brand-accent/20 group-hover:bg-brand-accent group-hover:text-white transition-colors">
-              Operations Hub
+              Pusat Operasi
             </span>
           </div>
 
           <div>
-            <span className="font-semibold text-[10px] text-brand-text-muted uppercase tracking-widest">Event Assets & Protocols</span>
-            <h3 className="font-headline text-3xl text-brand-primary mb-3">{totalLogisticsCount} Items Tracked</h3>
-            
+            <span className="font-semibold text-[10px] text-brand-text-muted uppercase tracking-widest">Aset & Protokol Acara</span>
+            <h3 className="font-headline text-3xl text-brand-primary mb-3">{totalLogisticsCount} Item Terlacak</h3>
+
             <div className="grid grid-cols-2 gap-3 pt-2 border-t border-brand-border">
               <div>
-                <span className="text-[10px] text-brand-text-muted uppercase block">Pending Logistics</span>
-                <span className="font-bold text-sm text-brand-warning">{pendingLogisticsCount} Pending</span>
+                <span className="text-[10px] text-brand-text-muted uppercase block">Logistik Tertunda</span>
+                <span className="font-bold text-sm text-brand-warning">{pendingLogisticsCount} Tertunda</span>
               </div>
               <div>
-                <span className="text-[10px] text-brand-text-muted uppercase block">Handover Protocol</span>
-                <span className="font-bold text-sm text-brand-success">{pendingHandoversCount} Pending</span>
+                <span className="text-[10px] text-brand-text-muted uppercase block">Protokol Serah Terima</span>
+                <span className="font-bold text-sm text-brand-success">{pendingHandoversCount} Tertunda</span>
               </div>
             </div>
           </div>
@@ -263,7 +264,7 @@ export const Dashboard = () => {
             </div>
             <div className="flex flex-col items-end">
               <span className="font-semibold text-[10px] text-brand-success uppercase flex items-center gap-1">
-                <span className="material-symbols-outlined text-[12px]">trending_up</span> On Track
+                <span className="material-symbols-outlined text-[12px]">trending_up</span> Sesuai Rencana
               </span>
               <span className="font-headline text-xl text-brand-primary mt-1">{formatIDR(totalProjected)}</span>
               <span className="font-semibold text-[8px] text-brand-text-muted uppercase tracking-widest">Target Budget</span>
@@ -280,28 +281,28 @@ export const Dashboard = () => {
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="font-headline text-xl text-brand-primary">{paidPercent}%</span>
-              <span className="font-semibold text-[8px] uppercase text-brand-text-muted">Paid</span>
+              <span className="font-semibold text-[8px] uppercase text-brand-text-muted">Terbayar</span>
             </div>
           </div>
-          
+
           <div className="space-y-4">
             <div className="space-y-1">
               <div className="flex justify-between items-end">
-                <h3 className="font-headline text-lg text-brand-text">Budget Health</h3>
-                <span className="font-semibold text-xs text-brand-primary">{allocatedPercent}% Allocated</span>
+                <h3 className="font-headline text-lg text-brand-text">Kesehatan Budget</h3>
+                <span className="font-semibold text-xs text-brand-primary">{allocatedPercent}% Teralokasi</span>
               </div>
               <div className="h-2 w-full bg-brand-surface-hover rounded-full overflow-hidden flex">
-                <div className="h-full bg-brand-success" style={{ width: `${paidPercent}%` }} title="Paid"></div>
-                <div className="h-full bg-brand-warning" style={{ width: `${100 - paidPercent}%` }} title="Remaining"></div>
+                <div className="h-full bg-brand-success" style={{ width: `${paidPercent}%` }} title="Terbayar"></div>
+                <div className="h-full bg-brand-warning" style={{ width: `${100 - paidPercent}%` }} title="Sisa"></div>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-1.5">
               <div className="flex flex-col p-2 rounded-lg hover:bg-brand-success/10 transition-colors w-full min-w-0">
-                <span className="font-semibold text-[10px] text-brand-text-muted uppercase">Paid</span>
+                <span className="font-semibold text-[10px] text-brand-text-muted uppercase">Terbayar</span>
                 <span className="font-bold text-brand-success text-xs whitespace-nowrap overflow-hidden text-ellipsis" title={formatIDR(totalPaid)}>{formatShortIDR(totalPaid)}</span>
               </div>
               <div className="flex flex-col p-2 rounded-lg hover:bg-brand-warning/10 transition-colors w-full min-w-0">
-                <span className="font-semibold text-[10px] text-brand-text-muted uppercase">Rem.</span>
+                <span className="font-semibold text-[10px] text-brand-text-muted uppercase">Sisa</span>
                 <span className="font-bold text-brand-warning text-xs whitespace-nowrap overflow-hidden text-ellipsis" title={formatIDR(remainingAllocated)}>{formatShortIDR(remainingAllocated)}</span>
               </div>
               <div className="flex flex-col p-2 rounded-lg hover:bg-brand-surface-hover transition-colors w-full min-w-0">
@@ -318,43 +319,43 @@ export const Dashboard = () => {
             <div className="p-2 bg-brand-surface-hover rounded-lg group-hover:bg-brand-primary/10 transition-colors duration-300">
               <span className="material-symbols-outlined text-brand-primary">group_add</span>
             </div>
-            <span className="font-semibold text-xs text-brand-text-muted bg-brand-surface px-3 py-1 rounded-full border border-brand-border group-hover:bg-brand-primary group-hover:text-white transition-colors">Manage</span>
+            <span className="font-semibold text-xs text-brand-text-muted bg-brand-surface px-3 py-1 rounded-full border border-brand-border group-hover:bg-brand-primary group-hover:text-white transition-colors">Kelola</span>
           </div>
-          
+
           <div className="flex-1 flex flex-col">
-            <h3 className="font-headline text-2xl text-brand-text mb-6">Guest Readiness</h3>
+            <h3 className="font-headline text-2xl text-brand-text mb-6">Kesiapan Tamu</h3>
             <div className="space-y-6">
               <div className="space-y-2">
                 <div className="flex justify-between items-end">
-                  <span className="font-semibold text-[10px] text-brand-text-muted uppercase tracking-wider">Response Rate</span>
+                  <span className="font-semibold text-[10px] text-brand-text-muted uppercase tracking-wider">Tingkat Respons</span>
                   <span className="font-semibold text-xl text-brand-primary">{confirmedGuests} <span className="text-sm font-normal text-brand-text-muted">/ {totalGuests}</span></span>
                 </div>
                 <div className="h-3 w-full bg-brand-surface-hover rounded-full overflow-hidden flex">
-                  <div className="h-full bg-brand-success" style={{ width: `${confirmedPercent}%` }} title="Confirmed"></div>
-                  <div className="h-full bg-brand-warning" style={{ width: `${pendingPercent}%` }} title="Pending"></div>
-                  <div className="h-full bg-brand-text-muted/30" style={{ width: `${declinedPercent}%` }} title="Declined"></div>
+                  <div className="h-full bg-brand-success" style={{ width: `${confirmedPercent}%` }} title="Terkonfirmasi"></div>
+                  <div className="h-full bg-brand-warning" style={{ width: `${pendingPercent}%` }} title="Menunggu"></div>
+                  <div className="h-full bg-brand-text-muted/30" style={{ width: `${declinedPercent}%` }} title="Menolak"></div>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 gap-3">
                 <div className="flex items-center justify-between p-2 rounded-lg hover:bg-brand-surface-hover transition-colors">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-brand-success"></div>
-                    <span className="font-semibold text-[10px] text-brand-text-muted uppercase">Confirmed</span>
+                    <span className="font-semibold text-[10px] text-brand-text-muted uppercase">Terkonfirmasi</span>
                   </div>
                   <span className="font-bold text-sm text-brand-success">{confirmedGuests}</span>
                 </div>
                 <div className="flex items-center justify-between p-2 rounded-lg hover:bg-brand-surface-hover transition-colors">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-brand-warning"></div>
-                    <span className="font-semibold text-[10px] text-brand-text-muted uppercase">Pending</span>
+                    <span className="font-semibold text-[10px] text-brand-text-muted uppercase">Menunggu</span>
                   </div>
                   <span className="font-bold text-sm text-brand-warning">{pendingGuests}</span>
                 </div>
                 <div className="flex items-center justify-between p-2 rounded-lg hover:bg-brand-surface-hover transition-colors">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-brand-border"></div>
-                    <span className="font-semibold text-[10px] text-brand-text-muted uppercase">Declined</span>
+                    <span className="font-semibold text-[10px] text-brand-text-muted uppercase">Menolak</span>
                   </div>
                   <span className="font-bold text-sm text-brand-text-muted">{declinedGuests}</span>
                 </div>
@@ -370,12 +371,12 @@ export const Dashboard = () => {
               <span className="material-symbols-outlined text-brand-primary">task_alt</span>
             </div>
             <button onClick={() => setCurrentView('timeline')} className="font-semibold text-xs text-brand-accent hover:text-brand-primary transition-colors flex items-center hover:underline active:scale-95 transition-transform">
-              View All <span className="material-symbols-outlined text-sm ml-1">arrow_forward</span>
+              Lihat Semua <span className="material-symbols-outlined text-sm ml-1">arrow_forward</span>
             </button>
           </div>
-          
+
           <div>
-            <h3 className="font-headline text-2xl text-brand-text mb-4">Upcoming Milestones</h3>
+            <h3 className="font-headline text-2xl text-brand-text mb-4">Milestone Mendatang</h3>
             <ul className="space-y-3">
               {upcomingTasks.map((t, idx) => (
                 <li key={t.id || idx} onClick={() => setCurrentView('timeline')} className={`flex items-center gap-4 p-4 rounded-xl transition-all cursor-pointer group/item border-l-4 shadow-sm hover:shadow-md hover:scale-[1.02] ${
@@ -389,16 +390,16 @@ export const Dashboard = () => {
                       <span className={`font-bold text-[10px] uppercase tracking-widest ${
                          t.priority === 'High' ? 'text-brand-primary' :
                          t.priority === 'Medium' ? 'text-brand-warning' : 'text-brand-success'
-                      }`}>{t.priority} Priority</span>
+                      }`}>Prioritas {taskPriorityLabel(t.priority)}</span>
                       <span className="text-brand-border">|</span>
                       <span className="font-medium text-[10px] text-brand-text-muted italic">{t.dueDate}</span>
                     </div>
                   </div>
-                  <button onClick={(e) => { e.stopPropagation(); setCurrentView('timeline'); }} className="group-hover/item:opacity-100 opacity-0 transition-all bg-brand-primary text-white px-4 py-2 rounded-lg font-semibold text-[10px] uppercase hover:opacity-90 hover:shadow-md active:scale-95">View Detail</button>
+                  <button onClick={(e) => { e.stopPropagation(); setCurrentView('timeline'); }} className="group-hover/item:opacity-100 opacity-0 transition-all bg-brand-primary text-white px-4 py-2 rounded-lg font-semibold text-[10px] uppercase hover:opacity-90 hover:shadow-md active:scale-95">Lihat Detail</button>
                 </li>
               ))}
               {upcomingTasks.length === 0 && (
-                <div className="text-center py-6 text-brand-text-muted italic border-2 border-dashed border-brand-border rounded-xl">All milestones are completed!</div>
+                <div className="text-center py-6 text-brand-text-muted italic border-2 border-dashed border-brand-border rounded-xl">Semua milestone sudah selesai!</div>
               )}
             </ul>
           </div>
@@ -408,7 +409,7 @@ export const Dashboard = () => {
       {/* Recent Activity Feed */}
       <section className="bg-brand-surface rounded-xl luxury-shadow-1 border border-brand-border overflow-hidden">
         <div className="p-6 border-b border-brand-border flex justify-between items-center bg-brand-surface-hover/30">
-          <h2 className="font-headline text-2xl text-brand-primary">Recent Activity</h2>
+          <h2 className="font-headline text-2xl text-brand-primary">Aktivitas Terbaru</h2>
           <div className="relative">
             <button onClick={() => setShowActivityMenu(!showActivityMenu)} className="material-symbols-outlined text-brand-text-muted hover:text-brand-primary transition-colors focus:outline-none">
               more_horiz
@@ -416,10 +417,10 @@ export const Dashboard = () => {
             {showActivityMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-brand-surface border border-brand-border rounded-xl shadow-md z-50 p-2 space-y-1">
                 <button onClick={() => setCurrentView('timeline')} className="w-full text-left px-3 py-2 text-sm hover:bg-brand-surface-hover rounded-lg transition-colors flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px]">list_alt</span> View Full Activity
+                  <span className="material-symbols-outlined text-[18px]">list_alt</span> Lihat Semua Aktivitas
                 </button>
                 <button onClick={() => setCurrentView('settings')} className="w-full text-left px-3 py-2 text-sm hover:bg-brand-surface-hover rounded-lg transition-colors flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px]">settings</span> Activity Settings
+                  <span className="material-symbols-outlined text-[18px]">settings</span> Pengaturan Aktivitas
                 </button>
               </div>
             )}
@@ -443,7 +444,7 @@ export const Dashboard = () => {
                   </div>
                   <p className="font-body text-sm text-brand-text-muted mb-2">{latestExpense.name}{latestExpense.vendor ? ` — ${latestExpense.vendor}` : ''}</p>
                   <span className="inline-block px-3 py-1 bg-brand-surface-hover text-brand-text-muted font-semibold text-xs rounded-full border border-brand-border">{formatIDR(latestExpense.total)}</span>
-                  <button onClick={() => setCurrentView('budget')} className="mt-2 text-brand-primary font-semibold text-xs hover:underline flex items-center gap-1">View Budget <span className="material-symbols-outlined text-sm">open_in_new</span></button>
+                  <button onClick={() => setCurrentView('budget')} className="mt-2 text-brand-primary font-semibold text-xs hover:underline flex items-center gap-1">Lihat Budget <span className="material-symbols-outlined text-sm">open_in_new</span></button>
                 </div>
               )}
 
@@ -456,7 +457,7 @@ export const Dashboard = () => {
                     <h4 className="font-semibold text-lg text-brand-text">Tamu Terbaru</h4>
                   </div>
                   <p className="font-body text-sm text-brand-text-muted mb-2">{latestGuest.name} ditambahkan ke grup '{latestGuest.group}'.</p>
-                  <button onClick={() => setCurrentView('guests')} className="mt-2 text-brand-primary font-semibold text-xs hover:underline flex items-center gap-1">View Guest List <span className="material-symbols-outlined text-sm">open_in_new</span></button>
+                  <button onClick={() => setCurrentView('guests')} className="mt-2 text-brand-primary font-semibold text-xs hover:underline flex items-center gap-1">Lihat Daftar Tamu <span className="material-symbols-outlined text-sm">open_in_new</span></button>
                 </div>
               )}
 
@@ -468,10 +469,10 @@ export const Dashboard = () => {
                   <div className="flex justify-between items-start mb-1">
                     <h4 className="font-semibold text-lg text-brand-text">Vendor Terbaru</h4>
                   </div>
-                  <p className="font-body text-sm text-brand-text-muted mb-3">{latestVendor.name} — {latestVendor.category} ({latestVendor.status}).</p>
+                  <p className="font-body text-sm text-brand-text-muted mb-3">{latestVendor.name} — {latestVendor.category} ({vendorStatusLabel(latestVendor.status)}).</p>
                   <button onClick={() => setCurrentView('vendors')} className="inline-flex items-center gap-2 px-4 py-2 bg-brand-surface text-brand-primary font-semibold text-xs rounded-xl border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-colors">
                     <span className="material-symbols-outlined text-[18px]">storefront</span>
-                    View Vendor
+                    Lihat Vendor
                   </button>
                 </div>
               )}
@@ -483,10 +484,10 @@ export const Dashboard = () => {
       {showConfirm && (
         <ConfirmDialog 
           isOpen={showConfirm}
-          title="Confirm Action"
-          message="Are you sure you want to proceed with this action?"
+          title="Konfirmasi Tindakan"
+          message="Apakah kamu yakin ingin melanjutkan tindakan ini?"
           type="info"
-          confirmText="Yes, Proceed"
+          confirmText="Ya, Lanjutkan"
           onConfirm={() => setShowConfirm(false)}
           onCancel={() => setShowConfirm(false)}
         />

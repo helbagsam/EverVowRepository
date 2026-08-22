@@ -54,15 +54,15 @@ type CategoryKey =
   | "budget";
 
 const CATEGORY_DEFS: Record<CategoryKey, Omit<Category, "id">> = {
-  venue: { name: "Venue & Catering", icon: "home", colorClass: "text-brand-primary", bgClass: "bg-brand-primary" },
-  design: { name: "Design & Decor", icon: "palette", colorClass: "text-brand-accent", bgClass: "bg-brand-accent" },
-  attire: { name: "Attire", icon: "shirt", colorClass: "text-brand-success", bgClass: "bg-brand-success" },
-  photo: { name: "Photo & Video", icon: "camera", colorClass: "text-brand-warning", bgClass: "bg-brand-warning" },
-  entertainment: { name: "Entertainment", icon: "music", colorClass: "text-brand-primary", bgClass: "bg-brand-primary" },
-  logistics: { name: "Logistics", icon: "truck", colorClass: "text-brand-accent", bgClass: "bg-brand-accent" },
-  admin: { name: "Administration", icon: "filetext", colorClass: "text-brand-success", bgClass: "bg-brand-success" },
-  guests: { name: "Guests & Invitations", icon: "users", colorClass: "text-brand-warning", bgClass: "bg-brand-warning" },
-  budget: { name: "Budget & Finance", icon: "creditcard", colorClass: "text-brand-primary", bgClass: "bg-brand-primary" },
+  venue: { name: "Venue & Katering", icon: "home", colorClass: "text-brand-primary", bgClass: "bg-brand-primary" },
+  design: { name: "Desain & Dekorasi", icon: "palette", colorClass: "text-brand-accent", bgClass: "bg-brand-accent" },
+  attire: { name: "Busana", icon: "shirt", colorClass: "text-brand-success", bgClass: "bg-brand-success" },
+  photo: { name: "Foto & Video", icon: "camera", colorClass: "text-brand-warning", bgClass: "bg-brand-warning" },
+  entertainment: { name: "Hiburan", icon: "music", colorClass: "text-brand-primary", bgClass: "bg-brand-primary" },
+  logistics: { name: "Logistik", icon: "truck", colorClass: "text-brand-accent", bgClass: "bg-brand-accent" },
+  admin: { name: "Administrasi", icon: "filetext", colorClass: "text-brand-success", bgClass: "bg-brand-success" },
+  guests: { name: "Tamu & Undangan", icon: "users", colorClass: "text-brand-warning", bgClass: "bg-brand-warning" },
+  budget: { name: "Budget & Keuangan", icon: "creditcard", colorClass: "text-brand-primary", bgClass: "bg-brand-primary" },
 };
 
 /**

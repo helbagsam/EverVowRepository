@@ -100,10 +100,10 @@ export const Administration: React.FC = () => {
     
     setConfirmState({
       isOpen: true,
-      title: editingId ? 'Save Changes' : 'Add Requirement',
-      message: editingId ? 'Are you sure you want to update this requirement?' : 'Are you sure you want to add this requirement?',
+      title: editingId ? 'Simpan Perubahan' : 'Tambah Persyaratan',
+      message: editingId ? 'Apakah kamu yakin ingin memperbarui persyaratan ini?' : 'Apakah kamu yakin ingin menambahkan persyaratan ini?',
       type: 'info',
-      confirmText: 'Save',
+      confirmText: 'Simpan',
       onConfirm: () => {
         if (editingId) {
           editRequirement({
@@ -133,10 +133,10 @@ export const Administration: React.FC = () => {
   const handleDelete = (id: string) => {
     setConfirmState({
       isOpen: true,
-      title: 'Delete Requirement',
-      message: 'Are you sure you want to delete this requirement? This action cannot be undone.',
+      title: 'Hapus Persyaratan',
+      message: 'Apakah kamu yakin ingin menghapus persyaratan ini? Tindakan ini tidak dapat dibatalkan.',
       type: 'danger',
-      confirmText: 'Delete',
+      confirmText: 'Hapus',
       onConfirm: () => {
         const target = requirements.find(r => r.id === id);
         deleteRequirement(id);
@@ -158,8 +158,8 @@ export const Administration: React.FC = () => {
     <div className="max-w-[1440px] mx-auto space-y-8 animate-in fade-in duration-500 relative">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="font-headline text-4xl text-brand-text mb-2">Legal & Administration</h1>
-          <p className="text-brand-text-muted">Manage your official documents and requirements.</p>
+          <h1 className="font-headline text-4xl text-brand-text mb-2">Legal & Administrasi</h1>
+          <p className="text-brand-text-muted">Kelola dokumen resmi dan persyaratan kamu.</p>
         </div>
         <div className="flex gap-3 relative">
           <button onClick={() => setShowStatusFilterPanel(v => !v)} className={`px-6 py-2.5 border rounded-xl font-semibold text-sm flex items-center gap-2 transition-colors ${statusFilter !== 'All' ? 'bg-brand-accent/10 border-brand-accent text-brand-accent' : 'border-brand-accent text-brand-accent hover:bg-brand-accent/10'}`}>
@@ -179,7 +179,7 @@ export const Administration: React.FC = () => {
             </div>
           )}
           <button onClick={openAddModal} className="px-6 py-2.5 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
-            <Plus size={18} /> Add Requirement
+            <Plus size={18} /> Tambah Persyaratan
           </button>
         </div>
       </div>
@@ -188,7 +188,7 @@ export const Administration: React.FC = () => {
         <div className="lg:col-span-3 space-y-6">
           <div className="card overflow-hidden">
             <div className="p-4 border-b border-brand-border bg-brand-surface-hover/50">
-              <h3 className="font-headline text-xl text-brand-primary">Categories</h3>
+              <h3 className="font-headline text-xl text-brand-primary">Kategori</h3>
             </div>
             <div className="p-2 space-y-1">
               {['All', 'CPP', 'CPW', 'Joint', 'KUA'].map(cat => (
@@ -201,10 +201,10 @@ export const Administration: React.FC = () => {
           </div>
 
           <div className="card p-5">
-            <h4 className="text-xs text-brand-text-muted uppercase tracking-wider font-semibold mb-3">Overall Progress</h4>
+            <h4 className="text-xs text-brand-text-muted uppercase tracking-wider font-semibold mb-3">Progres Keseluruhan</h4>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-bold text-brand-primary">{progressPercent}% Complete</span>
-              <span className="text-xs text-brand-text-muted font-medium">{completed} of {requirements.length} docs</span>
+              <span className="text-sm font-bold text-brand-primary">{progressPercent}% Selesai</span>
+              <span className="text-xs text-brand-text-muted font-medium">{completed} dari {requirements.length} dokumen</span>
             </div>
             <div className="h-2 w-full bg-brand-surface-hover rounded-full overflow-hidden">
               <div className="h-full bg-gradient-to-r from-brand-primary to-brand-accent rounded-full transition-all duration-500" style={{ width: `${progressPercent}%` }}></div>
@@ -218,11 +218,11 @@ export const Administration: React.FC = () => {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-brand-surface-hover border-b border-brand-border">
-                    <th className="px-6 py-4 text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Document Name</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Description</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Nama Dokumen</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Deskripsi</th>
                     <th className="px-6 py-4 text-xs font-semibold text-brand-text-muted uppercase tracking-wider">File</th>
                     <th className="px-6 py-4 text-xs font-semibold text-brand-text-muted uppercase tracking-wider w-32">Status</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-brand-text-muted uppercase tracking-wider w-32 text-center">Actions</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-brand-text-muted uppercase tracking-wider w-32 text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-brand-border">
@@ -245,7 +245,7 @@ export const Administration: React.FC = () => {
                             </div>
                           )
                         ) : (
-                          <span className="text-xs text-brand-text-muted/50 italic">No file</span>
+                          <span className="text-xs text-brand-text-muted/50 italic">Tidak ada file</span>
                         )}
                       </td>
                       <td className="px-6 py-4">
@@ -275,7 +275,7 @@ export const Administration: React.FC = () => {
                   ))}
                   {filteredReqs.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="text-center py-8 text-brand-text-muted text-sm">No documents in this category.</td>
+                      <td colSpan={5} className="text-center py-8 text-brand-text-muted text-sm">Tidak ada dokumen di kategori ini.</td>
                     </tr>
                   )}
                 </tbody>
@@ -302,9 +302,9 @@ export const Administration: React.FC = () => {
             </div>
             <div className="text-center">
               <p className="text-sm font-semibold text-brand-text">
-                {isUploading && uploadTargetId === 'new' ? 'Mengunggah...' : 'Drag and drop file to upload'}
+                {isUploading && uploadTargetId === 'new' ? 'Mengunggah...' : 'Tarik dan lepas file untuk mengunggah'}
               </p>
-              <p className="text-xs text-brand-text-muted mt-1">Support JPG, PNG (Max 4MB)</p>
+              <p className="text-xs text-brand-text-muted mt-1">Mendukung JPG, PNG (Maks 4MB)</p>
             </div>
             <button
               type="button"
@@ -312,7 +312,7 @@ export const Administration: React.FC = () => {
               disabled={isUploading}
               className="mt-2 px-4 py-1.5 text-xs font-semibold rounded-lg border border-brand-accent text-brand-accent disabled:opacity-50"
             >
-              Add Evidence
+              Tambah Bukti
             </button>
           </div>
         </div>
@@ -322,38 +322,38 @@ export const Administration: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-6 border-b border-brand-border">
-              <h3 className="font-headline text-xl text-brand-text">{editingId ? 'Edit Document Requirement' : 'Add Document Requirement'}</h3>
+              <h3 className="font-headline text-xl text-brand-text">{editingId ? 'Edit Persyaratan Dokumen' : 'Tambah Persyaratan Dokumen'}</h3>
               <button onClick={() => setShowModal(false)} className="text-brand-text-muted hover:text-brand-text transition-colors">
                 <X size={20} />
               </button>
             </div>
             <form onSubmit={handleAdd} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-brand-text mb-1">Document Name</label>
-                <input required value={newReq.name} onChange={e => setNewReq({...newReq, name: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" placeholder="e.g. Surat Pengantar" />
+                <label className="block text-sm font-semibold text-brand-text mb-1">Nama Dokumen</label>
+                <input required value={newReq.name} onChange={e => setNewReq({...newReq, name: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" placeholder="cth. Surat Pengantar" />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-brand-text mb-1">Description</label>
+                <label className="block text-sm font-semibold text-brand-text mb-1">Deskripsi</label>
                 <input value={newReq.desc} onChange={e => setNewReq({...newReq, desc: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-brand-text mb-1">Category</label>
-                  <select 
-                    value={allCategoriesList.includes(newReq.category as string) ? newReq.category : 'Other'} 
-                    onChange={e => setNewReq({...newReq, category: e.target.value})} 
+                  <label className="block text-sm font-semibold text-brand-text mb-1">Kategori</label>
+                  <select
+                    value={allCategoriesList.includes(newReq.category as string) ? newReq.category : 'Other'}
+                    onChange={e => setNewReq({...newReq, category: e.target.value})}
                     className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all appearance-none"
                   >
                     {allCategoriesList.filter(c => c !== 'Other').map(c => <option key={c} value={c}>{c}</option>)}
-                    <option value="Other">Other</option>
+                    <option value="Other">Lainnya</option>
                   </select>
                   {(!allCategoriesList.includes(newReq.category as string) || newReq.category === 'Other') && (
-                    <input 
-                      type="text" 
-                      value={newReq.category === 'Other' ? '' : (newReq.category || '')} 
-                      onChange={e => setNewReq({...newReq, category: e.target.value})} 
-                      className="w-full px-4 py-2 mt-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" 
-                      placeholder="Specify other category..." 
+                    <input
+                      type="text"
+                      value={newReq.category === 'Other' ? '' : (newReq.category || '')}
+                      onChange={e => setNewReq({...newReq, category: e.target.value})}
+                      className="w-full px-4 py-2 mt-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all"
+                      placeholder="Sebutkan kategori lain..."
                     />
                   )}
                 </div>
@@ -367,8 +367,8 @@ export const Administration: React.FC = () => {
                 </div>
               </div>
               <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover transition-colors">Cancel</button>
-                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover transition-colors">{editingId ? 'Update Document' : 'Save Document'}</button>
+                <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover transition-colors">Batal</button>
+                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover transition-colors">{editingId ? 'Perbarui Dokumen' : 'Simpan Dokumen'}</button>
               </div>
             </form>
           </div>

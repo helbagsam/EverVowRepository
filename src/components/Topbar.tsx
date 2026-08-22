@@ -205,7 +205,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onOpenMobileMenu }) => {
             <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-text-muted" />
             <input 
               type="text" 
-              placeholder="Search planning, guests, budget..." 
+              placeholder="Cari perencanaan, tamu, budget..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -218,18 +218,18 @@ export const Topbar: React.FC<TopbarProps> = ({ onOpenMobileMenu }) => {
           {/* Search Results Dropdown */}
           {showSearchResults && (
             <div className="absolute top-full left-0 mt-2 w-full bg-brand-surface border border-brand-border rounded-xl shadow-lg overflow-hidden py-2 animate-in fade-in slide-in-from-top-2">
-              <div className="px-4 py-2 text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Quick Results</div>
+              <div className="px-4 py-2 text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Hasil Cepat</div>
               <button onClick={() => { setCurrentView('budget'); setShowSearchResults(false); }} className="w-full text-left px-4 py-2 text-sm text-brand-text hover:bg-brand-surface-hover flex items-center gap-3">
                 <span className="material-symbols-outlined text-[18px] text-brand-text-muted">account_balance_wallet</span>
-                Budget Planning
+                Perencanaan Budget
               </button>
               <button onClick={() => { setCurrentView('guests'); setShowSearchResults(false); }} className="w-full text-left px-4 py-2 text-sm text-brand-text hover:bg-brand-surface-hover flex items-center gap-3">
                 <span className="material-symbols-outlined text-[18px] text-brand-text-muted">group</span>
-                Guest List
+                Daftar Tamu
               </button>
               <button onClick={() => { setCurrentView('timeline'); setShowSearchResults(false); }} className="w-full text-left px-4 py-2 text-sm text-brand-text hover:bg-brand-surface-hover flex items-center gap-3">
                 <span className="material-symbols-outlined text-[18px] text-brand-text-muted">event_available</span>
-                Timeline Milestones
+                Milestone Timeline
               </button>
             </div>
           )}
@@ -238,7 +238,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onOpenMobileMenu }) => {
 
       <div className="flex items-center gap-2 md:gap-4">
         {/* Theme Toggle */}
-        <button onClick={toggleTheme} className="p-2 text-brand-text-muted hover:text-brand-primary transition-colors rounded-full hover:bg-brand-surface-hover" title="Toggle Dark Mode">
+        <button onClick={toggleTheme} className="p-2 text-brand-text-muted hover:text-brand-primary transition-colors rounded-full hover:bg-brand-surface-hover" title="Ganti Mode Gelap">
           {isDark ? <Sun size={22} /> : <Moon size={22} />}
         </button>
 
@@ -248,7 +248,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onOpenMobileMenu }) => {
           className="hidden md:flex items-center gap-2 px-4 py-2 text-brand-primary hover:bg-brand-primary/5 rounded-full transition-colors text-sm font-semibold"
         >
           <RefreshCw size={18} className={isSyncing ? 'animate-spin text-brand-accent' : ''} />
-          {isSyncing ? 'Syncing...' : 'Sync Now'}
+          {isSyncing ? 'Menyinkronkan...' : 'Sinkronkan'}
         </button>
         
         <div className="w-px h-6 bg-brand-border hidden md:block mx-1"></div>
@@ -268,9 +268,9 @@ export const Topbar: React.FC<TopbarProps> = ({ onOpenMobileMenu }) => {
           {showNotifications && (
             <div className="absolute right-0 mt-2 w-80 bg-brand-surface border border-brand-border rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2">
               <div className="p-4 border-b border-brand-border flex justify-between items-center bg-brand-bg">
-                <h3 className="font-semibold text-brand-text">Notifications</h3>
+                <h3 className="font-semibold text-brand-text">Notifikasi</h3>
                 {unreadCount > 0 && (
-                  <button onClick={markAllRead} className="text-xs font-semibold text-brand-accent hover:text-brand-primary hover:underline cursor-pointer transition-colors">Mark all read</button>
+                  <button onClick={markAllRead} className="text-xs font-semibold text-brand-accent hover:text-brand-primary hover:underline cursor-pointer transition-colors">Tandai semua dibaca</button>
                 )}
               </div>
               <div className="max-h-80 overflow-y-auto">
@@ -298,7 +298,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onOpenMobileMenu }) => {
                 ))}
               </div>
               <div className="p-3 text-center border-t border-brand-border bg-brand-bg">
-                <button onClick={() => setShowNotifications(false)} className="text-xs font-semibold text-brand-primary hover:underline hover:text-brand-accent transition-colors">View All Notifications</button>
+                <button onClick={() => setShowNotifications(false)} className="text-xs font-semibold text-brand-primary hover:underline hover:text-brand-accent transition-colors">Lihat Semua Notifikasi</button>
               </div>
             </div>
           )}
@@ -314,8 +314,8 @@ export const Topbar: React.FC<TopbarProps> = ({ onOpenMobileMenu }) => {
               {initials}
             </div>
             <div className="hidden md:block text-left">
-              <p className="text-sm font-semibold text-brand-text leading-tight">{username || 'Loading...'}</p>
-              <p className="text-xs text-brand-text-muted leading-tight mt-0.5">Lead Planner</p>
+              <p className="text-sm font-semibold text-brand-text leading-tight">{username || 'Memuat...'}</p>
+              <p className="text-xs text-brand-text-muted leading-tight mt-0.5">Perencana Utama</p>
             </div>
             <ChevronDown size={18} className={`text-brand-text-muted hidden md:block transition-transform duration-200 ${showProfile ? 'rotate-180' : ''}`} />
           </button>
@@ -323,20 +323,20 @@ export const Topbar: React.FC<TopbarProps> = ({ onOpenMobileMenu }) => {
           {showProfile && (
             <div className="absolute right-0 mt-3 w-56 bg-brand-surface border border-brand-border rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2">
               <div className="p-4 border-b border-brand-border bg-brand-bg md:hidden">
-                <p className="text-sm font-semibold text-brand-text leading-tight">{username || 'Loading...'}</p>
-                <p className="text-xs text-brand-text-muted leading-tight mt-0.5">Lead Planner</p>
+                <p className="text-sm font-semibold text-brand-text leading-tight">{username || 'Memuat...'}</p>
+                <p className="text-xs text-brand-text-muted leading-tight mt-0.5">Perencana Utama</p>
               </div>
               <div className="p-2">
                 <button onClick={() => { setCurrentView('settings'); setShowProfile(false); }} className="w-full flex items-center gap-3 px-3 py-2 text-sm text-brand-text hover:bg-brand-surface-hover hover:text-brand-primary rounded-lg transition-colors">
-                  <User size={16} /> My Profile
+                  <User size={16} /> Profil Saya
                 </button>
                 <button onClick={() => { setCurrentView('settings'); setShowProfile(false); }} className="w-full flex items-center gap-3 px-3 py-2 text-sm text-brand-text hover:bg-brand-surface-hover hover:text-brand-primary rounded-lg transition-colors">
-                  <Settings size={16} /> Account Settings
+                  <Settings size={16} /> Pengaturan Akun
                 </button>
               </div>
               <div className="border-t border-brand-border p-2">
                 <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2 text-sm text-brand-danger hover:bg-brand-danger-bg hover:text-brand-danger rounded-lg transition-colors">
-                  <LogOut size={16} /> Log Out
+                  <LogOut size={16} /> Keluar
                 </button>
               </div>
             </div>

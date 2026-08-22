@@ -23,6 +23,7 @@ import {
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { formatIDR as formatCurrency } from '../utils/formatters';
+import { vendorStatusLabel } from '../lib/labels';
 
 export const Vendors: React.FC = () => {
   const { 
@@ -49,12 +50,12 @@ export const Vendors: React.FC = () => {
     
     addExpense({
       id: Date.now().toString(),
-      name: `Contract: ${vendor.name}`,
+      name: `Kontrak: ${vendor.name}`,
       vendor: vendor.name,
       total: vendor.totalValue,
       paid: vendor.paidValue,
       status: vendor.totalValue === vendor.paidValue ? 'Lunas' : (vendor.paidValue > 0 ? 'DP' : 'Unpaid'),
-      category: vendor.category || 'Other',
+      category: vendor.category || 'Lainnya',
     } as any);
 
     editVendor({ ...vendor, pushedToBudget: true });
@@ -66,8 +67,8 @@ export const Vendors: React.FC = () => {
       setVendorForm(vendor);
     } else {
       setEditingVendorId(null);
-      setVendorForm({ 
-        category: 'Venue & Catering', 
+      setVendorForm({
+        category: 'Venue & Katering',
         status: 'RESEARCHING', 
         totalValue: 0, 
         paidValue: 0,
@@ -98,10 +99,10 @@ export const Vendors: React.FC = () => {
   const handleDeleteVendor = (id: string) => {
     setConfirmState({
       isOpen: true,
-      title: 'Delete Vendor',
-      message: 'Are you sure you want to remove this vendor partner?',
+      title: 'Hapus Vendor',
+      message: 'Apakah kamu yakin ingin menghapus vendor partner ini?',
       type: 'danger',
-      confirmText: 'Delete',
+      confirmText: 'Hapus',
       onConfirm: () => {
         deleteVendor(id);
         setConfirmState(null);
@@ -110,7 +111,7 @@ export const Vendors: React.FC = () => {
   };
 
   // --- DIRECTORY FILTERS ---
-  const categoriesList = ['All', 'Venue & Catering', 'Florals & Decor', 'Photography & Video', 'Entertainment', 'Attire & Beauty', 'Transportation', 'Other'];
+  const categoriesList = ['All', 'Venue & Katering', 'Bunga & Dekorasi', 'Foto & Video', 'Hiburan', 'Busana & Kecantikan', 'Transportasi', 'Lainnya'];
   const statuses = ['ALL', 'RESEARCHING', 'CONTACTED', 'NEGOTIATING', 'BOOKED', 'COMPLETED'];
 
   const filteredVendors = vendors.filter(v => {
@@ -150,17 +151,17 @@ export const Vendors: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <p className="text-xs font-semibold text-brand-accent uppercase tracking-widest mb-2">Partner Directory</p>
-          <h2 className="font-headline text-4xl text-brand-primary mb-2">Vendor Directory & Partners</h2>
-          <p className="text-brand-text-muted">Manage vendor relationships, contracts, rates, and payment milestones.</p>
+          <p className="text-xs font-semibold text-brand-accent uppercase tracking-widest mb-2">Direktori Partner</p>
+          <h2 className="font-headline text-4xl text-brand-primary mb-2">Direktori Vendor & Partner</h2>
+          <p className="text-brand-text-muted">Kelola relasi vendor, kontrak, tarif, dan milestone pembayaran.</p>
         </div>
         <div className="flex gap-4">
-          <button 
+          <button
             onClick={() => openVendorModal()}
             className="flex items-center gap-2 px-4 py-2 bg-brand-primary text-white rounded-xl hover:bg-brand-primary-hover transition-colors shadow-sm text-sm font-semibold"
           >
             <Plus size={16} />
-            Add Vendor
+            Tambah Vendor
           </button>
         </div>
       </div>
@@ -173,11 +174,11 @@ export const Vendors: React.FC = () => {
               <div className="p-2 bg-brand-surface-hover rounded-lg text-brand-primary">
                 <Store size={20} />
               </div>
-              <h3 className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Total Vendors</h3>
+              <h3 className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Total Vendor</h3>
             </div>
             <p className="font-headline text-4xl text-brand-text">{vendors.length}</p>
             <p className="text-xs text-brand-text-muted mt-2 font-medium">
-              {vendors.filter(v => v.status === 'BOOKED' || v.status === 'COMPLETED').length} confirmed booked
+              {vendors.filter(v => v.status === 'BOOKED' || v.status === 'COMPLETED').length} terkonfirmasi dipesan
             </p>
           </div>
 
@@ -186,13 +187,13 @@ export const Vendors: React.FC = () => {
               <div className="p-2 bg-brand-primary/10 rounded-lg text-brand-primary">
                 <FileText size={20} />
               </div>
-              <h3 className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Contract Value</h3>
+              <h3 className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Nilai Kontrak</h3>
             </div>
             <p className="font-headline text-2xl text-brand-text truncate">{formatCurrency(calculateTotalValue())}</p>
             <div className="w-full h-1.5 bg-brand-surface-hover rounded-full overflow-hidden mt-3 mb-1">
               <div className="h-full bg-brand-primary rounded-full" style={{ width: `${calculateTotalValue() ? (calculateTotalPaid() / calculateTotalValue()) * 100 : 0}%` }} />
             </div>
-            <p className="text-xs text-brand-text-muted font-medium">{formatCurrency(calculateTotalPaid())} paid</p>
+            <p className="text-xs text-brand-text-muted font-medium">{formatCurrency(calculateTotalPaid())} dibayar</p>
           </div>
 
           <div className="bg-brand-surface border border-brand-border rounded-2xl p-6 flex flex-col justify-center shadow-sm">
@@ -200,18 +201,18 @@ export const Vendors: React.FC = () => {
               <div className="p-2 bg-brand-success-bg rounded-lg text-brand-success">
                 <CheckCircle size={20} />
               </div>
-              <h3 className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Budget Synced</h3>
+              <h3 className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Tersinkron ke Budget</h3>
             </div>
             <p className="font-headline text-4xl text-brand-text">
               {vendors.filter(v => v.pushedToBudget).length}
             </p>
-            <p className="text-xs text-brand-text-muted mt-2 font-medium">pushed to budget audit</p>
+            <p className="text-xs text-brand-text-muted mt-2 font-medium">didorong ke audit budget</p>
           </div>
         </div>
 
         <div className="bg-brand-surface border border-brand-border rounded-2xl p-6 shadow-sm min-h-[240px] flex flex-col">
           <h3 className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
-            <PieChartIcon size={16} /> Spend by Category
+            <PieChartIcon size={16} /> Pengeluaran per Kategori
           </h3>
           {chartData.length > 0 ? (
             <div className="flex-1 w-full relative min-h-[160px]">
@@ -240,7 +241,7 @@ export const Vendors: React.FC = () => {
             </div>
           ) : (
             <div className="flex-1 flex items-center justify-center text-brand-text-muted text-sm font-medium">
-              No category spend data
+              Belum ada data pengeluaran kategori
             </div>
           )}
         </div>
@@ -250,9 +251,9 @@ export const Vendors: React.FC = () => {
       <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-brand-surface p-4 rounded-2xl border border-brand-border">
         <div className="relative w-full md:w-80">
           <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-text-muted" />
-          <input 
-            type="text" 
-            placeholder="Search vendor or PIC..." 
+          <input
+            type="text"
+            placeholder="Cari vendor atau PIC..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className="w-full pl-11 pr-4 py-2 bg-brand-surface-hover rounded-xl border border-brand-border text-sm text-brand-text focus:outline-none focus:border-brand-primary transition-all"
@@ -267,7 +268,7 @@ export const Vendors: React.FC = () => {
                 filterCategory === cat ? 'bg-brand-primary text-white border-brand-primary' : 'bg-brand-surface border-brand-border text-brand-text-muted hover:border-brand-accent'
               }`}
             >
-              {cat}
+              {cat === 'All' ? 'Semua' : cat}
             </button>
           ))}
         </div>
@@ -283,7 +284,7 @@ export const Vendors: React.FC = () => {
               filterStatus === st ? 'bg-brand-primary text-white border-brand-primary' : 'bg-brand-surface-hover border-transparent text-brand-text-muted hover:border-brand-border'
             }`}
           >
-            {st}
+            {st === 'ALL' ? 'SEMUA' : vendorStatusLabel(st as Vendor['status']).toUpperCase()}
           </button>
         ))}
       </div>
@@ -301,10 +302,10 @@ export const Vendors: React.FC = () => {
               >
                 <Edit2 size={16} />
               </button>
-              <button 
-                onClick={() => handleDeleteVendor(vendor.id)} 
+              <button
+                onClick={() => handleDeleteVendor(vendor.id)}
                 className="p-2 bg-brand-surface-hover text-brand-text-muted hover:text-brand-danger rounded-full transition-colors"
-                title="Delete Vendor"
+                title="Hapus Vendor"
               >
                 <Trash2 size={16} />
               </button>
@@ -315,7 +316,7 @@ export const Vendors: React.FC = () => {
                 {vendor.name ? vendor.name.substring(0, 2).toUpperCase() : '?'}
               </div>
               <div className="flex-1">
-                <h3 className="font-headline text-2xl text-brand-text leading-tight mb-1">{vendor.name || 'Unnamed Vendor'}</h3>
+                <h3 className="font-headline text-2xl text-brand-text leading-tight mb-1">{vendor.name || 'Vendor Tanpa Nama'}</h3>
                 <p className="text-[10px] font-bold text-brand-accent tracking-wider uppercase mb-1">{vendor.category}</p>
                 <div className="flex gap-1 text-brand-accent">
                   {[...Array(5)].map((_, i) => (
@@ -327,42 +328,42 @@ export const Vendors: React.FC = () => {
 
             <div className="mb-4">
               <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(vendor.status || '')}`}>
-                {vendor.status ? vendor.status.charAt(0).toUpperCase() + vendor.status.slice(1).toLowerCase() : 'Unknown'}
+                {vendor.status ? vendorStatusLabel(vendor.status) : 'Tidak diketahui'}
               </span>
             </div>
 
             <div className="space-y-2.5 mb-6 text-xs text-brand-text flex-1">
               <div className="flex items-center gap-3">
                 <User size={15} className="text-brand-text-muted shrink-0" />
-                <span>{vendor.picName || 'PIC not assigned'}</span>
+                <span>{vendor.picName || 'PIC belum ditentukan'}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone size={15} className="text-brand-text-muted shrink-0" />
-                <span>{vendor.picPhone || 'No phone'}</span>
+                <span>{vendor.picPhone || 'Tidak ada telepon'}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Mail size={15} className="text-brand-text-muted shrink-0" />
-                <span className="truncate">{vendor.picEmail || 'No email'}</span>
+                <span className="truncate">{vendor.picEmail || 'Tidak ada email'}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Globe size={15} className="text-brand-text-muted shrink-0" />
-                <span className="truncate">{vendor.website || 'No website'}</span>
+                <span className="truncate">{vendor.website || 'Tidak ada website'}</span>
               </div>
             </div>
 
             <div className="border-t border-brand-border pt-4 mb-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs text-brand-text-muted">Contract Value</span>
+                <span className="text-xs text-brand-text-muted">Nilai Kontrak</span>
                 <span className="font-semibold text-brand-text text-sm">{formatCurrency(vendor.totalValue || 0)}</span>
               </div>
               <div className="w-full h-1.5 bg-brand-surface-hover rounded-full overflow-hidden mb-2">
-                <div 
+                <div
                   className="h-full bg-brand-success rounded-full"
                   style={{ width: `${vendor.totalValue ? ((vendor.paidValue || 0) / vendor.totalValue) * 100 : 0}%` }}
                 />
               </div>
               <div className="flex justify-between items-center text-xs">
-                <span className="text-brand-text-muted">{formatCurrency(vendor.paidValue || 0)} paid</span>
+                <span className="text-brand-text-muted">{formatCurrency(vendor.paidValue || 0)} dibayar</span>
                 <span className="font-semibold text-brand-text-muted">{Math.round(((vendor.paidValue || 0) / (vendor.totalValue || 1)) * 100)}%</span>
               </div>
             </div>
@@ -381,22 +382,22 @@ export const Vendors: React.FC = () => {
                 className="w-full py-2 bg-brand-surface-hover text-brand-text rounded-xl font-semibold text-xs flex items-center justify-center gap-2 hover:bg-brand-surface-hover/80 transition-colors"
               >
                 <MessageCircle size={16} />
-                WhatsApp Contact
+                Kontak WhatsApp
               </a>
               {vendor.status === 'BOOKED' || vendor.status === 'COMPLETED' ? (
                 <button
                   disabled={vendor.pushedToBudget}
                   onClick={(e) => { e.stopPropagation(); pushToBudget(vendor); }}
                   className={`w-full py-2 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors ${
-                    vendor.pushedToBudget 
-                      ? 'bg-brand-surface-hover text-brand-text-muted cursor-not-allowed border border-brand-border' 
+                    vendor.pushedToBudget
+                      ? 'bg-brand-surface-hover text-brand-text-muted cursor-not-allowed border border-brand-border'
                       : 'bg-brand-primary text-white hover:bg-brand-primary-hover'
                   }`}
                 >
                   {vendor.pushedToBudget ? (
-                    <><CheckCircle size={16} /> Synced to Budget</>
+                    <><CheckCircle size={16} /> Tersinkron ke Budget</>
                   ) : (
-                    <><Upload size={16} /> Push to Budgeting</>
+                    <><Upload size={16} /> Dorong ke Budget</>
                   )}
                 </button>
               ) : null}
@@ -406,7 +407,7 @@ export const Vendors: React.FC = () => {
 
         {filteredVendors.length === 0 && (
           <div className="col-span-full text-center py-12 text-brand-text-muted border-2 border-dashed border-brand-border rounded-2xl">
-            No vendors found matching your criteria.
+            Tidak ada vendor yang cocok dengan kriteria kamu.
           </div>
         )}
       </div>
@@ -416,57 +417,57 @@ export const Vendors: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-6 border-b border-brand-border bg-brand-surface-hover">
-              <h3 className="font-headline text-2xl text-brand-primary">{editingVendorId ? 'Edit Vendor Partner' : 'Add New Vendor Partner'}</h3>
+              <h3 className="font-headline text-2xl text-brand-primary">{editingVendorId ? 'Edit Vendor Partner' : 'Tambah Vendor Partner Baru'}</h3>
               <button onClick={() => setShowVendorModal(false)} className="text-brand-text-muted hover:text-brand-text transition-colors">
                 <XCircle size={20} />
               </button>
             </div>
             <form onSubmit={saveVendor} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto hide-scrollbar">
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Vendor Name</label>
-                <input required value={vendorForm.name || ''} onChange={e => setVendorForm({...vendorForm, name: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="e.g. The Grand Estate" />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Nama Vendor</label>
+                <input required value={vendorForm.name || ''} onChange={e => setVendorForm({...vendorForm, name: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="cth. The Grand Estate" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Category</label>
-                  <select value={vendorForm.category || 'Venue & Catering'} onChange={e => setVendorForm({...vendorForm, category: e.target.value})} className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary">
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Kategori</label>
+                  <select value={vendorForm.category || 'Venue & Katering'} onChange={e => setVendorForm({...vendorForm, category: e.target.value})} className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary">
                     {categoriesList.filter(c => c !== 'All').map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Status</label>
                   <select value={vendorForm.status || 'RESEARCHING'} onChange={e => setVendorForm({...vendorForm, status: e.target.value as any})} className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary">
-                    <option value="RESEARCHING">RESEARCHING</option>
-                    <option value="CONTACTED">CONTACTED</option>
-                    <option value="NEGOTIATING">NEGOTIATING</option>
-                    <option value="BOOKED">BOOKED</option>
-                    <option value="COMPLETED">COMPLETED</option>
+                    <option value="RESEARCHING">Riset</option>
+                    <option value="CONTACTED">Dihubungi</option>
+                    <option value="NEGOTIATING">Negosiasi</option>
+                    <option value="BOOKED">Dipesan</option>
+                    <option value="COMPLETED">Selesai</option>
                   </select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Total Contract (Rp)</label>
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Total Kontrak (Rp)</label>
                   <input value={vendorForm.totalValue || 0} onChange={e => setVendorForm({...vendorForm, totalValue: Number(e.target.value)})} type="number" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Paid Value (Rp)</label>
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Nilai Dibayar (Rp)</label>
                   <input value={vendorForm.paidValue || 0} onChange={e => setVendorForm({...vendorForm, paidValue: Number(e.target.value)})} type="number" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">PIC Name</label>
-                  <input value={vendorForm.picName || ''} onChange={e => setVendorForm({...vendorForm, picName: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="e.g. Amanda Wells" />
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Nama PIC</label>
+                  <input value={vendorForm.picName || ''} onChange={e => setVendorForm({...vendorForm, picName: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="cth. Amanda Wells" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">PIC Phone (WhatsApp)</label>
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Telepon PIC (WhatsApp)</label>
                   <input value={vendorForm.picPhone || ''} onChange={e => setVendorForm({...vendorForm, picPhone: e.target.value})} type="tel" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="+628123456789" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">PIC Email</label>
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Email PIC</label>
                   <input value={vendorForm.picEmail || ''} onChange={e => setVendorForm({...vendorForm, picEmail: e.target.value})} type="email" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="contact@vendor.id" />
                 </div>
                 <div>
@@ -475,12 +476,12 @@ export const Vendors: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Notes</label>
-                <textarea value={vendorForm.notes || ''} onChange={e => setVendorForm({...vendorForm, notes: e.target.value})} rows={3} className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="Add contract notes or walkthrough details..." />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Catatan</label>
+                <textarea value={vendorForm.notes || ''} onChange={e => setVendorForm({...vendorForm, notes: e.target.value})} rows={3} className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="Tambahkan catatan kontrak atau detail walkthrough..." />
               </div>
               <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setShowVendorModal(false)} className="flex-1 px-4 py-2.5 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Cancel</button>
-                <button type="submit" className="flex-1 px-4 py-2.5 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingVendorId ? 'Update Partner' : 'Save Partner'}</button>
+                <button type="button" onClick={() => setShowVendorModal(false)} className="flex-1 px-4 py-2.5 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Batal</button>
+                <button type="submit" className="flex-1 px-4 py-2.5 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingVendorId ? 'Perbarui Partner' : 'Simpan Partner'}</button>
               </div>
             </form>
           </div>

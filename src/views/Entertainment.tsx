@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Gamepad2, Plus, Clock, Edit2, Trash2, PartyPopper, Gift, X, CheckCircle } from 'lucide-react';
 import { useAppContext, Activity } from '../store/AppContext';
+import { activityStatusLabel } from '../lib/labels';
 
 interface FlowSlot {
   id: string;
@@ -37,7 +38,7 @@ export const Entertainment: React.FC = () => {
   
   const [newAct, setNewAct] = useState<Partial<Activity>>({
     title: '',
-    category: 'Reception',
+    category: 'Resepsi',
     status: 'Planning',
     duration: 15,
     needs: '',
@@ -61,7 +62,7 @@ export const Entertainment: React.FC = () => {
 
   const openAddModal = () => {
     setEditingId(null);
-    setNewAct({ title: '', category: 'Reception', status: 'Planning', duration: 15, needs: '', desc: '' });
+    setNewAct({ title: '', category: 'Resepsi', status: 'Planning', duration: 15, needs: '', desc: '' });
     setShowModal(true);
   };
 
@@ -79,7 +80,7 @@ export const Entertainment: React.FC = () => {
       editActivity({
         id: editingId,
         title: newAct.title!,
-        category: newAct.category || 'Reception',
+        category: newAct.category || 'Resepsi',
         status: newAct.status as any,
         duration: newAct.duration || 15,
         needs: newAct.needs || '',
@@ -89,7 +90,7 @@ export const Entertainment: React.FC = () => {
       addActivity({
         id: Date.now().toString(),
         title: newAct.title!,
-        category: newAct.category || 'Reception',
+        category: newAct.category || 'Resepsi',
         status: newAct.status as any,
         duration: newAct.duration || 15,
         needs: newAct.needs || '',
@@ -102,10 +103,10 @@ export const Entertainment: React.FC = () => {
   const handleDelete = (id: string) => {
     setConfirmState({
       isOpen: true,
-      title: 'Delete Activity',
-      message: 'Are you sure you want to delete this activity?',
+      title: 'Hapus Aktivitas',
+      message: 'Apakah kamu yakin ingin menghapus aktivitas ini?',
       type: 'danger',
-      confirmText: 'Delete',
+      confirmText: 'Hapus',
       onConfirm: () => {
         deleteActivity(id);
         setConfirmState(null);
@@ -140,8 +141,8 @@ export const Entertainment: React.FC = () => {
     setFlowSlots(flowSlots.filter(s => s.id !== id));
   };
 
-  const allCategoriesList = Array.from(new Set(['Reception', 'Icebreaker', 'Pre-Wedding', 'After Party', 'Other', ...activities.map(a => a.category as string)])).filter(Boolean);
-  const filterCategories = ['All', ...allCategoriesList.filter(c => c !== 'Other')];
+  const allCategoriesList = Array.from(new Set(['Resepsi', 'Icebreaker', 'Pra-Nikah', 'After Party', 'Lainnya', ...activities.map(a => a.category as string)])).filter(Boolean);
+  const filterCategories = ['All', ...allCategoriesList.filter(c => c !== 'Lainnya')];
 
   const filteredActs = filter === 'All' ? activities : activities.filter(a => a.category === filter);
   const totalDuration = activities.reduce((sum, act) => sum + act.duration, 0);
@@ -151,13 +152,13 @@ export const Entertainment: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
-          <p className="text-xs font-semibold text-brand-accent uppercase tracking-widest mb-2">Program & Engagement</p>
-          <h1 className="font-headline text-4xl text-brand-text mb-2">Entertainment & Event Flow</h1>
-          <p className="text-brand-text-muted">Curate games, speeches, acoustic performances, and run of show timelines.</p>
+          <p className="text-xs font-semibold text-brand-accent uppercase tracking-widest mb-2">Program & Interaksi</p>
+          <h1 className="font-headline text-4xl text-brand-text mb-2">Hiburan & Alur Acara</h1>
+          <p className="text-brand-text-muted">Kurasi permainan, sambutan, penampilan akustik, dan timeline run of show.</p>
         </div>
         <div className="flex gap-4">
           <button onClick={openAddModal} className="px-6 py-2.5 bg-brand-primary text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-brand-primary-hover transition-colors shadow-sm">
-            <Plus size={18} /> Add Activity
+            <Plus size={18} /> Tambah Aktivitas
           </button>
         </div>
       </div>
@@ -169,7 +170,7 @@ export const Entertainment: React.FC = () => {
             <PartyPopper size={24} />
           </div>
           <div>
-            <p className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider mb-1">Total Activities</p>
+            <p className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider mb-1">Total Aktivitas</p>
             <p className="font-headline text-3xl text-brand-text">{activities.length}</p>
           </div>
         </div>
@@ -178,8 +179,8 @@ export const Entertainment: React.FC = () => {
             <Clock size={24} />
           </div>
           <div>
-            <p className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider mb-1">Scheduled Duration</p>
-            <p className="font-headline text-3xl text-brand-text">{totalDuration} mins</p>
+            <p className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider mb-1">Durasi Terjadwal</p>
+            <p className="font-headline text-3xl text-brand-text">{totalDuration} menit</p>
           </div>
         </div>
         <div className="card p-6 flex items-center gap-4 hover:border-brand-accent transition-colors">
@@ -187,7 +188,7 @@ export const Entertainment: React.FC = () => {
             <Gift size={24} />
           </div>
           <div>
-            <p className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider mb-1">Timeline Slots</p>
+            <p className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider mb-1">Slot Timeline</p>
             <p className="font-headline text-3xl text-brand-text">{flowSlots.length}</p>
           </div>
         </div>
@@ -198,7 +199,7 @@ export const Entertainment: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex gap-2 bg-brand-surface p-1 rounded-lg border border-brand-border w-fit overflow-x-auto hide-scrollbar">
             {filterCategories.map(cat => (
-              <button key={cat} onClick={() => setFilter(cat)} className={`px-4 py-2 rounded-md font-semibold text-sm whitespace-nowrap transition-colors ${filter === cat ? 'bg-brand-primary text-white shadow-sm' : 'text-brand-text-muted hover:bg-brand-surface-hover'}`}>{cat}</button>
+              <button key={cat} onClick={() => setFilter(cat)} className={`px-4 py-2 rounded-md font-semibold text-sm whitespace-nowrap transition-colors ${filter === cat ? 'bg-brand-primary text-white shadow-sm' : 'text-brand-text-muted hover:bg-brand-surface-hover'}`}>{cat === 'All' ? 'Semua' : cat}</button>
             ))}
           </div>
 
@@ -212,7 +213,7 @@ export const Entertainment: React.FC = () => {
                 <div className="flex justify-between items-start mb-4 pr-16">
                   <div>
                     <span className={`inline-block px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider mb-2 ${
-                      act.category === 'Reception' ? 'bg-brand-accent/20 text-brand-accent' : 'bg-brand-primary/20 text-brand-primary'
+                      act.category === 'Resepsi' ? 'bg-brand-accent/20 text-brand-accent' : 'bg-brand-primary/20 text-brand-primary'
                     }`}>
                       {act.category}
                     </span>
@@ -223,13 +224,13 @@ export const Entertainment: React.FC = () => {
                   <span className={`px-3 py-1 rounded-full text-[11px] font-semibold border ${
                     act.status === 'Confirmed' ? 'bg-brand-success-bg text-brand-success border-brand-success/20' : 'bg-brand-warning-bg text-brand-warning border-brand-warning/30'
                   }`}>
-                    {act.status}
+                    {activityStatusLabel(act.status)}
                   </span>
                 </div>
                 <p className="text-sm text-brand-text-muted mb-4 line-clamp-2 flex-1">{act.desc}</p>
                 <div className="flex items-center gap-4 border-t border-brand-border pt-4">
                   <div className="flex items-center gap-1 text-brand-text-muted text-xs font-medium">
-                    <Clock size={16} /> {act.duration} mins
+                    <Clock size={16} /> {act.duration} menit
                   </div>
                   {act.needs && (
                     <div className="flex items-center gap-1 text-brand-text-muted text-xs font-medium line-clamp-1">
@@ -241,7 +242,7 @@ export const Entertainment: React.FC = () => {
             ))}
             {filteredActs.length === 0 && (
               <div className="col-span-1 md:col-span-2 text-center py-12 text-brand-text-muted border-2 border-dashed border-brand-border rounded-xl">
-                No activities found in this category.
+                Tidak ada aktivitas ditemukan di kategori ini.
               </div>
             )}
           </div>
@@ -253,7 +254,7 @@ export const Entertainment: React.FC = () => {
             <div className="flex justify-between items-center border-b border-brand-border pb-4 mb-6">
               <h3 className="font-headline text-2xl text-brand-text">Flow Timeline</h3>
               <button onClick={() => openFlowModal()} className="flex items-center gap-1 text-brand-primary text-xs font-semibold hover:underline transition-all">
-                <Plus size={14} /> Add Slot
+                <Plus size={14} /> Tambah Slot
               </button>
             </div>
 
@@ -278,7 +279,7 @@ export const Entertainment: React.FC = () => {
               ))}
 
               {flowSlots.length === 0 && (
-                <p className="text-xs text-brand-text-muted italic">No flow timeline slots defined.</p>
+                <p className="text-xs text-brand-text-muted italic">Belum ada slot flow timeline.</p>
               )}
             </div>
           </div>
@@ -290,44 +291,44 @@ export const Entertainment: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-6 border-b border-brand-border bg-brand-surface-hover">
-              <h3 className="font-headline text-xl text-brand-text">{editingId ? 'Edit Activity' : 'Add Activity'}</h3>
+              <h3 className="font-headline text-xl text-brand-text">{editingId ? 'Edit Aktivitas' : 'Tambah Aktivitas'}</h3>
               <button onClick={() => setShowModal(false)} className="text-brand-text-muted hover:text-brand-text transition-colors">
                 <X size={20} />
               </button>
             </div>
             <form onSubmit={handleAdd} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Activity Title</label>
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Judul Aktivitas</label>
                 <input required value={newAct.title} onChange={e => setNewAct({...newAct, title: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Description</label>
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Deskripsi</label>
                 <input value={newAct.desc} onChange={e => setNewAct({...newAct, desc: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Category</label>
-                  <select 
-                    value={allCategoriesList.includes(newAct.category as string) ? newAct.category : 'Other'} 
-                    onChange={e => setNewAct({...newAct, category: e.target.value})} 
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Kategori</label>
+                  <select
+                    value={allCategoriesList.includes(newAct.category as string) ? newAct.category : 'Lainnya'}
+                    onChange={e => setNewAct({...newAct, category: e.target.value})}
                     className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary"
                   >
-                    {allCategoriesList.filter(c => c !== 'Other').map(c => <option key={c} value={c}>{c}</option>)}
-                    <option value="Other">Other</option>
+                    {allCategoriesList.filter(c => c !== 'Lainnya').map(c => <option key={c} value={c}>{c}</option>)}
+                    <option value="Lainnya">Lainnya</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Duration (mins)</label>
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Durasi (menit)</label>
                   <input value={newAct.duration} onChange={e => setNewAct({...newAct, duration: parseInt(e.target.value) || 0})} type="number" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Needs/Prizes</label>
-                <input value={newAct.needs} onChange={e => setNewAct({...newAct, needs: e.target.value})} type="text" placeholder="e.g. 2 Chairs, 5 Prizes" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Kebutuhan/Hadiah</label>
+                <input value={newAct.needs} onChange={e => setNewAct({...newAct, needs: e.target.value})} type="text" placeholder="cth. 2 Kursi, 5 Hadiah" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" />
               </div>
               <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Cancel</button>
-                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingId ? 'Update Activity' : 'Save Activity'}</button>
+                <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Batal</button>
+                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingId ? 'Perbarui Aktivitas' : 'Simpan Aktivitas'}</button>
               </div>
             </form>
           </div>
@@ -339,29 +340,29 @@ export const Entertainment: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-6 border-b border-brand-border bg-brand-surface-hover">
-              <h3 className="font-headline text-xl text-brand-text">{editingFlowId ? 'Edit Flow Slot' : 'Add Flow Timeline Slot'}</h3>
+              <h3 className="font-headline text-xl text-brand-text">{editingFlowId ? 'Edit Slot Flow' : 'Tambah Slot Flow Timeline'}</h3>
               <button onClick={() => setShowFlowModal(false)} className="text-brand-text-muted hover:text-brand-text"><X size={20} /></button>
             </div>
             <form onSubmit={saveFlowSlot} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Time Slot (HH:MM)</label>
-                <input required value={flowForm.time || ''} onChange={e => setFlowForm({...flowForm, time: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="e.g. 19:30" />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Slot Waktu (HH:MM)</label>
+                <input required value={flowForm.time || ''} onChange={e => setFlowForm({...flowForm, time: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="cth. 19:30" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Program / Activity Title</label>
-                <input required value={flowForm.title || ''} onChange={e => setFlowForm({...flowForm, title: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="e.g. First Dance & Cake Cutting" />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Program / Judul Aktivitas</label>
+                <input required value={flowForm.title || ''} onChange={e => setFlowForm({...flowForm, title: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="cth. First Dance & Potong Kue" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Duration Note (Optional)</label>
-                <input value={flowForm.duration || ''} onChange={e => setFlowForm({...flowForm, duration: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="e.g. 15 mins" />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Catatan Durasi (Opsional)</label>
+                <input value={flowForm.duration || ''} onChange={e => setFlowForm({...flowForm, duration: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="cth. 15 menit" />
               </div>
               <div className="flex items-center gap-2 pt-2">
                 <input type="checkbox" id="highlight" checked={flowForm.highlight || false} onChange={e => setFlowForm({...flowForm, highlight: e.target.checked})} className="rounded text-brand-primary focus:ring-brand-primary" />
-                <label htmlFor="highlight" className="text-sm font-medium text-brand-text">Highlight as Key Moment</label>
+                <label htmlFor="highlight" className="text-sm font-medium text-brand-text">Tandai sebagai Momen Utama</label>
               </div>
               <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setShowFlowModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Cancel</button>
-                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingFlowId ? 'Update Slot' : 'Save Slot'}</button>
+                <button type="button" onClick={() => setShowFlowModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Batal</button>
+                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingFlowId ? 'Perbarui Slot' : 'Simpan Slot'}</button>
               </div>
             </form>
           </div>

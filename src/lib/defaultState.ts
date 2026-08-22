@@ -46,13 +46,13 @@ export function demoWeddingState(): WeddingState {
       primaryVenue: "The Grand Estate Ballroom, Jakarta",
     },
     guests: [
-      { id: "1", name: "Arthur Abernathy", phone: "+6281234567890", group: "Bride's Family", status: "Confirmed", table: "T-01" },
-      { id: "2", name: "Beatrice Sterling", phone: "+6281298765432", group: "Work Colleagues", status: "Pending", table: "Unassigned" },
+      { id: "1", name: "Arthur Abernathy", phone: "+6281234567890", group: "Keluarga Mempelai Wanita", status: "Confirmed", table: "T-01" },
+      { id: "2", name: "Beatrice Sterling", phone: "+6281298765432", group: "Rekan Kerja", status: "Pending", table: "Unassigned" },
       { id: "3", name: "Charles Harrington", phone: "+6281112223334", group: "Groom's Friends", status: "Declined", table: "N/A" },
       { id: "4", name: "Diana Astor", phone: "+6281998877665", group: "VIP", status: "Confirmed", table: "T-01" },
-      { id: "5", name: "Edward Winslow", phone: "+6281223344556", group: "Groom's Family", status: "Confirmed", table: "T-02" },
-      { id: "6", name: "Fiona Marlowe", phone: "+6281334455667", group: "Bride's Family", status: "Confirmed", table: "T-02" },
-      { id: "7", name: "George Halloway", phone: "+6281445566778", group: "Work Colleagues", status: "Pending", table: "Unassigned" },
+      { id: "5", name: "Edward Winslow", phone: "+6281223344556", group: "Keluarga Mempelai Pria", status: "Confirmed", table: "T-02" },
+      { id: "6", name: "Fiona Marlowe", phone: "+6281334455667", group: "Keluarga Mempelai Wanita", status: "Confirmed", table: "T-02" },
+      { id: "7", name: "George Halloway", phone: "+6281445566778", group: "Rekan Kerja", status: "Pending", table: "Unassigned" },
       { id: "8", name: "Helena Ashworth", phone: "+6281556677889", group: "VIP", status: "Confirmed", table: "T-01" },
     ],
     expenses: [
@@ -73,11 +73,11 @@ export function demoWeddingState(): WeddingState {
       { id: "3", title: "First Dance & Live Band Set", category: "Reception", status: "Confirmed", duration: 30, needs: "7-Piece Live Band, Dance Floor Lighting", desc: "Opening dance followed by a live set to bring guests to the dance floor." },
     ],
     attireItems: [
-      { id: "1", name: "Eleanor V.", role: "Bride", status: "Final Fitting", vendor: "Maison de Blanc", desc: "Custom Ivory Silk Gown", measurements: 'Bust: 34", Waist: 26", Hips: 36", Hollow to Hem: 58"', imageUrl: "https://images.unsplash.com/photo-1749550056692-2e3c5483c21c?w=200&h=200&fit=crop" },
-      { id: "2", name: "James T.", role: "Groom", status: "In Progress", vendor: "Savile Row Bespoke", desc: "Midnight Blue Tuxedo", measurements: 'Chest: 40", Waist: 32", Inseam: 30", Sleeve: 34"', imageUrl: "https://images.unsplash.com/photo-1604531826248-f0eca8eeb896?w=200&h=200&fit=crop" },
-      { id: "3", name: "Sarah C.", role: "Maid of Honor", status: "In Progress", vendor: "Maison de Blanc", desc: "Burgundy Velvet Gown", measurements: 'Bust: 36", Waist: 28", Hips: 38"', imageUrl: "https://images.unsplash.com/photo-1749550657899-fe214ea4da84?w=200&h=200&fit=crop" },
-      { id: "4", name: "Vincent V.", role: "Best Man", status: "Not Started", vendor: "Savile Row Bespoke", desc: "Midnight Blue Wool Suit", measurements: 'Chest: 42", Waist: 34", Inseam: 32"', imageUrl: "https://images.unsplash.com/photo-1603394151492-5e9b974b090b?w=200&h=200&fit=crop" },
-      { id: "5", name: "Helena V.", role: "Mother of the Bride", status: "Final Fitting", vendor: "Maison de Blanc", desc: "Champagne Lace Gown", measurements: 'Bust: 38", Waist: 30"', imageUrl: "https://images.unsplash.com/photo-1749550243004-9f8fc8f87aa9?w=200&h=200&fit=crop" },
+      { id: "1", name: "Eleanor V.", role: "Mempelai Wanita", status: "Final Fitting", vendor: "Maison de Blanc", desc: "Custom Ivory Silk Gown", measurements: 'Bust: 34", Waist: 26", Hips: 36", Hollow to Hem: 58"', imageUrl: "https://images.unsplash.com/photo-1749550056692-2e3c5483c21c?w=200&h=200&fit=crop" },
+      { id: "2", name: "James T.", role: "Mempelai Pria", status: "In Progress", vendor: "Savile Row Bespoke", desc: "Midnight Blue Tuxedo", measurements: 'Chest: 40", Waist: 32", Inseam: 30", Sleeve: 34"', imageUrl: "https://images.unsplash.com/photo-1604531826248-f0eca8eeb896?w=200&h=200&fit=crop" },
+      { id: "3", name: "Sarah C.", role: "Pendamping Utama Wanita", status: "In Progress", vendor: "Maison de Blanc", desc: "Burgundy Velvet Gown", measurements: 'Bust: 36", Waist: 28", Hips: 38"', imageUrl: "https://images.unsplash.com/photo-1749550657899-fe214ea4da84?w=200&h=200&fit=crop" },
+      { id: "4", name: "Vincent V.", role: "Pendamping Utama Pria", status: "Not Started", vendor: "Savile Row Bespoke", desc: "Midnight Blue Wool Suit", measurements: 'Chest: 42", Waist: 34", Inseam: 32"', imageUrl: "https://images.unsplash.com/photo-1603394151492-5e9b974b090b?w=200&h=200&fit=crop" },
+      { id: "5", name: "Helena V.", role: "Ibu Mempelai Wanita", status: "Final Fitting", vendor: "Maison de Blanc", desc: "Champagne Lace Gown", measurements: 'Bust: 38", Waist: 30"', imageUrl: "https://images.unsplash.com/photo-1749550243004-9f8fc8f87aa9?w=200&h=200&fit=crop" },
     ],
     attireVendorNotes: [
       { id: "1", vendorName: "Maison de Blanc (Bridal)", notes: "Ensure train is bustled discreetly. Extra lace requested for veil detailing.", dueDate: relDate(30) },
@@ -130,15 +130,15 @@ export function demoWeddingState(): WeddingState {
       { id: "t25", categoryId: "cat9", title: "Reconcile final catering invoice", status: "In Progress", assigneeId: "m2", dueDate: relDate(5), priority: "Medium", desc: "Cross-checking final headcount against the last invoice from Gourmet Luxe." },
     ],
     categories: [
-      { id: "cat1", name: "Venue & Catering", icon: "home", colorClass: "text-brand-primary", bgClass: "bg-brand-primary" },
-      { id: "cat2", name: "Design & Decor", icon: "palette", colorClass: "text-brand-accent", bgClass: "bg-brand-accent" },
-      { id: "cat3", name: "Attire", icon: "shirt", colorClass: "text-brand-success", bgClass: "bg-brand-success" },
-      { id: "cat4", name: "Photo & Video", icon: "camera", colorClass: "text-brand-warning", bgClass: "bg-brand-warning" },
-      { id: "cat5", name: "Entertainment", icon: "music", colorClass: "text-brand-primary", bgClass: "bg-brand-primary" },
-      { id: "cat6", name: "Logistics", icon: "truck", colorClass: "text-brand-accent", bgClass: "bg-brand-accent" },
-      { id: "cat7", name: "Administration", icon: "filetext", colorClass: "text-brand-success", bgClass: "bg-brand-success" },
-      { id: "cat8", name: "Guests & Invitations", icon: "users", colorClass: "text-brand-warning", bgClass: "bg-brand-warning" },
-      { id: "cat9", name: "Budget & Finance", icon: "creditcard", colorClass: "text-brand-primary", bgClass: "bg-brand-primary" },
+      { id: "cat1", name: "Venue & Katering", icon: "home", colorClass: "text-brand-primary", bgClass: "bg-brand-primary" },
+      { id: "cat2", name: "Desain & Dekorasi", icon: "palette", colorClass: "text-brand-accent", bgClass: "bg-brand-accent" },
+      { id: "cat3", name: "Busana", icon: "shirt", colorClass: "text-brand-success", bgClass: "bg-brand-success" },
+      { id: "cat4", name: "Foto & Video", icon: "camera", colorClass: "text-brand-warning", bgClass: "bg-brand-warning" },
+      { id: "cat5", name: "Hiburan", icon: "music", colorClass: "text-brand-primary", bgClass: "bg-brand-primary" },
+      { id: "cat6", name: "Logistik", icon: "truck", colorClass: "text-brand-accent", bgClass: "bg-brand-accent" },
+      { id: "cat7", name: "Administrasi", icon: "filetext", colorClass: "text-brand-success", bgClass: "bg-brand-success" },
+      { id: "cat8", name: "Tamu & Undangan", icon: "users", colorClass: "text-brand-warning", bgClass: "bg-brand-warning" },
+      { id: "cat9", name: "Budget & Keuangan", icon: "creditcard", colorClass: "text-brand-primary", bgClass: "bg-brand-primary" },
     ],
     members: [
       { id: "m1", name: "Siti Aminah", initials: "SA", color: "#ffffff", bgColor: "#8b4a52" },
@@ -150,9 +150,9 @@ export function demoWeddingState(): WeddingState {
     targetGuests: 180,
     totalBudget: 150000000,
     vendors: [
-      { id: "1", name: "The Grand Estate", category: "Venue & Catering", status: "BOOKED", totalValue: 43500000, paidValue: 34250000, picName: "Amanda Wells", picPhone: "+628112233445", picEmail: "events@thegrandestate.id", website: "thegrandestate.id", rating: 5, notes: "Ballroom confirmed for the full evening. Final walkthrough scheduled 2 weeks prior." },
-      { id: "2", name: "Gourmet Luxe", category: "Venue & Catering", status: "NEGOTIATING", totalValue: 18500000, paidValue: 9250000, picName: "Chef Rian Pratama", picPhone: "+628129988776", picEmail: "hello@gourmetluxe.id", website: "gourmetluxe.id", rating: 4, notes: "Awaiting final headcount to confirm plated dinner pricing tier." },
-      { id: "3", name: "Botanica Atelier", category: "Florals & Decor", status: "BOOKED", totalValue: 8200000, paidValue: 2000000, picName: "Nadia Kusuma", picPhone: "+628134455667", picEmail: "studio@botanica-atelier.id", website: "botanica-atelier.id", rating: 5, notes: "Moodboard approved. Mock-up arrangement scheduled one month prior." },
+      { id: "1", name: "The Grand Estate", category: "Venue & Katering", status: "BOOKED", totalValue: 43500000, paidValue: 34250000, picName: "Amanda Wells", picPhone: "+628112233445", picEmail: "events@thegrandestate.id", website: "thegrandestate.id", rating: 5, notes: "Ballroom dikonfirmasi untuk sepanjang malam. Walkthrough final dijadwalkan 2 minggu sebelumnya." },
+      { id: "2", name: "Gourmet Luxe", category: "Venue & Katering", status: "NEGOTIATING", totalValue: 18500000, paidValue: 9250000, picName: "Chef Rian Pratama", picPhone: "+628129988776", picEmail: "hello@gourmetluxe.id", website: "gourmetluxe.id", rating: 4, notes: "Menunggu jumlah tamu final untuk mengonfirmasi tingkat harga plated dinner." },
+      { id: "3", name: "Botanica Atelier", category: "Bunga & Dekorasi", status: "BOOKED", totalValue: 8200000, paidValue: 2000000, picName: "Nadia Kusuma", picPhone: "+628134455667", picEmail: "studio@botanica-atelier.id", website: "botanica-atelier.id", rating: 5, notes: "Moodboard disetujui. Mock-up rangkaian dijadwalkan satu bulan sebelumnya." },
     ],
     rentals: [
       { id: "1", name: "Chiavari Chairs - Gold", vendorId: "1", quantity: 200, arrivalStatus: "Pending", returnStatus: "Pending", notes: "Include velvet cushions" },
@@ -174,24 +174,24 @@ export function demoWeddingState(): WeddingState {
     // (PhotoVideo, Entertainment) — sekarang ikut dalam 1 blob ini.
     misc: {
       evervow_shots: [
-        { id: "s1", category: "Getting Ready", title: "Bride's gown hanging by the window", priority: "High", type: "Photo", done: true },
-        { id: "s2", category: "Getting Ready", title: "Groom straightening his tie", priority: "Medium", type: "Photo", done: true },
-        { id: "s3", category: "Getting Ready", title: "Bridesmaids helping with the veil", priority: "Medium", type: "Both", done: false },
-        { id: "s4", category: "Ceremony", title: "First look between the couple", priority: "High", type: "Both", done: false },
-        { id: "s5", category: "Ceremony", title: "Exchange of vows, close-up", priority: "High", type: "Both", done: false },
-        { id: "s6", category: "Ceremony", title: "Ring exchange detail shot", priority: "High", type: "Photo", done: false },
-        { id: "s7", category: "Reception", title: "Grand entrance of the newlyweds", priority: "High", type: "Video", done: false },
-        { id: "s8", category: "Reception", title: "First dance, wide shot", priority: "Medium", type: "Both", done: false },
-        { id: "s9", category: "Reception", title: "Cake cutting moment", priority: "Medium", type: "Photo", done: false },
-        { id: "s10", category: "Portraits", title: "Full bridal party group photo", priority: "Medium", type: "Photo", done: true },
+        { id: "s1", category: "Persiapan", title: "Gaun pengantin tergantung di dekat jendela", priority: "High", type: "Photo", done: true },
+        { id: "s2", category: "Persiapan", title: "Mempelai pria merapikan dasi", priority: "Medium", type: "Photo", done: true },
+        { id: "s3", category: "Persiapan", title: "Bridesmaid membantu memasang veil", priority: "Medium", type: "Both", done: false },
+        { id: "s4", category: "Upacara", title: "First look antara pasangan", priority: "High", type: "Both", done: false },
+        { id: "s5", category: "Upacara", title: "Ucapan janji suci, close-up", priority: "High", type: "Both", done: false },
+        { id: "s6", category: "Upacara", title: "Detail shot pertukaran cincin", priority: "High", type: "Photo", done: false },
+        { id: "s7", category: "Resepsi", title: "Grand entrance pengantin baru", priority: "High", type: "Video", done: false },
+        { id: "s8", category: "Resepsi", title: "First dance, wide shot", priority: "Medium", type: "Both", done: false },
+        { id: "s9", category: "Resepsi", title: "Momen potong kue", priority: "Medium", type: "Photo", done: false },
+        { id: "s10", category: "Potret", title: "Foto grup lengkap bridal party", priority: "Medium", type: "Photo", done: true },
       ],
       evervow_tech_notes: [
-        { id: "n1", title: "Lighting Restriction", note: "Ballroom does not allow additional flash rigs — use bounce flash only during the reception." },
-        { id: "n2", title: "Drone Permit", note: "Aerial shots require venue approval; confirm with events@thegrandestate.id before flying." },
+        { id: "n1", title: "Batasan Pencahayaan", note: "Ballroom tidak mengizinkan flash rig tambahan — gunakan bounce flash saja saat resepsi." },
+        { id: "n2", title: "Izin Drone", note: "Shot udara memerlukan persetujuan venue; konfirmasi ke events@thegrandestate.id sebelum terbang." },
       ],
       evervow_flow_slots: [],
     },
-    guestGroups: ["Bride's Family", "Groom's Family", 'Work Colleagues', 'VIP', 'Unassigned'],
+    guestGroups: ["Keluarga Mempelai Wanita", "Keluarga Mempelai Pria", 'Rekan Kerja', 'VIP', 'Unassigned'],
   };
 }
 
@@ -238,6 +238,6 @@ export function emptyWeddingState(): WeddingState {
     // Ini BUKAN data personal — cuma daftar label kategori standar biar
     // dropdown Guest List tidak kosong melompong di hari pertama. Semua
     // tetap bisa diedit/dihapus pembeli lewat Settings > Guest Categories.
-    guestGroups: ["Bride's Family", "Groom's Family", 'Work Colleagues', 'VIP', 'Unassigned'],
+    guestGroups: ["Keluarga Mempelai Wanita", "Keluarga Mempelai Pria", 'Rekan Kerja', 'VIP', 'Unassigned'],
   };
 }

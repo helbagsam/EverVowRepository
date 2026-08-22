@@ -18,12 +18,12 @@ interface FaqCategory {
 const categories: FaqCategory[] = [
   {
     icon: <Rocket size={24} />,
-    title: 'Memulai (Getting Started)',
+    title: 'Memulai',
     desc: 'Panduan dasar pengaturan akun dan profil EverVow.',
     items: [
-      { q: 'Bagaimana cara mengganti tanggal pernikahan?', a: 'Buka menu Settings > tab "Client Profile", lalu ubah field "Wedding Date". Perubahan otomatis memengaruhi hitung mundur di Dashboard.' },
-      { q: 'Bagaimana cara mengubah nama pasangan yang tampil di Dashboard?', a: 'Buka Settings > "Client Profile", isi "Bride\'s Full Name" dan "Groom\'s Full Name", lalu klik Save Changes.' },
-      { q: 'Bagaimana cara mengganti tema terang/gelap?', a: 'Buka Settings > tab "Preferences" > "Appearance & Theme", pilih Light atau Dark.' },
+      { q: 'Bagaimana cara mengganti tanggal pernikahan?', a: 'Buka menu Pengaturan > tab "Profil Klien", lalu ubah field "Tanggal Pernikahan". Perubahan otomatis memengaruhi hitung mundur di Dashboard.' },
+      { q: 'Bagaimana cara mengubah nama pasangan yang tampil di Dashboard?', a: 'Buka Pengaturan > "Profil Klien", isi "Nama Lengkap Mempelai Wanita" dan "Nama Lengkap Mempelai Pria", lalu klik Simpan Perubahan.' },
+      { q: 'Bagaimana cara mengganti tema terang/gelap?', a: 'Buka Pengaturan > tab "Preferensi" > "Tampilan & Tema", pilih Terang atau Gelap.' },
     ],
   },
   {
@@ -31,19 +31,19 @@ const categories: FaqCategory[] = [
     title: 'Tugas & Kolaborasi',
     desc: 'Alur kerja tim, pendelegasian, dan linimasa proyek.',
     items: [
-      { q: 'Bagaimana cara menambah task baru?', a: 'Buka menu Timeline, klik "Add Task" pada kategori yang sesuai, isi judul, prioritas, due date, dan assignee.' },
-      { q: 'Bagaimana cara menambah atau mengganti nama planner/tim (assignee)?', a: 'Buka Settings > tab "Team & Assignee". Di sana kamu bisa menambah, mengubah nama, atau menghapus planner yang muncul sebagai pilihan assignee di Timeline.' },
-      { q: 'Kenapa filter "Incomplete" di Timeline tidak menampilkan task tertentu?', a: 'Filter "Incomplete" hanya menyembunyikan task dengan status Completed. Task dengan status Not Started, In Progress, atau On Hold tetap tampil.' },
+      { q: 'Bagaimana cara menambah task baru?', a: 'Buka menu Timeline, klik "Tambah Tugas" pada kategori yang sesuai, isi judul, prioritas, tenggat waktu, dan penanggung jawab.' },
+      { q: 'Bagaimana cara menambah atau mengganti nama planner/tim (assignee)?', a: 'Buka Pengaturan > tab "Tim & Penanggung Jawab". Di sana kamu bisa menambah, mengubah nama, atau menghapus planner yang muncul sebagai pilihan penanggung jawab di Timeline.' },
+      { q: 'Kenapa filter "Belum Selesai" di Timeline tidak menampilkan task tertentu?', a: 'Filter "Belum Selesai" hanya menyembunyikan task dengan status Selesai. Task dengan status Belum Mulai, Berjalan, atau Ditunda tetap tampil.' },
     ],
   },
   {
     icon: <Handshake size={24} />,
-    title: 'Manajemen Tamu (Guest List)',
+    title: 'Manajemen Tamu (Daftar Tamu)',
     desc: 'Import, export, dan pengelolaan status tamu undangan.',
     items: [
-      { q: 'Bagaimana format file CSV untuk import tamu?', a: 'Unduh dulu template lewat tombol "Excel Template" di menu Guest List. Formatnya: Name, Phone, Group, Status, Table — satu baris per tamu, dipisah koma. Semua baris akan ikut terimpor, bukan cuma baris terakhir.' },
-      { q: 'Kenapa hanya sebagian tamu yang muncul di tabel?', a: 'Cek tombol "More Filters" di pojok kanan atas tabel — kemungkinan ada filter Status atau Group yang aktif. Klik "Reset Filter" untuk menampilkan semua tamu lagi.' },
-      { q: 'Apa arti status Confirmed, Pending, dan Declined?', a: 'Confirmed = tamu sudah mengonfirmasi kehadiran. Pending = belum ada jawaban. Declined = tamu tidak dapat hadir.' },
+      { q: 'Bagaimana format file CSV untuk import tamu?', a: 'Unduh dulu template lewat tombol "Template Excel" di menu Daftar Tamu. Formatnya: Name, Phone, Group, Status, Table — satu baris per tamu, dipisah koma. Semua baris akan ikut terimpor, bukan cuma baris terakhir.' },
+      { q: 'Kenapa hanya sebagian tamu yang muncul di tabel?', a: 'Cek tombol "Filter Lainnya" di pojok kanan atas tabel — kemungkinan ada filter Status atau Group yang aktif. Klik "Reset Filter" untuk menampilkan semua tamu lagi.' },
+      { q: 'Apa arti status Terkonfirmasi, Menunggu, dan Menolak?', a: 'Terkonfirmasi = tamu sudah mengonfirmasi kehadiran. Menunggu = belum ada jawaban. Menolak = tamu tidak dapat hadir.' },
     ],
   },
   {
@@ -51,9 +51,9 @@ const categories: FaqCategory[] = [
     title: 'Manajemen Vendor',
     desc: 'Komunikasi, kontrak, dan pembayaran vendor.',
     items: [
-      { q: 'Apa perbedaan status vendor RESEARCHING, NEGOTIATING, dan BOOKED?', a: 'RESEARCHING = masih mencari opsi. CONTACTED = sudah dihubungi. NEGOTIATING = sedang tawar-menawar harga/detail. BOOKED = sudah deal dan dikontrak. COMPLETED = layanan sudah selesai diberikan.' },
-      { q: 'Bagaimana cara memasukkan biaya vendor ke Budget?', a: 'Pada kartu vendor, gunakan opsi "Push to Budget" agar nilai total vendor otomatis tercatat sebagai pengeluaran di menu Budget.' },
-      { q: 'Bagaimana cara memfilter vendor berdasarkan kategori atau status?', a: 'Gunakan tombol kategori (Venue & Catering, Florals & Decor, dst.) dan tombol status di bagian atas menu Vendors — keduanya bisa dikombinasikan.' },
+      { q: 'Apa perbedaan status vendor Riset, Negosiasi, dan Dipesan?', a: 'Riset = masih mencari opsi. Dihubungi = sudah dihubungi. Negosiasi = sedang tawar-menawar harga/detail. Dipesan = sudah deal dan dikontrak. Selesai = layanan sudah selesai diberikan.' },
+      { q: 'Bagaimana cara memasukkan biaya vendor ke Budget?', a: 'Pada kartu vendor, gunakan opsi "Dorong ke Budget" agar nilai total vendor otomatis tercatat sebagai pengeluaran di menu Budget.' },
+      { q: 'Bagaimana cara memfilter vendor berdasarkan kategori atau status?', a: 'Gunakan tombol kategori (Venue & Katering, Bunga & Dekorasi, dst.) dan tombol status di bagian atas menu Vendor — keduanya bisa dikombinasikan.' },
     ],
   },
   {
@@ -61,18 +61,18 @@ const categories: FaqCategory[] = [
     title: 'Anggaran & Faktur',
     desc: 'Pelacakan budget, kuitansi, dan tagihan klien.',
     items: [
-      { q: 'Bagaimana cara mengatur total budget pernikahan?', a: 'Buka Settings > "Client Profile" > "Target Budget (IDR)". Nilai ini menjadi acuan progress bar dan status overbudget di menu Budget.' },
-      { q: 'Bagaimana cara memfilter pengeluaran berdasarkan status pembayaran?', a: 'Klik ikon Filter di atas tabel "Expense Breakdown" pada menu Budget, lalu pilih Lunas, DP, atau Unpaid.' },
+      { q: 'Bagaimana cara mengatur total budget pernikahan?', a: 'Buka Pengaturan > "Profil Klien" > "Target Anggaran (IDR)". Nilai ini menjadi acuan progress bar dan status overbudget di menu Budget.' },
+      { q: 'Bagaimana cara memfilter pengeluaran berdasarkan status pembayaran?', a: 'Klik ikon Filter di atas tabel "Rincian Pengeluaran" pada menu Budget, lalu pilih Lunas, DP, atau Belum Bayar.' },
       { q: 'Format apa yang didukung untuk upload kuitansi/receipt?', a: 'Hanya file gambar JPG dan PNG yang bisa diupload sebagai bukti pembayaran. Format lain seperti PDF atau Word tidak didukung.' },
     ],
   },
   {
     icon: <Shirt size={24} />,
-    title: 'Attire & Fitting',
+    title: 'Busana & Fitting',
     desc: 'Pengukuran, status fitting, dan catatan vendor busana.',
     items: [
-      { q: 'Bagaimana cara memfilter attire berdasarkan peran (Bride, Groom, dst.)?', a: 'Gunakan deretan tombol peran di bagian atas menu Attire — klik salah satu untuk menampilkan hanya item milik peran tersebut.' },
-      { q: 'Bagaimana cara menambahkan foto untuk item attire?', a: 'Saat menambah/mengedit item, masukkan URL gambar pada field "Image URL", atau gunakan tombol upload (mendukung JPG/PNG).' },
+      { q: 'Bagaimana cara memfilter attire berdasarkan peran (Mempelai Wanita, Mempelai Pria, dst.)?', a: 'Gunakan deretan tombol peran di bagian atas menu Busana — klik salah satu untuk menampilkan hanya item milik peran tersebut.' },
+      { q: 'Bagaimana cara menambahkan foto untuk item attire?', a: 'Saat menambah/mengedit item, masukkan URL gambar pada field "atau tempel Image URL", atau gunakan tombol upload (mendukung JPG/PNG).' },
     ],
   },
   {
@@ -80,8 +80,8 @@ const categories: FaqCategory[] = [
     title: 'Logistik & Operasional',
     desc: 'Sewa peralatan, transportasi, dan serah terima barang bernilai tinggi.',
     items: [
-      { q: 'Bagaimana cara memfilter inventaris logistik per kategori?', a: 'Gunakan tombol kategori (Rentals, Decor, Gifts, dst.) di bagian atas menu Logistics — daftar item otomatis mengikuti kategori yang dipilih.' },
-      { q: 'Bagaimana cara mencatat serah terima cincin/mahar?', a: 'Buka bagian "High-Value Handover" di menu Logistics, tandai status menjadi "Handed Over" atau "Returned" — waktunya tercatat otomatis.' },
+      { q: 'Bagaimana cara memfilter inventaris logistik per kategori?', a: 'Gunakan tombol kategori (Sewa, Dekorasi, Hadiah, dst.) di bagian atas menu Logistik — daftar item otomatis mengikuti kategori yang dipilih.' },
+      { q: 'Bagaimana cara mencatat serah terima cincin/mahar?', a: 'Buka bagian "Protokol Serah Terima Barang Bernilai Tinggi" di menu Logistik, tandai status menjadi "Sudah Diserahkan" atau "Sudah Dikembalikan" — waktunya tercatat otomatis.' },
     ],
   },
   {
@@ -119,7 +119,7 @@ export const HelpCenter: React.FC = () => {
   return (
     <div className="max-w-[1140px] mx-auto pb-32 animate-in fade-in duration-500">
       <section className="text-center mb-16 max-w-2xl mx-auto pt-8">
-        <h1 className="font-headline text-5xl text-brand-primary mb-4">How can we help you today?</h1>
+        <h1 className="font-headline text-5xl text-brand-primary mb-4">Ada yang bisa kami bantu hari ini?</h1>
         <p className="text-lg text-brand-text-muted mb-8">Cari pertanyaan atau jelajahi kategori di bawah ini.</p>
         <div className="relative group">
           <Search size={24} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-text-muted group-focus-within:text-brand-accent transition-colors z-10" />
@@ -138,7 +138,7 @@ export const HelpCenter: React.FC = () => {
       )}
 
       <section className="mb-16">
-        {!searchTerm.trim() && <h2 className="font-headline text-3xl text-brand-primary mb-6">Browse by Category</h2>}
+        {!searchTerm.trim() && <h2 className="font-headline text-3xl text-brand-primary mb-6">Jelajahi berdasarkan Kategori</h2>}
         <div className={searchTerm.trim() ? 'space-y-4' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'}>
           {filtered.map((cat, i) => {
             const isOpen = searchTerm.trim() ? true : openCategory === i;

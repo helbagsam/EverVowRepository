@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../store/AppContext';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { formatDate } from '../utils/formatters';
+import { taskPriorityLabel } from '../lib/labels';
 import { 
   Plus, Clock, CheckCircle, Gauge, 
   MapPin, Palette, Plane, Filter, PlusCircle, Edit2, Trash2,
@@ -185,10 +186,10 @@ export const Timeline: React.FC = () => {
   const handleDeleteTask = (id: string) => {
     setConfirmState({
       isOpen: true,
-      title: 'Delete Task',
-      message: 'Are you sure you want to delete this task?',
+      title: 'Hapus Tugas',
+      message: 'Apakah kamu yakin ingin menghapus tugas ini?',
       type: 'danger',
-      confirmText: 'Delete',
+      confirmText: 'Hapus',
       onConfirm: () => {
         setTasks(tasks.filter(t => t.id !== id));
         setConfirmState(null);
@@ -222,31 +223,31 @@ export const Timeline: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-brand-border pb-6 pt-4">
         <div>
           <h2 className="font-headline text-4xl text-brand-primary mb-2">Master Timeline</h2>
-          <p className="font-body text-lg text-brand-text-muted max-w-2xl">Orchestrate every detail of your celebration with precision. Track progress across all major phases.</p>
+          <p className="font-body text-lg text-brand-text-muted max-w-2xl">Rencanakan setiap detail perayaan kamu dengan presisi. Lacak progres di seluruh fase utama.</p>
         </div>
         <div className="flex items-center gap-4 flex-wrap">
           <button onClick={() => openAddCategory()} className="px-6 py-3 rounded-xl border border-brand-primary text-brand-primary font-semibold text-xs tracking-wide hover:bg-brand-primary/5 hover:shadow-md hover:scale-[1.02] transition-all flex items-center gap-2">
-            <PlusCircle size={18} /> New Category
+            <PlusCircle size={18} /> Kategori Baru
           </button>
-          
+
           <div className="bg-brand-surface-hover rounded-xl p-1 flex border border-brand-border">
             <button onClick={() => setViewMode('list')} className={`px-6 py-2 rounded-lg font-semibold text-xs tracking-wide transition-all ${viewMode === 'list' ? 'bg-brand-primary text-white shadow-sm' : 'text-brand-text-muted hover:text-brand-primary'}`}>
-              List View
+              Tampilan List
             </button>
             <button onClick={() => setViewMode('gantt')} className={`px-6 py-2 rounded-lg font-semibold text-xs tracking-wide transition-all ${viewMode === 'gantt' ? 'bg-brand-primary text-white shadow-sm' : 'text-brand-text-muted hover:text-brand-primary'}`}>
               Gantt Chart
             </button>
           </div>
-          
+
           <button onClick={() => openAddTask()} className="bg-brand-primary text-white px-6 py-3 rounded-xl font-semibold text-xs tracking-wide shadow-sm hover:opacity-90 hover:shadow-md hover:scale-[1.02] transition-all flex items-center gap-2">
-            <Plus size={18} /> Add Task
+            <Plus size={18} /> Tambah Tugas
           </button>
         </div>
       </div>
 
       {/* Milestone Cards */}
       <section>
-        <h3 className="font-headline text-2xl text-brand-primary mb-6">Timeline Overview</h3>
+        <h3 className="font-headline text-2xl text-brand-primary mb-6">Ringkasan Timeline</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-brand-surface rounded-xl p-6 border border-brand-border luxury-shadow-sm flex flex-col justify-center items-center text-center">
             <div className="relative w-24 h-24 mb-4">
@@ -258,30 +259,30 @@ export const Timeline: React.FC = () => {
                 {overallProgress}%
               </div>
             </div>
-            <h4 className="font-semibold text-lg text-brand-text mb-1">Overall Progress</h4>
-            <p className="font-body text-sm text-brand-text-muted">{completedTasks} of {totalTasks} tasks completed.</p>
+            <h4 className="font-semibold text-lg text-brand-text mb-1">Progres Keseluruhan</h4>
+            <p className="font-body text-sm text-brand-text-muted">{completedTasks} dari {totalTasks} tugas selesai.</p>
           </div>
 
           <div className="bg-brand-surface rounded-xl p-6 border border-brand-border luxury-shadow-sm">
-             <h4 className="font-semibold text-xs tracking-wide text-brand-text-muted uppercase mb-4">Quick Stats</h4>
+             <h4 className="font-semibold text-xs tracking-wide text-brand-text-muted uppercase mb-4">Statistik Cepat</h4>
              <div className="space-y-4">
                 <div className="flex justify-between items-center pb-3 border-b border-brand-border/50">
-                   <span className="text-brand-text font-medium flex items-center gap-2"><CheckCircle size={16} className="text-brand-success" /> Completed</span>
+                   <span className="text-brand-text font-medium flex items-center gap-2"><CheckCircle size={16} className="text-brand-success" /> Selesai</span>
                    <span className="font-bold text-brand-text">{completedTasks}</span>
                 </div>
                 <div className="flex justify-between items-center pb-3 border-b border-brand-border/50">
-                   <span className="text-brand-text font-medium flex items-center gap-2"><Clock size={16} className="text-brand-warning" /> In Progress</span>
+                   <span className="text-brand-text font-medium flex items-center gap-2"><Clock size={16} className="text-brand-warning" /> Berjalan</span>
                    <span className="font-bold text-brand-text">{tasks.filter(t => t.status === 'In Progress').length}</span>
                 </div>
                 <div className="flex justify-between items-center pb-3 border-b border-brand-border/50">
-                   <span className="text-brand-text font-medium flex items-center gap-2"><div className="w-4 h-4 rounded-full border-2 border-brand-border"></div> Not Started</span>
+                   <span className="text-brand-text font-medium flex items-center gap-2"><div className="w-4 h-4 rounded-full border-2 border-brand-border"></div> Belum Mulai</span>
                    <span className="font-bold text-brand-text">{tasks.filter(t => t.status === 'Not Started').length}</span>
                 </div>
              </div>
           </div>
-          
+
           <div className="bg-brand-surface rounded-xl p-6 border border-brand-border luxury-shadow-sm flex flex-col">
-            <h4 className="font-semibold text-xs tracking-wide text-brand-text-muted uppercase mb-4">Team Workload</h4>
+            <h4 className="font-semibold text-xs tracking-wide text-brand-text-muted uppercase mb-4">Beban Kerja Tim</h4>
             <div className="flex-1 overflow-y-auto space-y-3 pr-2">
               {members.map(member => {
                 const memberTasks = tasks.filter(t => t.assigneeId === member.id);
@@ -306,7 +307,7 @@ export const Timeline: React.FC = () => {
                 )
               })}
               {members.filter(m => tasks.some(t => t.assigneeId === m.id)).length === 0 && (
-                <p className="text-sm text-brand-text-muted text-center pt-6">No tasks assigned yet.</p>
+                <p className="text-sm text-brand-text-muted text-center pt-6">Belum ada tugas yang ditugaskan.</p>
               )}
             </div>
           </div>
@@ -317,22 +318,22 @@ export const Timeline: React.FC = () => {
       {viewMode === 'gantt' && (
         <section className="space-y-6 animate-in fade-in">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <h3 className="font-headline text-2xl text-brand-primary">Project Schedule & S-Curve</h3>
+            <h3 className="font-headline text-2xl text-brand-primary">Jadwal Proyek & Kurva-S</h3>
             <div className="flex items-center gap-6 bg-brand-surface p-4 rounded-xl border border-brand-border luxury-shadow-sm">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-brand-primary"></div>
-                <span className="font-semibold text-xs tracking-wide">Planned</span>
+                <span className="font-semibold text-xs tracking-wide">Rencana</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-brand-accent"></div>
-                <span className="font-semibold text-xs tracking-wide">Actual</span>
+                <span className="font-semibold text-xs tracking-wide">Aktual</span>
               </div>
             </div>
           </div>
 
           <div className="bg-brand-surface rounded-xl border border-brand-border luxury-shadow-sm overflow-hidden">
             <div className="grid grid-cols-[250px_1fr] border-b border-brand-border bg-brand-surface-hover">
-              <div className="p-4 font-semibold text-xs tracking-wide border-r border-brand-border">Phase / Category</div>
+              <div className="p-4 font-semibold text-xs tracking-wide border-r border-brand-border">Fase / Kategori</div>
               <div className="grid grid-cols-4 p-4 font-semibold text-xs tracking-wide text-center">
                 <div>Q1</div><div>Q2</div><div>Q3</div><div>Q4</div>
               </div>
@@ -393,25 +394,25 @@ export const Timeline: React.FC = () => {
               {/* S-Curve Area */}
               <div className="mt-8 px-6 pb-6">
                 <div className="flex justify-between items-end mb-2">
-                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-widest">Completion S-Curve</span>
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-widest">Kurva-S Penyelesaian</span>
                 </div>
                 <div className="relative h-40 border-l border-b border-brand-border/50 bg-gradient-to-t from-brand-surface-hover/30 to-transparent">
                   <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 100">
                     {/* Planned Curve (Ideal) */}
                     <path d="M0,90 Q250,80 500,50 T1000,10" fill="none" stroke="var(--primary)" strokeDasharray="5,5" strokeWidth="2"></path>
-                    
+
                     {/* Actual Curve (Dynamic based on overall progress) */}
                     <path d={`M0,90 Q250,${(90 + sCurveActualY)/2} 500,${sCurveActualY}`} fill="none" stroke="var(--accent)" strokeWidth="3" className="transition-all duration-1000"></path>
-                    
+
                     {/* Connection line */}
                     <line stroke="var(--accent)" strokeDasharray="2,2" strokeWidth="1" x1="500" x2="500" y1={sCurveActualY} y2="50" className="transition-all duration-1000"></line>
                     <circle cx="500" cy={sCurveActualY} fill="var(--accent)" r="5" stroke="white" strokeWidth="2" className="transition-all duration-1000"></circle>
                     <circle cx="500" cy="50" fill="var(--primary)" opacity="0.5" r="4"></circle>
                   </svg>
                   <div className="absolute -bottom-6 left-0 w-full flex justify-between text-[10px] font-semibold tracking-wide text-brand-text-muted">
-                    <span>Project Start</span>
-                    <span className="text-brand-accent font-bold">Current Progress ({overallProgress}%)</span>
-                    <span>Target Completion</span>
+                    <span>Mulai Proyek</span>
+                    <span className="text-brand-accent font-bold">Progres Saat Ini ({overallProgress}%)</span>
+                    <span>Target Selesai</span>
                   </div>
                 </div>
               </div>
@@ -424,10 +425,10 @@ export const Timeline: React.FC = () => {
       {viewMode === 'list' && (
         <section className="space-y-6 animate-in fade-in">
           <div className="flex justify-between items-center">
-            <h3 className="font-headline text-2xl text-brand-primary">Milestone Checklist</h3>
+            <h3 className="font-headline text-2xl text-brand-primary">Checklist Milestone</h3>
             <div className="flex gap-4 items-center">
               <button onClick={() => setIsExpanded(!isExpanded)} className="font-semibold text-xs tracking-wide text-brand-primary hover:underline focus:ring-2 focus:ring-brand-primary/20 rounded px-2 py-1 transition-all active:scale-95">
-                {isExpanded ? 'Collapse All' : 'Expand All'}
+                {isExpanded ? 'Tutup Semua' : 'Buka Semua'}
               </button>
               <div className="relative">
                 <button onClick={(e) => { e.stopPropagation(); setShowFilter(!showFilter); }} className="font-semibold text-xs tracking-wide text-brand-text-muted hover:text-brand-primary focus:ring-2 focus:ring-brand-primary/20 rounded px-2 py-1 transition-all active:scale-95 flex items-center gap-1">
@@ -435,8 +436,8 @@ export const Timeline: React.FC = () => {
                 </button>
                 {showFilter && (
                   <div className="absolute right-0 mt-2 w-48 bg-brand-surface border border-brand-border rounded-xl shadow-md z-50 p-2 space-y-1">
-                    <button onClick={() => { setTaskFilter('all'); setShowFilter(false); }} className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${taskFilter === 'all' ? 'bg-brand-primary/10 text-brand-primary font-semibold' : 'hover:bg-brand-surface-hover'}`}>All Tasks</button>
-                    <button onClick={() => { setTaskFilter('incomplete'); setShowFilter(false); }} className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${taskFilter === 'incomplete' ? 'bg-brand-primary/10 text-brand-primary font-semibold' : 'hover:bg-brand-surface-hover'}`}>Incomplete</button>
+                    <button onClick={() => { setTaskFilter('all'); setShowFilter(false); }} className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${taskFilter === 'all' ? 'bg-brand-primary/10 text-brand-primary font-semibold' : 'hover:bg-brand-surface-hover'}`}>Semua Tugas</button>
+                    <button onClick={() => { setTaskFilter('incomplete'); setShowFilter(false); }} className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${taskFilter === 'incomplete' ? 'bg-brand-primary/10 text-brand-primary font-semibold' : 'hover:bg-brand-surface-hover'}`}>Belum Selesai</button>
                   </div>
                 )}
               </div>
@@ -456,19 +457,19 @@ export const Timeline: React.FC = () => {
                   <div className="bg-brand-surface-hover px-6 py-4 flex justify-between items-center border-b border-brand-border">
                     <div className="flex items-center gap-3">
                       <span className="font-semibold text-lg text-brand-primary">{cat.name}</span>
-                      <span className="font-semibold text-xs tracking-wide text-brand-text-muted">({progress}% Complete)</span>
+                      <span className="font-semibold text-xs tracking-wide text-brand-text-muted">({progress}% Selesai)</span>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="hidden sm:block w-32 h-1.5 bg-brand-border/50 rounded-full overflow-hidden">
                         <div className={`h-full ${isDone ? 'bg-brand-success' : 'bg-brand-accent'} transition-all duration-500`} style={{ width: `${progress}%` }}></div>
                       </div>
                       <button onClick={() => openAddTask(cat.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-brand-border text-brand-text font-semibold text-[12px] hover:border-brand-primary hover:text-brand-primary hover:shadow-sm transition-all sm:ml-4">
-                        <Plus size={16} />Add Task
+                        <Plus size={16} />Tambah Tugas
                       </button>
-                      <button onClick={() => openEditCategory(cat)} className="p-1.5 text-brand-text-muted hover:text-brand-primary rounded-lg transition-colors" title="Edit Category">
+                      <button onClick={() => openEditCategory(cat)} className="p-1.5 text-brand-text-muted hover:text-brand-primary rounded-lg transition-colors" title="Edit Kategori">
                         <Edit2 size={16} />
                       </button>
-                      <button onClick={() => handleDeleteCategory(cat.id)} className="p-1.5 text-brand-text-muted hover:text-brand-danger rounded-lg transition-colors" title="Delete Category">
+                      <button onClick={() => handleDeleteCategory(cat.id)} className="p-1.5 text-brand-text-muted hover:text-brand-danger rounded-lg transition-colors" title="Hapus Kategori">
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -508,17 +509,17 @@ export const Timeline: React.FC = () => {
                                 <span className={`text-xs font-medium hidden sm:block whitespace-nowrap ${isTaskDone ? 'text-brand-text-muted/50' : 'text-brand-text-muted'}`}>{assignee.name}</span>
                               </div>
                             ) : (
-                              <span className="text-xs text-brand-text-muted/50 italic hidden sm:block whitespace-nowrap">Unassigned</span>
+                              <span className="text-xs text-brand-text-muted/50 italic hidden sm:block whitespace-nowrap">Belum Ditugaskan</span>
                             )}
 
                             {/* Priority Badge */}
                             <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded whitespace-nowrap
-                                ${task.priority === 'High' ? 'bg-brand-danger-bg text-brand-danger' : 
-                                  task.priority === 'Medium' ? 'bg-brand-warning-bg text-brand-warning' : 
+                                ${task.priority === 'High' ? 'bg-brand-danger-bg text-brand-danger' :
+                                  task.priority === 'Medium' ? 'bg-brand-warning-bg text-brand-warning' :
                                   'bg-brand-border/50 text-brand-text-muted'}
                                 ${isTaskDone ? 'opacity-50 grayscale' : ''}
                             `}>
-                              {task.priority}
+                              {taskPriorityLabel(task.priority)}
                             </span>
 
                             {/* Actions */}
@@ -532,26 +533,26 @@ export const Timeline: React.FC = () => {
                     })}
                     {catTasks.length === 0 && (
                       <div className="px-6 py-8 text-center text-brand-text-muted text-sm italic">
-                        No tasks in this category yet.
+                        Belum ada tugas di kategori ini.
                       </div>
                     )}
                     <div className="px-6 py-3 bg-brand-surface-hover/50 border-t border-brand-border/50">
                       <button onClick={() => openAddTask(cat.id)} className="w-full py-2 flex items-center justify-center gap-2 text-brand-primary font-semibold text-xs tracking-wide hover:bg-brand-primary/5 rounded-lg transition-all">
-                        <PlusCircle size={18} /> Add Task to {cat.name}
+                        <PlusCircle size={18} /> Tambah Tugas ke {cat.name}
                       </button>
                     </div>
                   </div>
                 </div>
               )
             })}
-            
+
             {categories.length === 0 && (
               <div className="text-center py-16 border-2 border-dashed border-brand-border rounded-xl">
                 <FolderPlus size={48} className="mx-auto text-brand-border mb-4" />
-                <h3 className="font-headline text-2xl text-brand-text mb-2">No Categories Yet</h3>
-                <p className="text-brand-text-muted mb-6">Create a category to start organizing your timeline.</p>
+                <h3 className="font-headline text-2xl text-brand-text mb-2">Belum Ada Kategori</h3>
+                <p className="text-brand-text-muted mb-6">Buat kategori untuk mulai mengorganisir timeline kamu.</p>
                 <button onClick={() => openAddCategory()} className="px-6 py-3 rounded-xl bg-brand-primary text-white font-semibold text-sm hover:opacity-90">
-                  Create First Category
+                  Buat Kategori Pertama
                 </button>
               </div>
             )}
@@ -566,41 +567,41 @@ export const Timeline: React.FC = () => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm overflow-y-auto">
           <div className="bg-brand-surface w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-brand-border my-8 animate-in zoom-in-95 duration-200">
             <div className="p-6 border-b border-brand-border flex justify-between items-center bg-brand-surface-hover/30">
-              <h3 className="font-headline text-3xl text-brand-primary">{editingTaskId ? 'Edit Milestone' : 'Add New Milestone'}</h3>
+              <h3 className="font-headline text-3xl text-brand-primary">{editingTaskId ? 'Edit Milestone' : 'Tambah Milestone Baru'}</h3>
               <button onClick={() => setShowTaskModal(false)} className="text-brand-text-muted hover:text-brand-primary p-1 rounded-full hover:bg-brand-border/50 transition-colors">
                 <X size={24} />
               </button>
             </div>
             <form className="p-6 space-y-5" onSubmit={handleSaveTask}>
               <div className="space-y-1.5">
-                <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Task Name</label>
-                <input required value={newTask.title} onChange={e => setNewTask({...newTask, title: e.target.value})} type="text" placeholder="e.g. Finalize Floral Palette" className="w-full bg-brand-surface-hover border border-brand-border rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all" />
+                <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Nama Tugas</label>
+                <input required value={newTask.title} onChange={e => setNewTask({...newTask, title: e.target.value})} type="text" placeholder="cth. Finalisasi Palet Bunga" className="w-full bg-brand-surface-hover border border-brand-border rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all" />
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
-                  <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Category</label>
+                  <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Kategori</label>
                   <select required value={newTask.categoryId} onChange={e => setNewTask({...newTask, categoryId: e.target.value})} className="w-full bg-brand-surface-hover border border-brand-border rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-brand-primary/20 outline-none appearance-none">
-                    <option value="" disabled>Select Category</option>
+                    <option value="" disabled>Pilih Kategori</option>
                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1.5">
                   <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Status</label>
                   <select value={newTask.status} onChange={e => setNewTask({...newTask, status: e.target.value as any})} className="w-full bg-brand-surface-hover border border-brand-border rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-brand-primary/20 outline-none appearance-none">
-                    <option value="Not Started">Not Started</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                    <option value="On Hold">On Hold</option>
+                    <option value="Not Started">Belum Mulai</option>
+                    <option value="In Progress">Berjalan</option>
+                    <option value="Completed">Selesai</option>
+                    <option value="On Hold">Ditunda</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
-                  <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Assignee</label>
-                  <select 
-                    value={showNewMemberInput ? 'NEW' : (newTask.assigneeId || '')} 
+                  <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Penanggung Jawab</label>
+                  <select
+                    value={showNewMemberInput ? 'NEW' : (newTask.assigneeId || '')}
                     onChange={e => {
                       if (e.target.value === 'NEW') {
                         setShowNewMemberInput(true);
@@ -609,36 +610,36 @@ export const Timeline: React.FC = () => {
                         setShowNewMemberInput(false);
                         setNewTask({...newTask, assigneeId: e.target.value});
                       }
-                    }} 
+                    }}
                     className="w-full bg-brand-surface-hover border border-brand-border rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-brand-primary/20 outline-none appearance-none"
                   >
-                    <option value="">Unassigned</option>
+                    <option value="">Belum Ditugaskan</option>
                     {members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                    <option value="NEW" className="font-bold text-brand-primary">+ Invite New Member</option>
+                    <option value="NEW" className="font-bold text-brand-primary">+ Undang Anggota Baru</option>
                   </select>
-                  
+
                   {/* Dynamic Inline Input for New Member */}
                   {showNewMemberInput && (
                     <div className="mt-2 animate-in slide-in-from-top-2">
-                       <input autoFocus required value={newMemberName} onChange={e => setNewMemberName(e.target.value)} type="text" placeholder="Enter new member name..." className="w-full bg-white border border-brand-primary rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-brand-primary/20 outline-none" />
+                       <input autoFocus required value={newMemberName} onChange={e => setNewMemberName(e.target.value)} type="text" placeholder="Masukkan nama anggota baru..." className="w-full bg-white border border-brand-primary rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-brand-primary/20 outline-none" />
                     </div>
                   )}
                 </div>
-                
+
                 <div className="space-y-1.5">
-                  <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Due Date</label>
+                  <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Tenggat Waktu</label>
                   <input value={newTask.dueDate} onChange={e => setNewTask({...newTask, dueDate: e.target.value})} type="date" className="w-full bg-brand-surface-hover border border-brand-border rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-brand-primary/20 outline-none" />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Description (Optional)</label>
-                <textarea value={newTask.desc} onChange={e => setNewTask({...newTask, desc: e.target.value})} placeholder="Add details..." className="w-full bg-brand-surface-hover border border-brand-border rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-brand-primary/20 outline-none h-20 resize-none"></textarea>
+                <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Deskripsi (Opsional)</label>
+                <textarea value={newTask.desc} onChange={e => setNewTask({...newTask, desc: e.target.value})} placeholder="Tambahkan detail..." className="w-full bg-brand-surface-hover border border-brand-border rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-brand-primary/20 outline-none h-20 resize-none"></textarea>
               </div>
 
               <div className="flex gap-3 pt-4 border-t border-brand-border/50">
-                <button type="button" onClick={() => setShowTaskModal(false)} className="flex-1 px-6 py-3 rounded-xl border border-brand-border font-semibold text-xs tracking-wide text-brand-text-muted hover:bg-brand-surface-hover transition-all">Cancel</button>
-                <button type="submit" className="flex-1 px-6 py-3 rounded-xl bg-brand-primary text-white font-semibold text-xs tracking-wide hover:opacity-90 hover:shadow-md transition-all active:scale-95">Save Milestone</button>
+                <button type="button" onClick={() => setShowTaskModal(false)} className="flex-1 px-6 py-3 rounded-xl border border-brand-border font-semibold text-xs tracking-wide text-brand-text-muted hover:bg-brand-surface-hover transition-all">Batal</button>
+                <button type="submit" className="flex-1 px-6 py-3 rounded-xl bg-brand-primary text-white font-semibold text-xs tracking-wide hover:opacity-90 hover:shadow-md transition-all active:scale-95">Simpan Milestone</button>
               </div>
             </form>
           </div>
@@ -650,31 +651,31 @@ export const Timeline: React.FC = () => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm overflow-y-auto">
           <div className="bg-brand-surface w-full max-w-md rounded-xl shadow-2xl overflow-hidden border border-brand-border animate-in zoom-in-95 duration-200 my-8">
             <div className="p-6 border-b border-brand-border flex justify-between items-center bg-brand-surface-hover/30">
-              <h3 className="font-headline text-3xl text-brand-primary">{editingCatId ? 'Edit Category' : 'New Category'}</h3>
+              <h3 className="font-headline text-3xl text-brand-primary">{editingCatId ? 'Edit Kategori' : 'Kategori Baru'}</h3>
               <button onClick={() => { setShowCatModal(false); setEditingCatId(null); }} className="text-brand-text-muted hover:text-brand-primary p-1 rounded-full hover:bg-brand-border/50 transition-colors">
                 <X size={24} />
               </button>
             </div>
             <form className="p-6 space-y-6" onSubmit={handleSaveCategory}>
               <div className="space-y-1.5">
-                <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Category Name</label>
-                <input autoFocus required value={newCat.name} onChange={e => setNewCat({...newCat, name: e.target.value})} type="text" placeholder="e.g. Floral & Decor" className="w-full bg-brand-surface-hover border border-brand-border rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all" />
+                <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Nama Kategori</label>
+                <input autoFocus required value={newCat.name} onChange={e => setNewCat({...newCat, name: e.target.value})} type="text" placeholder="cth. Bunga & Dekorasi" className="w-full bg-brand-surface-hover border border-brand-border rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all" />
               </div>
-              
+
               <div className="space-y-2.5">
-                <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Select Icon</label>
+                <label className="font-semibold text-xs tracking-wide text-brand-text-muted">Pilih Ikon</label>
                 <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
                   {[
                     { id: 'home', label: 'Venue', icon: Home },
-                    { id: 'palette', label: 'Design', icon: Palette },
-                    { id: 'shirt', label: 'Attire', icon: Shirt },
-                    { id: 'camera', label: 'Photo', icon: Camera },
-                    { id: 'music', label: 'Music', icon: Music },
-                    { id: 'truck', label: 'Logistics', icon: Truck },
+                    { id: 'palette', label: 'Desain', icon: Palette },
+                    { id: 'shirt', label: 'Busana', icon: Shirt },
+                    { id: 'camera', label: 'Foto', icon: Camera },
+                    { id: 'music', label: 'Musik', icon: Music },
+                    { id: 'truck', label: 'Logistik', icon: Truck },
                     { id: 'filetext', label: 'Admin', icon: FileText },
-                    { id: 'users', label: 'Guests', icon: Users },
+                    { id: 'users', label: 'Tamu', icon: Users },
                     { id: 'creditcard', label: 'Budget', icon: CreditCard },
-                    { id: 'more', label: 'Other', icon: MoreHorizontal },
+                    { id: 'more', label: 'Lainnya', icon: MoreHorizontal },
                   ].map(item => {
                     const IconComp = item.icon;
                     const isActive = newCat.icon === item.id;
@@ -694,8 +695,8 @@ export const Timeline: React.FC = () => {
               </div>
 
               <div className="flex gap-3 pt-6 border-t border-brand-border/50">
-                <button type="button" onClick={() => { setShowCatModal(false); setEditingCatId(null); }} className="flex-1 px-6 py-3 rounded-xl border border-brand-border font-semibold text-xs tracking-wide text-brand-text-muted hover:bg-brand-surface-hover transition-all">Cancel</button>
-                <button type="submit" disabled={!newCat.name.trim()} className="flex-1 px-6 py-3 rounded-xl bg-brand-primary text-white font-semibold text-xs tracking-wide hover:opacity-90 hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed">{editingCatId ? 'Save Changes' : 'Create Category'}</button>
+                <button type="button" onClick={() => { setShowCatModal(false); setEditingCatId(null); }} className="flex-1 px-6 py-3 rounded-xl border border-brand-border font-semibold text-xs tracking-wide text-brand-text-muted hover:bg-brand-surface-hover transition-all">Batal</button>
+                <button type="submit" disabled={!newCat.name.trim()} className="flex-1 px-6 py-3 rounded-xl bg-brand-primary text-white font-semibold text-xs tracking-wide hover:opacity-90 hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed">{editingCatId ? 'Simpan Perubahan' : 'Buat Kategori'}</button>
               </div>
             </form>
           </div>

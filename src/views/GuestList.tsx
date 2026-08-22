@@ -5,6 +5,7 @@ import { useAppContext, Guest } from '../store/AppContext';
 import { Search, Filter, Plus, Download, MessageCircle, Users, CheckCircle, Clock, XCircle, Trash2, Edit, Upload, FileSpreadsheet } from 'lucide-react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import * as XLSX from 'xlsx';
+import { guestStatusLabel } from '../lib/labels';
 
 export const GuestList: React.FC = () => {
   const { guests, addGuest, deleteGuest, editGuest, targetGuests, guestGroups } = useAppContext();
@@ -24,9 +25,9 @@ export const GuestList: React.FC = () => {
   // memakai titik-koma sebagai pemisah CSV default).
   const handleDownloadTemplate = () => {
     const rows = [
-      ['Name', 'Phone', 'Group', 'Status', 'Table'],
-      ['Arthur Pendelton', '+62812345678', 'Family', 'Confirmed', 'T-01'],
-      ['Clara Oswald', '+62819876543', 'Friends', 'Pending', 'Unassigned'],
+      ['Nama', 'Telepon', 'Grup', 'Status', 'Meja'],
+      ['Arthur Pendelton', '+62812345678', 'Keluarga', 'Confirmed', 'T-01'],
+      ['Clara Oswald', '+62819876543', 'Teman', 'Pending', 'Unassigned'],
     ];
     const ws = XLSX.utils.aoa_to_sheet(rows);
     ws['!cols'] = [{ wch: 22 }, { wch: 16 }, { wch: 16 }, { wch: 12 }, { wch: 12 }];
@@ -120,7 +121,7 @@ export const GuestList: React.FC = () => {
   // Export current guests — file .xlsx asli dengan kolom terpisah.
   const handleExportGuests = () => {
     const rows = [
-      ['Name', 'Phone', 'Group', 'Status', 'Table'],
+      ['Nama', 'Telepon', 'Grup', 'Status', 'Meja'],
       ...guests.map(g => [g.name, g.phone, g.group, g.status, g.table]),
     ];
     const ws = XLSX.utils.aoa_to_sheet(rows);
@@ -162,10 +163,10 @@ export const GuestList: React.FC = () => {
     if (newGuest.name && newGuest.phone) {
       setConfirmState({
         isOpen: true,
-        title: editingId ? 'Save Changes' : 'Add Guest',
-        message: editingId ? 'Are you sure you want to update this guest?' : 'Are you sure you want to add this guest?',
+        title: editingId ? 'Simpan Perubahan' : 'Tambah Tamu',
+        message: editingId ? 'Apakah kamu yakin ingin memperbarui data tamu ini?' : 'Apakah kamu yakin ingin menambahkan tamu ini?',
         type: 'info',
-        confirmText: 'Save',
+        confirmText: 'Simpan',
         onConfirm: () => {
           if (editingId) {
             editGuest({
@@ -196,10 +197,10 @@ export const GuestList: React.FC = () => {
   const handleDelete = (id: string) => {
     setConfirmState({
       isOpen: true,
-      title: 'Delete Guest',
-      message: 'Are you sure you want to delete this guest? This action cannot be undone.',
+      title: 'Hapus Tamu',
+      message: 'Apakah kamu yakin ingin menghapus tamu ini? Tindakan ini tidak dapat dibatalkan.',
       type: 'danger',
-      confirmText: 'Delete',
+      confirmText: 'Hapus',
       onConfirm: () => {
         deleteGuest(id);
         setConfirmState(null);
@@ -236,10 +237,10 @@ export const GuestList: React.FC = () => {
     if (count === 0) return;
     setConfirmState({
       isOpen: true,
-      title: 'Delete Selected Guests',
-      message: `Are you sure you want to delete ${count} selected guest${count > 1 ? 's' : ''}? This action cannot be undone.`,
+      title: 'Hapus Tamu Terpilih',
+      message: `Apakah kamu yakin ingin menghapus ${count} tamu yang dipilih? Tindakan ini tidak dapat dibatalkan.`,
       type: 'danger',
-      confirmText: `Delete ${count}`,
+      confirmText: `Hapus ${count}`,
       onConfirm: () => {
         selectedIds.forEach(id => deleteGuest(id));
         setSelectedIds(new Set());
@@ -252,32 +253,32 @@ export const GuestList: React.FC = () => {
     <div className="max-w-[1440px] mx-auto space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
-          <p className="text-xs font-semibold text-brand-accent uppercase tracking-widest mb-2">Management</p>
-          <h2 className="font-headline text-4xl text-brand-text">Guest List & Seating</h2>
+          <p className="text-xs font-semibold text-brand-accent uppercase tracking-widest mb-2">Manajemen</p>
+          <h2 className="font-headline text-4xl text-brand-text">Daftar Tamu & Tempat Duduk</h2>
         </div>
         <div className="flex flex-wrap gap-3">
           <button onClick={handleDownloadTemplate} className="flex items-center gap-2 px-4 py-2.5 bg-brand-surface border border-brand-accent text-brand-accent rounded-xl hover:bg-brand-accent/10 transition-colors font-semibold text-xs">
-            <FileSpreadsheet size={16} /> Excel Template
+            <FileSpreadsheet size={16} /> Template Excel
           </button>
           <label className="flex items-center gap-2 px-4 py-2.5 bg-brand-surface border border-brand-border text-brand-text rounded-xl hover:bg-brand-surface-hover transition-colors font-semibold text-xs cursor-pointer">
-            <Upload size={16} /> Import Guests
+            <Upload size={16} /> Impor Tamu
             <input type="file" accept=".csv,.xlsx,.xls" onChange={handleImportCSV} className="hidden" />
           </label>
           <button onClick={handleExportGuests} className="flex items-center gap-2 px-4 py-2.5 bg-brand-surface border border-brand-border text-brand-text rounded-xl hover:bg-brand-surface-hover transition-colors font-semibold text-xs">
-            <Download size={16} /> Export List
+            <Download size={16} /> Ekspor Daftar
           </button>
           <button className="flex items-center gap-2 px-5 py-2.5 bg-brand-primary text-white rounded-xl shadow-md hover:bg-brand-primary-hover transition-colors font-semibold text-xs" onClick={openAddModal}>
-            <Plus size={16} /> Add Guest
+            <Plus size={16} /> Tambah Tamu
           </button>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Target Guests" value={targetGuests} icon={<Users />} color="text-brand-primary" bg="bg-brand-primary/10" subtitle={`${stats.total} Invited`} />
-        <StatCard title="Confirmed" value={stats.confirmed} icon={<CheckCircle />} color="text-brand-success" bg="bg-brand-success-bg" subtitle={`${Math.round((stats.confirmed/stats.total)*100)||0}%`} />
-        <StatCard title="Pending" value={stats.pending} icon={<Clock />} color="text-brand-warning" bg="bg-brand-warning-bg" subtitle="Awaiting" />
-        <StatCard title="Declined" value={stats.declined} icon={<XCircle />} color="text-brand-danger" bg="bg-brand-danger-bg" subtitle="Regrets" />
+        <StatCard title="Target Tamu" value={targetGuests} icon={<Users />} color="text-brand-primary" bg="bg-brand-primary/10" subtitle={`${stats.total} Diundang`} />
+        <StatCard title="Terkonfirmasi" value={stats.confirmed} icon={<CheckCircle />} color="text-brand-success" bg="bg-brand-success-bg" subtitle={`${Math.round((stats.confirmed/stats.total)*100)||0}%`} />
+        <StatCard title="Menunggu" value={stats.pending} icon={<Clock />} color="text-brand-warning" bg="bg-brand-warning-bg" subtitle="Menunggu" />
+        <StatCard title="Menolak" value={stats.declined} icon={<XCircle />} color="text-brand-danger" bg="bg-brand-danger-bg" subtitle="Berhalangan" />
       </div>
 
       {/* Table Section */}
@@ -285,9 +286,9 @@ export const GuestList: React.FC = () => {
         <div className="p-6 border-b border-brand-border flex flex-col md:flex-row justify-between gap-4 items-center bg-brand-surface-hover/50">
           <div className="relative w-full max-w-md">
             <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-text-muted" />
-            <input 
-              type="text" 
-              placeholder="Search guests by name or group..." 
+            <input
+              type="text"
+              placeholder="Cari tamu berdasarkan nama atau grup..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-brand-surface border border-brand-border rounded-xl focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-sm text-brand-text"
@@ -298,7 +299,7 @@ export const GuestList: React.FC = () => {
               onClick={() => setShowFilterPanel(v => !v)}
               className={`flex items-center gap-2 px-4 py-2.5 border rounded-xl text-sm font-semibold transition-colors whitespace-nowrap ${(statusFilter !== 'All' || groupFilter !== 'All') ? 'bg-brand-primary/10 border-brand-primary text-brand-primary' : 'bg-brand-surface border-brand-border hover:bg-brand-surface-hover'}`}
             >
-              <Filter size={18} /> More Filters {(statusFilter !== 'All' || groupFilter !== 'All') && <span className="w-1.5 h-1.5 rounded-full bg-brand-primary" />}
+              <Filter size={18} /> Filter Lainnya {(statusFilter !== 'All' || groupFilter !== 'All') && <span className="w-1.5 h-1.5 rounded-full bg-brand-primary" />}
             </button>
             {showFilterPanel && (
               <div className="absolute right-0 mt-2 w-64 bg-brand-surface border border-brand-border rounded-xl shadow-lg z-50 p-4 space-y-4">
@@ -306,15 +307,15 @@ export const GuestList: React.FC = () => {
                   <label className="text-xs font-semibold text-brand-text-muted mb-1.5 block">Status</label>
                   <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as any)} className="w-full px-3 py-2 rounded-lg bg-brand-surface-hover border border-brand-border text-sm focus:outline-none focus:border-brand-primary">
                     <option value="All">Semua Status</option>
-                    <option value="Confirmed">Confirmed</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Declined">Declined</option>
+                    <option value="Confirmed">Terkonfirmasi</option>
+                    <option value="Pending">Menunggu</option>
+                    <option value="Declined">Menolak</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-brand-text-muted mb-1.5 block">Group</label>
+                  <label className="text-xs font-semibold text-brand-text-muted mb-1.5 block">Grup</label>
                   <select value={groupFilter} onChange={e => setGroupFilter(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-brand-surface-hover border border-brand-border text-sm focus:outline-none focus:border-brand-primary">
-                    <option value="All">Semua Group</option>
+                    <option value="All">Semua Grup</option>
                     {guestGroups.map(g => <option key={g} value={g}>{g}</option>)}
                   </select>
                 </div>
@@ -352,17 +353,17 @@ export const GuestList: React.FC = () => {
                     className="w-4 h-4 rounded border-brand-border text-brand-primary focus:ring-brand-primary cursor-pointer"
                   />
                 </th>
-                <th className="py-4 px-6">Guest Name</th>
-                <th className="py-4 px-6">Group</th>
-                <th className="py-4 px-6">RSVP Status</th>
-                <th className="py-4 px-6">Table No.</th>
-                <th className="py-4 px-6 text-center">Contact</th>
-                <th className="py-4 px-6 text-right">Actions</th>
+                <th className="py-4 px-6">Nama Tamu</th>
+                <th className="py-4 px-6">Grup</th>
+                <th className="py-4 px-6">Status RSVP</th>
+                <th className="py-4 px-6">No. Meja</th>
+                <th className="py-4 px-6 text-center">Kontak</th>
+                <th className="py-4 px-6 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-brand-border">
               {filteredGuests.length === 0 ? (
-                <tr><td colSpan={7} className="py-8 text-center text-brand-text-muted">No guests found.</td></tr>
+                <tr><td colSpan={7} className="py-8 text-center text-brand-text-muted">Tidak ada tamu ditemukan.</td></tr>
               ) : (
                 filteredGuests.map(guest => (
                   <tr key={guest.id} className={`hover:bg-brand-surface-hover transition-colors group ${selectedIds.has(guest.id) ? 'bg-brand-primary/5' : ''}`}>
@@ -380,7 +381,7 @@ export const GuestList: React.FC = () => {
                           {guest.name ? guest.name.split(' ').map(n => n[0]).join('').substring(0, 2) : '?'}
                         </div>
                         <div>
-                          <p className="font-semibold text-brand-text">{guest.name || 'Unnamed Guest'}</p>
+                          <p className="font-semibold text-brand-text">{guest.name || 'Tamu Tanpa Nama'}</p>
                           <p className="text-xs text-brand-text-muted">{guest.phone}</p>
                         </div>
                       </div>
@@ -401,7 +402,7 @@ export const GuestList: React.FC = () => {
                           guest.status === 'Pending' ? 'bg-brand-warning' :
                           'bg-brand-danger'
                         }`}></span>
-                        {guest.status}
+                        {guestStatusLabel(guest.status)}
                       </span>
                     </td>
                     <td className="py-4 px-6">
@@ -411,7 +412,7 @@ export const GuestList: React.FC = () => {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex justify-center">
-                        <a href={`https://wa.me/${guest.phone?.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full flex items-center justify-center bg-green-50 text-green-600 hover:bg-green-500 hover:text-white transition-colors" title="Message on WhatsApp">
+                        <a href={`https://wa.me/${guest.phone?.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full flex items-center justify-center bg-green-50 text-green-600 hover:bg-green-500 hover:text-white transition-colors" title="Kirim pesan via WhatsApp">
                           <MessageCircle size={16} />
                         </a>
                       </div>
@@ -439,55 +440,55 @@ export const GuestList: React.FC = () => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in">
           <div className="bg-brand-surface w-full max-w-lg rounded-2xl shadow-xl border border-brand-border max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-brand-border flex justify-between items-center bg-brand-surface-hover">
-              <h3 className="font-headline text-2xl text-brand-primary">{editingId ? 'Edit Guest' : 'Add New Guest'}</h3>
+              <h3 className="font-headline text-2xl text-brand-primary">{editingId ? 'Edit Tamu' : 'Tambah Tamu Baru'}</h3>
               <button onClick={() => setShowAddModal(false)} className="text-brand-text-muted hover:text-brand-text"><XCircle size={24} /></button>
             </div>
             <form onSubmit={handleAddSubmit} className="p-6 space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-brand-text-muted uppercase">Full Name</label>
-                <input required type="text" value={newGuest.name || ''} onChange={e => setNewGuest({...newGuest, name: e.target.value})} className="w-full px-4 py-2 bg-brand-surface border border-brand-border rounded-xl focus:outline-none focus:border-brand-primary text-sm text-brand-text" placeholder="e.g. John Doe" />
+                <label className="text-xs font-semibold text-brand-text-muted uppercase">Nama Lengkap</label>
+                <input required type="text" value={newGuest.name || ''} onChange={e => setNewGuest({...newGuest, name: e.target.value})} className="w-full px-4 py-2 bg-brand-surface border border-brand-border rounded-xl focus:outline-none focus:border-brand-primary text-sm text-brand-text" placeholder="cth. John Doe" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-brand-text-muted uppercase">Phone (WhatsApp)</label>
+                <label className="text-xs font-semibold text-brand-text-muted uppercase">Telepon (WhatsApp)</label>
                 <input required type="tel" value={newGuest.phone || ''} onChange={e => setNewGuest({...newGuest, phone: e.target.value})} className="w-full px-4 py-2 bg-brand-surface border border-brand-border rounded-xl focus:outline-none focus:border-brand-primary text-sm text-brand-text" placeholder="+62 812 3456 7890" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-brand-text-muted uppercase">Group</label>
-                  <select 
-                    value={guestGroups.includes(newGuest.group as string) ? newGuest.group : 'Other'} 
-                    onChange={e => setNewGuest({...newGuest, group: e.target.value})} 
+                  <label className="text-xs font-semibold text-brand-text-muted uppercase">Grup</label>
+                  <select
+                    value={guestGroups.includes(newGuest.group as string) ? newGuest.group : 'Other'}
+                    onChange={e => setNewGuest({...newGuest, group: e.target.value})}
                     className="w-full px-4 py-2 bg-brand-surface border border-brand-border rounded-xl focus:outline-none focus:border-brand-primary text-sm text-brand-text appearance-none"
                   >
                     {guestGroups.filter(g => g !== 'Other').map(g => <option key={g} value={g}>{g}</option>)}
-                    <option value="Other">Other</option>
+                    <option value="Other">Lainnya</option>
                   </select>
                   {(!guestGroups.includes(newGuest.group as string) || newGuest.group === 'Other') && (
-                    <input 
-                      type="text" 
-                      value={newGuest.group === 'Other' ? '' : (newGuest.group || '')} 
-                      onChange={e => setNewGuest({...newGuest, group: e.target.value})} 
-                      className="w-full px-4 py-2 mt-2 bg-brand-surface border border-brand-border rounded-xl focus:outline-none focus:border-brand-primary text-sm text-brand-text" 
-                      placeholder="Specify other group..." 
+                    <input
+                      type="text"
+                      value={newGuest.group === 'Other' ? '' : (newGuest.group || '')}
+                      onChange={e => setNewGuest({...newGuest, group: e.target.value})}
+                      className="w-full px-4 py-2 mt-2 bg-brand-surface border border-brand-border rounded-xl focus:outline-none focus:border-brand-primary text-sm text-brand-text"
+                      placeholder="Sebutkan grup lain..."
                     />
                   )}
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-brand-text-muted uppercase">Table No.</label>
-                  <input type="text" value={newGuest.table || ''} onChange={e => setNewGuest({...newGuest, table: e.target.value})} className="w-full px-4 py-2 bg-brand-surface border border-brand-border rounded-xl focus:outline-none focus:border-brand-primary text-sm text-brand-text" placeholder="e.g. T-01" />
+                  <label className="text-xs font-semibold text-brand-text-muted uppercase">No. Meja</label>
+                  <input type="text" value={newGuest.table || ''} onChange={e => setNewGuest({...newGuest, table: e.target.value})} className="w-full px-4 py-2 bg-brand-surface border border-brand-border rounded-xl focus:outline-none focus:border-brand-primary text-sm text-brand-text" placeholder="cth. T-01" />
                 </div>
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-brand-text-muted uppercase">Status</label>
                 <select value={newGuest.status} onChange={e => setNewGuest({...newGuest, status: e.target.value as any})} className="w-full px-4 py-2 bg-brand-surface border border-brand-border rounded-xl focus:outline-none focus:border-brand-primary text-sm text-brand-text">
-                  <option value="Pending">Pending</option>
-                  <option value="Confirmed">Confirmed</option>
-                  <option value="Declined">Declined</option>
+                  <option value="Pending">Menunggu</option>
+                  <option value="Confirmed">Terkonfirmasi</option>
+                  <option value="Declined">Menolak</option>
                 </select>
               </div>
               <div className="flex justify-end gap-3 pt-4 border-t border-brand-border">
-                <button type="button" onClick={() => setShowAddModal(false)} className="px-6 py-2 rounded-xl font-semibold text-brand-text-muted hover:bg-brand-surface-hover">Cancel</button>
-                <button type="submit" className="px-6 py-2 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-primary-hover">{editingId ? 'Update Guest' : 'Save Guest'}</button>
+                <button type="button" onClick={() => setShowAddModal(false)} className="px-6 py-2 rounded-xl font-semibold text-brand-text-muted hover:bg-brand-surface-hover">Batal</button>
+                <button type="submit" className="px-6 py-2 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-primary-hover">{editingId ? 'Perbarui Tamu' : 'Simpan Tamu'}</button>
               </div>
             </form>
           </div>

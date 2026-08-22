@@ -10,6 +10,10 @@ import {
 } from '../store/AppContext';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { formatIDR } from '../utils/formatters';
+import {
+  logisticItemStatusLabel, rentalConditionLabel, handoverStatusLabel,
+  logisticsTimelineTypeLabel, transportStayTypeLabel
+} from '../lib/labels';
 
 export const Logistics: React.FC = () => {
   const { 
@@ -160,22 +164,22 @@ export const Logistics: React.FC = () => {
     <div className="max-w-[1440px] mx-auto space-y-8 animate-in fade-in duration-500 relative pb-20">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <p className="text-xs font-semibold text-brand-accent uppercase tracking-widest mb-2">Event Operations & Asset Hub</p>
-          <h2 className="font-headline text-4xl text-brand-primary">Logistics & Venue Operations</h2>
-          <p className="text-brand-text-muted">Manage items, rental assets, handover protocols, load-in/out schedules, and mobility.</p>
+          <p className="text-xs font-semibold text-brand-accent uppercase tracking-widest mb-2">Pusat Operasi & Aset Acara</p>
+          <h2 className="font-headline text-4xl text-brand-primary">Logistik & Operasi Venue</h2>
+          <p className="text-brand-text-muted">Kelola item, aset sewa, protokol serah terima, jadwal load-in/out, dan mobilitas.</p>
         </div>
         <div className="flex gap-4">
-          <button 
+          <button
             onClick={() => {
               if (activeTab === 'inventory') openInventoryModal();
               if (activeTab === 'rentals') openRentalModal();
               if (activeTab === 'handovers') openHandoverModal();
               if (activeTab === 'venueTimeline') openTimelineModal();
               if (activeTab === 'transport') openTransportModal();
-            }} 
+            }}
             className="flex items-center gap-2 px-6 py-2.5 bg-brand-primary text-white rounded-xl hover:bg-brand-primary-hover transition-all font-semibold text-sm shadow-sm"
           >
-            <Plus size={18} /> Add Logistics Entry
+            <Plus size={18} /> Tambah Entri Logistik
           </button>
         </div>
       </header>
@@ -183,11 +187,11 @@ export const Logistics: React.FC = () => {
       {/* Tabs */}
       <div className="flex overflow-x-auto hide-scrollbar gap-2 pb-2 border-b border-brand-border">
         {[
-          { id: 'inventory', label: 'Inventory & Essentials', icon: Box },
-          { id: 'rentals', label: 'Rentals & Asset Tracking', icon: Package },
-          { id: 'handovers', label: 'Mahar & Gift Handover', icon: ShieldCheck },
-          { id: 'venueTimeline', label: 'Venue Load-In / Out Timeline', icon: Clock },
-          { id: 'transport', label: 'Transport & Accommodation', icon: Car },
+          { id: 'inventory', label: 'Inventaris & Kebutuhan Pokok', icon: Box },
+          { id: 'rentals', label: 'Sewa & Pelacakan Aset', icon: Package },
+          { id: 'handovers', label: 'Serah Terima Mahar & Hadiah', icon: ShieldCheck },
+          { id: 'venueTimeline', label: 'Timeline Load-In / Out Venue', icon: Clock },
+          { id: 'transport', label: 'Transportasi & Akomodasi', icon: Car },
         ].map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -216,25 +220,25 @@ export const Logistics: React.FC = () => {
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Box size={64} className="text-brand-primary" />
               </div>
-              <p className="text-xs font-semibold text-brand-text-muted uppercase tracking-wide mb-2">Total Logistics Items</p>
+              <p className="text-xs font-semibold text-brand-text-muted uppercase tracking-wide mb-2">Total Item Logistik</p>
               <h3 className="font-headline text-4xl text-brand-primary mb-1">{logistics.length}</h3>
-              <p className="text-sm text-brand-text-muted">Across all inventory categories</p>
+              <p className="text-sm text-brand-text-muted">Di seluruh kategori inventaris</p>
             </div>
             <div className="card p-6 relative overflow-hidden group hover:border-brand-warning/40 transition-all">
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Package size={64} className="text-brand-warning" />
               </div>
-              <p className="text-xs font-semibold text-brand-text-muted uppercase tracking-wide mb-2">Pending Items</p>
+              <p className="text-xs font-semibold text-brand-text-muted uppercase tracking-wide mb-2">Item Tertunda</p>
               <h3 className="font-headline text-4xl text-brand-primary mb-1">{pendingCount}</h3>
-              <p className="text-sm font-medium text-brand-warning">Inquiry / Awaiting Confirmation</p>
+              <p className="text-sm font-medium text-brand-warning">Tanya Ketersediaan / Menunggu Konfirmasi</p>
             </div>
             <div className="card p-6 relative overflow-hidden group hover:border-brand-accent/40 transition-all">
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Wallet size={64} className="text-brand-accent" />
               </div>
-              <p className="text-xs font-semibold text-brand-text-muted uppercase tracking-wide mb-2">Est. Inventory Cost</p>
+              <p className="text-xs font-semibold text-brand-text-muted uppercase tracking-wide mb-2">Estimasi Biaya Inventaris</p>
               <h3 className="font-headline text-3xl text-brand-primary mb-1">{formatIDR(totalCost)}</h3>
-              <p className="text-sm text-brand-text-muted">Total budget allocated for essentials</p>
+              <p className="text-sm text-brand-text-muted">Total budget yang dialokasikan untuk kebutuhan pokok</p>
             </div>
           </section>
 
@@ -242,11 +246,11 @@ export const Logistics: React.FC = () => {
             <div className="p-6 border-b border-brand-border flex flex-col sm:flex-row justify-between gap-4 items-center bg-brand-surface-hover/30">
               <div className="relative w-full sm:w-96">
                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-text-muted" />
-                <input value={search} onChange={e => setSearch(e.target.value)} type="text" placeholder="Search items, suppliers..." className="w-full h-11 pl-11 pr-4 bg-brand-surface rounded-xl border border-brand-border focus:outline-none focus:border-brand-primary transition-all text-sm text-brand-text" />
+                <input value={search} onChange={e => setSearch(e.target.value)} type="text" placeholder="Cari item, supplier..." className="w-full h-11 pl-11 pr-4 bg-brand-surface rounded-xl border border-brand-border focus:outline-none focus:border-brand-primary transition-all text-sm text-brand-text" />
               </div>
               <div className="flex gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 hide-scrollbar">
                 {['All', 'Rentals', 'Decor', 'Gifts'].map(cat => (
-                  <button key={cat} onClick={() => setFilterCategory(cat)} className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${filterCategory === cat ? 'bg-brand-primary text-white' : 'bg-brand-surface border border-brand-border text-brand-text-muted hover:border-brand-accent'}`}>{cat}</button>
+                  <button key={cat} onClick={() => setFilterCategory(cat)} className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${filterCategory === cat ? 'bg-brand-primary text-white' : 'bg-brand-surface border border-brand-border text-brand-text-muted hover:border-brand-accent'}`}>{cat === 'All' ? 'Semua' : cat === 'Rentals' ? 'Sewa' : cat === 'Decor' ? 'Dekorasi' : 'Hadiah'}</button>
                 ))}
               </div>
             </div>
@@ -276,7 +280,7 @@ export const Logistics: React.FC = () => {
                       item.status === 'Confirmed' ? 'bg-brand-success-bg text-brand-success' :
                       item.status === 'Pending' ? 'bg-brand-warning-bg text-brand-warning' :
                       'bg-brand-danger-bg text-brand-danger'
-                    }`}>{item.status}</span>
+                    }`}>{logisticItemStatusLabel(item.status)}</span>
                   </div>
                   <div className="col-span-1 flex justify-end gap-1">
                     <button onClick={() => openInventoryModal(item)} className="p-1.5 hover:bg-brand-surface-hover rounded-lg transition-colors text-brand-text-muted hover:text-brand-primary"><Edit2 size={16} /></button>
@@ -286,7 +290,7 @@ export const Logistics: React.FC = () => {
               ))}
               {filteredInventory.length === 0 && (
                 <div className="text-center py-12 text-brand-text-muted border-2 border-dashed border-brand-border rounded-xl">
-                  No inventory items found.
+                  Tidak ada item inventaris ditemukan.
                 </div>
               )}
             </div>
@@ -299,11 +303,11 @@ export const Logistics: React.FC = () => {
         <div className="card overflow-hidden">
           <div className="p-6 border-b border-brand-border flex justify-between items-center bg-brand-surface-hover/50">
             <div>
-              <h3 className="font-headline text-2xl text-brand-primary">Rentals & Asset Tracking</h3>
-              <p className="text-xs text-brand-text-muted mt-1">Audit condition and arrival/return status for rented chairs, decor, crystalware, and equipment.</p>
+              <h3 className="font-headline text-2xl text-brand-primary">Sewa & Pelacakan Aset</h3>
+              <p className="text-xs text-brand-text-muted mt-1">Audit kondisi dan status kedatangan/pengembalian untuk kursi, dekorasi, kristal, dan peralatan sewaan.</p>
             </div>
             <button onClick={() => openRentalModal()} className="px-4 py-2 bg-brand-primary text-white rounded-xl text-xs font-semibold hover:bg-brand-primary-hover flex items-center gap-2">
-              <Plus size={16} /> Add Rental Asset
+              <Plus size={16} /> Tambah Aset Sewa
             </button>
           </div>
           <div className="overflow-x-auto">
@@ -311,11 +315,11 @@ export const Logistics: React.FC = () => {
               <thead>
                 <tr className="bg-brand-surface-hover border-b border-brand-border text-xs font-semibold text-brand-text-muted uppercase tracking-wider">
                   <th className="py-4 px-6">Item & Vendor</th>
-                  <th className="py-4 px-6">Quantity</th>
-                  <th className="py-4 px-6">Arrival Condition</th>
-                  <th className="py-4 px-6">Return Status</th>
-                  <th className="py-4 px-6">Notes</th>
-                  <th className="py-4 px-6 text-right">Actions</th>
+                  <th className="py-4 px-6">Jumlah</th>
+                  <th className="py-4 px-6">Kondisi Kedatangan</th>
+                  <th className="py-4 px-6">Status Pengembalian</th>
+                  <th className="py-4 px-6">Catatan</th>
+                  <th className="py-4 px-6 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-brand-border">
@@ -330,20 +334,20 @@ export const Logistics: React.FC = () => {
                       <td className="py-4 px-6 text-sm font-semibold text-brand-primary">{rental.quantity} pcs</td>
                       <td className="py-4 px-6">
                         <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-full ${
-                          rental.arrivalStatus === 'Good' ? 'bg-brand-success-bg text-brand-success' : 
-                          rental.arrivalStatus === 'Damaged' ? 'bg-brand-danger-bg text-brand-danger' : 
+                          rental.arrivalStatus === 'Good' ? 'bg-brand-success-bg text-brand-success' :
+                          rental.arrivalStatus === 'Damaged' ? 'bg-brand-danger-bg text-brand-danger' :
                           'bg-brand-warning-bg text-brand-warning'
                         }`}>
-                          {rental.arrivalStatus}
+                          {rentalConditionLabel(rental.arrivalStatus)}
                         </span>
                       </td>
                       <td className="py-4 px-6">
                         <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-full ${
-                          rental.returnStatus === 'Good' ? 'bg-brand-success-bg text-brand-success' : 
-                          rental.returnStatus === 'Damaged' ? 'bg-brand-danger-bg text-brand-danger' : 
+                          rental.returnStatus === 'Good' ? 'bg-brand-success-bg text-brand-success' :
+                          rental.returnStatus === 'Damaged' ? 'bg-brand-danger-bg text-brand-danger' :
                           'bg-brand-warning-bg text-brand-warning'
                         }`}>
-                          {rental.returnStatus}
+                          {rentalConditionLabel(rental.returnStatus)}
                         </span>
                       </td>
                       <td className="py-4 px-6 text-xs text-brand-text-muted italic max-w-[200px] truncate">{rental.notes || '-'}</td>
@@ -356,7 +360,7 @@ export const Logistics: React.FC = () => {
                   );
                 })}
                 {rentals.length === 0 && (
-                  <tr><td colSpan={6} className="py-8 text-center text-brand-text-muted text-sm">No rental assets tracked yet.</td></tr>
+                  <tr><td colSpan={6} className="py-8 text-center text-brand-text-muted text-sm">Belum ada aset sewa terlacak.</td></tr>
                 )}
               </tbody>
             </table>
@@ -369,21 +373,21 @@ export const Logistics: React.FC = () => {
         <div className="card overflow-hidden">
           <div className="p-6 border-b border-brand-border flex justify-between items-center bg-brand-surface-hover/50">
             <div>
-              <h3 className="font-headline text-2xl text-brand-primary">High-Value Handover Protocols</h3>
-              <p className="text-xs text-brand-text-muted mt-1">Track high-value assets (wedding rings, Mahar, cash, dowry, family jewels) and responsible PICs.</p>
+              <h3 className="font-headline text-2xl text-brand-primary">Protokol Serah Terima Barang Bernilai Tinggi</h3>
+              <p className="text-xs text-brand-text-muted mt-1">Lacak aset bernilai tinggi (cincin nikah, Mahar, uang tunai, mas kawin, perhiasan keluarga) dan PIC penanggung jawab.</p>
             </div>
             <button onClick={() => openHandoverModal()} className="px-4 py-2 bg-brand-primary text-white rounded-xl text-xs font-semibold hover:bg-brand-primary-hover flex items-center gap-2">
-              <Plus size={16} /> Add Handover Item
+              <Plus size={16} /> Tambah Item Serah Terima
             </button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-brand-surface-hover border-b border-brand-border text-xs font-semibold text-brand-text-muted uppercase tracking-wider">
-                  <th className="py-4 px-6">Item & Description</th>
-                  <th className="py-4 px-6">Responsible PIC</th>
-                  <th className="py-4 px-6">Handover Status</th>
-                  <th className="py-4 px-6 text-right">Protocol Action</th>
+                  <th className="py-4 px-6">Item & Deskripsi</th>
+                  <th className="py-4 px-6">PIC Penanggung Jawab</th>
+                  <th className="py-4 px-6">Status Serah Terima</th>
+                  <th className="py-4 px-6 text-right">Aksi Protokol</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-brand-border">
@@ -405,25 +409,25 @@ export const Logistics: React.FC = () => {
                         item.status === 'Returned' ? 'bg-brand-primary/10 text-brand-primary' :
                         'bg-brand-warning-bg text-brand-warning'
                       }`}>
-                        {item.status}
+                        {handoverStatusLabel(item.status)}
                       </span>
                     </td>
                     <td className="py-4 px-6 text-right">
                       <div className="flex justify-end gap-2">
                         {item.status !== 'Handed Over' && (
-                          <button 
+                          <button
                             onClick={() => editHandover({ ...item, status: 'Handed Over', handoverTime: new Date().toLocaleTimeString() })}
                             className="px-3 py-1 bg-brand-success-bg text-brand-success rounded-lg text-xs font-semibold hover:bg-brand-success/20 transition-colors"
                           >
-                            Mark Handed Over
+                            Tandai Diserahkan
                           </button>
                         )}
                         {item.status === 'Handed Over' && (
-                          <button 
+                          <button
                             onClick={() => editHandover({ ...item, status: 'Returned', returnTime: new Date().toLocaleTimeString() })}
                             className="px-3 py-1 bg-brand-primary/10 text-brand-primary rounded-lg text-xs font-semibold hover:bg-brand-primary/20 transition-colors"
                           >
-                            Mark Returned
+                            Tandai Dikembalikan
                           </button>
                         )}
                         <button onClick={() => openHandoverModal(item)} className="p-1.5 text-brand-text-muted hover:text-brand-primary rounded-lg">
@@ -434,7 +438,7 @@ export const Logistics: React.FC = () => {
                   </tr>
                 ))}
                 {handovers.length === 0 && (
-                  <tr><td colSpan={4} className="py-8 text-center text-brand-text-muted text-sm">No handover protocols recorded.</td></tr>
+                  <tr><td colSpan={4} className="py-8 text-center text-brand-text-muted text-sm">Belum ada protokol serah terima tercatat.</td></tr>
                 )}
               </tbody>
             </table>
@@ -447,22 +451,22 @@ export const Logistics: React.FC = () => {
         <div className="card overflow-hidden">
           <div className="p-6 border-b border-brand-border flex justify-between items-center bg-brand-surface-hover/50">
             <div>
-              <h3 className="font-headline text-2xl text-brand-primary">Venue Load-In / Out Schedule</h3>
-              <p className="text-xs text-brand-text-muted mt-1">Coordinate loading docks, vendor setup windows, sound checks, and post-reception teardown.</p>
+              <h3 className="font-headline text-2xl text-brand-primary">Jadwal Load-In / Out Venue</h3>
+              <p className="text-xs text-brand-text-muted mt-1">Koordinasikan loading dock, jendela setup vendor, sound check, dan pembongkaran pasca-resepsi.</p>
             </div>
             <button onClick={() => openTimelineModal()} className="px-4 py-2 bg-brand-primary text-white rounded-xl text-xs font-semibold hover:bg-brand-primary-hover flex items-center gap-2">
-              <Plus size={16} /> Add Load Window
+              <Plus size={16} /> Tambah Jendela Muat
             </button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-brand-surface-hover border-b border-brand-border text-xs font-semibold text-brand-text-muted uppercase tracking-wider">
-                  <th className="py-4 px-6">Time Window</th>
-                  <th className="py-4 px-6">Activity & Vendor</th>
-                  <th className="py-4 px-6">Type</th>
+                  <th className="py-4 px-6">Jendela Waktu</th>
+                  <th className="py-4 px-6">Aktivitas & Vendor</th>
+                  <th className="py-4 px-6">Tipe</th>
                   <th className="py-4 px-6">Status</th>
-                  <th className="py-4 px-6 text-right">Actions</th>
+                  <th className="py-4 px-6 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-brand-border">
@@ -482,18 +486,18 @@ export const Logistics: React.FC = () => {
                       </td>
                       <td className="py-4 px-6">
                         <span className="px-2.5 py-1 bg-brand-surface border border-brand-border text-brand-text-muted rounded-md text-xs font-medium">
-                          {log.type}
+                          {logisticsTimelineTypeLabel(log.type)}
                         </span>
                       </td>
                       <td className="py-4 px-6">
-                        <select 
-                          value={log.status} 
+                        <select
+                          value={log.status}
                           onChange={(e) => editLogisticsTimeline({ ...log, status: e.target.value as any })}
                           className="bg-brand-surface border border-brand-border text-brand-text text-xs rounded-lg px-2.5 py-1 font-semibold focus:outline-none"
                         >
-                          <option value="Pending">Pending</option>
-                          <option value="In Progress">In Progress</option>
-                          <option value="Completed">Completed</option>
+                          <option value="Pending">Menunggu</option>
+                          <option value="In Progress">Berjalan</option>
+                          <option value="Completed">Selesai</option>
                         </select>
                       </td>
                       <td className="py-4 px-6 text-right">
@@ -505,7 +509,7 @@ export const Logistics: React.FC = () => {
                   );
                 })}
                 {logisticsTimelines.length === 0 && (
-                  <tr><td colSpan={5} className="py-8 text-center text-brand-text-muted text-sm">No venue loading windows defined.</td></tr>
+                  <tr><td colSpan={5} className="py-8 text-center text-brand-text-muted text-sm">Belum ada jendela muat venue.</td></tr>
                 )}
               </tbody>
             </table>
@@ -530,17 +534,17 @@ export const Logistics: React.FC = () => {
                     {item.type === 'Accommodation' ? <FileText size={24} /> : <Car size={24} />}
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-brand-accent uppercase tracking-wider">{item.type}</span>
+                    <span className="text-[10px] font-bold text-brand-accent uppercase tracking-wider">{transportStayTypeLabel(item.type)}</span>
                     <h4 className="font-headline text-2xl text-brand-text leading-tight">{item.name}</h4>
                   </div>
                 </div>
                 <div className="space-y-2 text-xs text-brand-text-muted border-t border-brand-border pt-4">
                   <div className="flex justify-between">
-                    <span>Allocation:</span>
+                    <span>Alokasi:</span>
                     <span className="font-semibold text-brand-text">{item.allocation}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Capacity:</span>
+                    <span>Kapasitas:</span>
                     <span className="font-semibold text-brand-text">{item.capacity}</span>
                   </div>
                   {item.notes && (
@@ -554,7 +558,7 @@ export const Logistics: React.FC = () => {
           ))}
           {transportStays.length === 0 && (
             <div className="col-span-full text-center py-12 card text-brand-text-muted">
-              No mobility or accommodation stays assigned.
+              Belum ada mobilitas atau akomodasi yang ditugaskan.
             </div>
           )}
         </div>
@@ -565,36 +569,36 @@ export const Logistics: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-6 border-b border-brand-border bg-brand-surface-hover">
-              <h3 className="font-headline text-xl text-brand-text">{editingInventoryId ? 'Edit Logistic Item' : 'Add Logistic Item'}</h3>
+              <h3 className="font-headline text-xl text-brand-text">{editingInventoryId ? 'Edit Item Logistik' : 'Tambah Item Logistik'}</h3>
               <button onClick={() => setShowInventoryModal(false)} className="text-brand-text-muted hover:text-brand-text"><XCircle size={20} /></button>
             </div>
             <form onSubmit={saveInventory} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Item Name</label>
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Nama Item</label>
                 <input required value={inventoryForm.name || ''} onChange={e => setInventoryForm({...inventoryForm, name: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Category</label>
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Kategori</label>
                   <select value={inventoryForm.category || 'Rentals'} onChange={e => setInventoryForm({...inventoryForm, category: e.target.value})} className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary">
-                    <option value="Rentals">Rentals</option>
-                    <option value="Decor">Decor</option>
-                    <option value="Gifts">Gifts</option>
-                    <option value="Other">Other</option>
+                    <option value="Rentals">Sewa</option>
+                    <option value="Decor">Dekorasi</option>
+                    <option value="Gifts">Hadiah</option>
+                    <option value="Other">Lainnya</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Status</label>
                   <select value={inventoryForm.status || 'Inquiry'} onChange={e => setInventoryForm({...inventoryForm, status: e.target.value as any})} className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary">
-                    <option value="Inquiry">Inquiry</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Confirmed">Confirmed</option>
+                    <option value="Inquiry">Tanya Ketersediaan</option>
+                    <option value="Pending">Menunggu</option>
+                    <option value="Confirmed">Terkonfirmasi</option>
                   </select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Cost (Rp)</label>
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Biaya (Rp)</label>
                   <input value={inventoryForm.cost || 0} onChange={e => setInventoryForm({...inventoryForm, cost: parseInt(e.target.value) || 0})} type="number" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" />
                 </div>
                 <div>
@@ -607,8 +611,8 @@ export const Logistics: React.FC = () => {
                 <input value={inventoryForm.supplier || ''} onChange={e => setInventoryForm({...inventoryForm, supplier: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" />
               </div>
               <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setShowInventoryModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Cancel</button>
-                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingInventoryId ? 'Update Item' : 'Save Item'}</button>
+                <button type="button" onClick={() => setShowInventoryModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Batal</button>
+                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingInventoryId ? 'Perbarui Item' : 'Simpan Item'}</button>
               </div>
             </form>
           </div>
@@ -620,13 +624,13 @@ export const Logistics: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-6 border-b border-brand-border bg-brand-surface-hover">
-              <h3 className="font-headline text-xl text-brand-text">{editingRentalId ? 'Edit Rental Asset' : 'Add Rental Asset'}</h3>
+              <h3 className="font-headline text-xl text-brand-text">{editingRentalId ? 'Edit Aset Sewa' : 'Tambah Aset Sewa'}</h3>
               <button onClick={() => setShowRentalModal(false)} className="text-brand-text-muted hover:text-brand-text"><XCircle size={20} /></button>
             </div>
             <form onSubmit={saveRental} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Asset Name</label>
-                <input required value={rentalForm.name || ''} onChange={e => setRentalForm({...rentalForm, name: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="e.g. Chiavari Chairs - Gold" />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Nama Aset</label>
+                <input required value={rentalForm.name || ''} onChange={e => setRentalForm({...rentalForm, name: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="cth. Kursi Chiavari - Emas" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -636,37 +640,37 @@ export const Logistics: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Quantity</label>
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Jumlah</label>
                   <input value={rentalForm.quantity || 1} onChange={e => setRentalForm({...rentalForm, quantity: Number(e.target.value)})} type="number" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Arrival Status</label>
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Status Kedatangan</label>
                   <select value={rentalForm.arrivalStatus || 'Pending'} onChange={e => setRentalForm({...rentalForm, arrivalStatus: e.target.value as any})} className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary">
-                    <option value="Pending">Pending</option>
-                    <option value="Good">Good</option>
-                    <option value="Damaged">Damaged</option>
-                    <option value="Missing">Missing</option>
+                    <option value="Pending">Menunggu</option>
+                    <option value="Good">Baik</option>
+                    <option value="Damaged">Rusak</option>
+                    <option value="Missing">Hilang</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Return Status</label>
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Status Pengembalian</label>
                   <select value={rentalForm.returnStatus || 'Pending'} onChange={e => setRentalForm({...rentalForm, returnStatus: e.target.value as any})} className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary">
-                    <option value="Pending">Pending</option>
-                    <option value="Good">Good</option>
-                    <option value="Damaged">Damaged</option>
-                    <option value="Missing">Missing</option>
+                    <option value="Pending">Menunggu</option>
+                    <option value="Good">Baik</option>
+                    <option value="Damaged">Rusak</option>
+                    <option value="Missing">Hilang</option>
                   </select>
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Notes</label>
-                <input value={rentalForm.notes || ''} onChange={e => setRentalForm({...rentalForm, notes: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="Special handling notes..." />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Catatan</label>
+                <input value={rentalForm.notes || ''} onChange={e => setRentalForm({...rentalForm, notes: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="Catatan penanganan khusus..." />
               </div>
               <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setShowRentalModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Cancel</button>
-                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingRentalId ? 'Update Asset' : 'Save Asset'}</button>
+                <button type="button" onClick={() => setShowRentalModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Batal</button>
+                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingRentalId ? 'Perbarui Aset' : 'Simpan Aset'}</button>
               </div>
             </form>
           </div>
@@ -678,33 +682,33 @@ export const Logistics: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-6 border-b border-brand-border bg-brand-surface-hover">
-              <h3 className="font-headline text-xl text-brand-text">{editingHandoverId ? 'Edit Handover Item' : 'Add Handover Protocol'}</h3>
+              <h3 className="font-headline text-xl text-brand-text">{editingHandoverId ? 'Edit Item Serah Terima' : 'Tambah Protokol Serah Terima'}</h3>
               <button onClick={() => setShowHandoverModal(false)} className="text-brand-text-muted hover:text-brand-text"><XCircle size={20} /></button>
             </div>
             <form onSubmit={saveHandover} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Item Title</label>
-                <input required value={handoverForm.name || ''} onChange={e => setHandoverForm({...handoverForm, name: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="e.g. Wedding Rings / Mahar" />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Judul Item</label>
+                <input required value={handoverForm.name || ''} onChange={e => setHandoverForm({...handoverForm, name: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="cth. Cincin Nikah / Mahar" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Description & Value</label>
-                <input value={handoverForm.valueDescription || ''} onChange={e => setHandoverForm({...handoverForm, valueDescription: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="e.g. Platinum & Diamond ring set" />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Deskripsi & Nilai</label>
+                <input value={handoverForm.valueDescription || ''} onChange={e => setHandoverForm({...handoverForm, valueDescription: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="cth. Set cincin Platinum & Berlian" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Responsible PIC</label>
-                <input value={handoverForm.picName || ''} onChange={e => setHandoverForm({...handoverForm, picName: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="e.g. Best Man (Arthur)" />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">PIC Penanggung Jawab</label>
+                <input value={handoverForm.picName || ''} onChange={e => setHandoverForm({...handoverForm, picName: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="cth. Pendamping Utama Pria (Arthur)" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Status</label>
                 <select value={handoverForm.status || 'Pending'} onChange={e => setHandoverForm({...handoverForm, status: e.target.value as any})} className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary">
-                  <option value="Pending">Pending</option>
-                  <option value="Handed Over">Handed Over</option>
-                  <option value="Returned">Returned</option>
+                  <option value="Pending">Menunggu</option>
+                  <option value="Handed Over">Sudah Diserahkan</option>
+                  <option value="Returned">Sudah Dikembalikan</option>
                 </select>
               </div>
               <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setShowHandoverModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Cancel</button>
-                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingHandoverId ? 'Update Protocol' : 'Save Protocol'}</button>
+                <button type="button" onClick={() => setShowHandoverModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Batal</button>
+                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingHandoverId ? 'Perbarui Protokol' : 'Simpan Protokol'}</button>
               </div>
             </form>
           </div>
@@ -716,31 +720,31 @@ export const Logistics: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-6 border-b border-brand-border bg-brand-surface-hover">
-              <h3 className="font-headline text-xl text-brand-text">{editingTimelineId ? 'Edit Load-In Slot' : 'Add Venue Loading Slot'}</h3>
+              <h3 className="font-headline text-xl text-brand-text">{editingTimelineId ? 'Edit Slot Load-In' : 'Tambah Slot Muat Venue'}</h3>
               <button onClick={() => setShowTimelineModal(false)} className="text-brand-text-muted hover:text-brand-text"><XCircle size={20} /></button>
             </div>
             <form onSubmit={saveTimeline} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Activity Name</label>
-                <input required value={timelineForm.activity || ''} onChange={e => setTimelineForm({...timelineForm, activity: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="e.g. Decor Loading & Rigging" />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Nama Aktivitas</label>
+                <input required value={timelineForm.activity || ''} onChange={e => setTimelineForm({...timelineForm, activity: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="cth. Muat & Rigging Dekorasi" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Start Time</label>
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Waktu Mulai</label>
                   <input value={timelineForm.startTime || '08:00'} onChange={e => setTimelineForm({...timelineForm, startTime: e.target.value})} type="time" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">End Time</label>
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Waktu Selesai</label>
                   <input value={timelineForm.endTime || '10:00'} onChange={e => setTimelineForm({...timelineForm, endTime: e.target.value})} type="time" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Type</label>
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Tipe</label>
                   <select value={timelineForm.type || 'Load-In'} onChange={e => setTimelineForm({...timelineForm, type: e.target.value as any})} className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary">
-                    <option value="Load-In">Load-In</option>
-                    <option value="Operational">Operational</option>
-                    <option value="Load-Out">Load-Out</option>
+                    <option value="Load-In">Muat Masuk</option>
+                    <option value="Operational">Operasional</option>
+                    <option value="Load-Out">Muat Keluar</option>
                   </select>
                 </div>
                 <div>
@@ -751,8 +755,8 @@ export const Logistics: React.FC = () => {
                 </div>
               </div>
               <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setShowTimelineModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Cancel</button>
-                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingTimelineId ? 'Update Slot' : 'Save Slot'}</button>
+                <button type="button" onClick={() => setShowTimelineModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Batal</button>
+                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingTimelineId ? 'Perbarui Slot' : 'Simpan Slot'}</button>
               </div>
             </form>
           </div>
@@ -764,39 +768,39 @@ export const Logistics: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-6 border-b border-brand-border bg-brand-surface-hover">
-              <h3 className="font-headline text-xl text-brand-text">{editingTransportId ? 'Edit Mobility / Stay' : 'Add Transport / Accommodation'}</h3>
+              <h3 className="font-headline text-xl text-brand-text">{editingTransportId ? 'Edit Mobilitas / Menginap' : 'Tambah Transportasi / Akomodasi'}</h3>
               <button onClick={() => setShowTransportModal(false)} className="text-brand-text-muted hover:text-brand-text"><XCircle size={20} /></button>
             </div>
             <form onSubmit={saveTransport} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Title / Vehicle Name</label>
-                <input required value={transportForm.name || ''} onChange={e => setTransportForm({...transportForm, name: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="e.g. Alphard Black VIP / Presidential Suite" />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Judul / Nama Kendaraan</label>
+                <input required value={transportForm.name || ''} onChange={e => setTransportForm({...transportForm, name: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="cth. Alphard Hitam VIP / Presidential Suite" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Type</label>
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Tipe</label>
                   <select value={transportForm.type || 'Vehicle'} onChange={e => setTransportForm({...transportForm, type: e.target.value as any})} className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary">
-                    <option value="Vehicle">Vehicle</option>
+                    <option value="Vehicle">Kendaraan</option>
                     <option value="Shuttle">Shuttle</option>
-                    <option value="Accommodation">Accommodation</option>
+                    <option value="Accommodation">Akomodasi</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Capacity</label>
-                  <input value={transportForm.capacity || ''} onChange={e => setTransportForm({...transportForm, capacity: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="e.g. 4 Pax" />
+                  <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Kapasitas</label>
+                  <input value={transportForm.capacity || ''} onChange={e => setTransportForm({...transportForm, capacity: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="cth. 4 Pax" />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Allocation / Designated For</label>
-                <input value={transportForm.allocation || ''} onChange={e => setTransportForm({...transportForm, allocation: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="e.g. Couple & Parents" />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Alokasi / Diperuntukkan Untuk</label>
+                <input value={transportForm.allocation || ''} onChange={e => setTransportForm({...transportForm, allocation: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="cth. Pasangan & Orang Tua" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Notes & Schedule</label>
-                <input value={transportForm.notes || ''} onChange={e => setTransportForm({...transportForm, notes: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="e.g. Standby at 07:00 AM at Hotel Lobby" />
+                <label className="block text-xs font-semibold text-brand-text-muted uppercase mb-1">Catatan & Jadwal</label>
+                <input value={transportForm.notes || ''} onChange={e => setTransportForm({...transportForm, notes: e.target.value})} type="text" className="w-full px-4 py-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary" placeholder="cth. Standby pukul 07:00 di Lobi Hotel" />
               </div>
               <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setShowTransportModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Cancel</button>
-                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingTransportId ? 'Update Entry' : 'Save Entry'}</button>
+                <button type="button" onClick={() => setShowTransportModal(false)} className="flex-1 px-4 py-2 border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-surface-hover">Batal</button>
+                <button type="submit" className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover">{editingTransportId ? 'Perbarui Entri' : 'Simpan Entri'}</button>
               </div>
             </form>
           </div>

@@ -7,6 +7,7 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 import { formatDate } from '../utils/formatters';
 import { UploadButton, deleteUploadedFile } from '../utils/uploadthing';
 import { compressImagesBeforeUpload } from '../utils/imageCompression';
+import { attireStatusLabel } from '../lib/labels';
 
 
 export const Attire: React.FC = () => {
@@ -15,7 +16,7 @@ export const Attire: React.FC = () => {
     attireVendorNotes, addAttireVendorNote, deleteAttireVendorNote, editAttireVendorNote
   } = useAppContext();
   
-  const [filter, setFilter] = useState('All Roles');
+  const [filter, setFilter] = useState('Semua Peran');
   
   // Member Form State
   const [showModal, setShowModal] = useState(false);
@@ -35,10 +36,10 @@ export const Attire: React.FC = () => {
     vendorName: '', notes: '', dueDate: ''
   });
 
-  const allRolesList = Array.from(new Set(['Bride', 'Groom', 'Maid of Honor', 'Best Man', 'Bridesmaids', 'Groomsmen', "Bride's Family", "Groom's Family", 'Other', ...attireItems.map(a => a.role as string)])).filter(Boolean);
-  const filterRoles = ['All Roles', ...allRolesList.filter(r => r !== 'Other')];
+  const allRolesList = Array.from(new Set(['Mempelai Wanita', 'Mempelai Pria', 'Pendamping Utama Wanita', 'Pendamping Utama Pria', 'Pendamping Wanita', 'Pendamping Pria', "Keluarga Mempelai Wanita", "Keluarga Mempelai Pria", 'Other', ...attireItems.map(a => a.role as string)])).filter(Boolean);
+  const filterRoles = ['Semua Peran', ...allRolesList.filter(r => r !== 'Other')];
 
-  const filteredItems = filter === 'All Roles' ? attireItems : attireItems.filter(a => a.role === filter);
+  const filteredItems = filter === 'Semua Peran' ? attireItems : attireItems.filter(a => a.role === filter);
 
   // --- Member Methods ---
   const openAddModal = () => {
@@ -84,10 +85,10 @@ export const Attire: React.FC = () => {
   const handleDelete = (id: string) => {
     setConfirmState({
       isOpen: true,
-      title: 'Delete Attire Record',
-      message: 'Are you sure you want to delete this record? This cannot be undone.',
+      title: 'Hapus Catatan Busana',
+      message: 'Apakah kamu yakin ingin menghapus catatan ini? Tindakan ini tidak dapat dibatalkan.',
       type: 'danger',
-      confirmText: 'Delete',
+      confirmText: 'Hapus',
       onConfirm: () => {
         const target = attireItems.find(a => a.id === id);
         deleteAttireItem(id);
@@ -133,10 +134,10 @@ export const Attire: React.FC = () => {
   const handleDeleteNote = (id: string) => {
     setConfirmState({
       isOpen: true,
-      title: 'Delete Vendor Note',
-      message: 'Are you sure you want to delete this note?',
+      title: 'Hapus Catatan Vendor',
+      message: 'Apakah kamu yakin ingin menghapus catatan ini?',
       type: 'danger',
-      confirmText: 'Delete',
+      confirmText: 'Hapus',
       onConfirm: () => {
         deleteAttireVendorNote(id);
         setConfirmState(null);
@@ -185,13 +186,13 @@ export const Attire: React.FC = () => {
     <div className="max-w-[1440px] mx-auto space-y-8 animate-in fade-in duration-500 relative pb-12">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4">
         <div>
-          <h1 className="font-headline text-4xl text-brand-text mb-2">Attire & Uniforms</h1>
-          <p className="text-brand-text-muted text-lg">Manage fittings, measurements, and vendor notes.</p>
+          <h1 className="font-headline text-4xl text-brand-text mb-2">Busana & Seragam</h1>
+          <p className="text-brand-text-muted text-lg">Kelola fitting, ukuran, dan catatan vendor.</p>
         </div>
         <div className="flex gap-3">
           <button onClick={openAddModal} className="px-5 py-2.5 rounded-xl bg-brand-primary text-white font-semibold text-sm hover:bg-brand-primary-hover transition-all flex items-center gap-2 shadow-sm">
             <UserPlus size={18} />
-            Add Member
+            Tambah Anggota
           </button>
         </div>
       </header>
@@ -242,33 +243,33 @@ export const Attire: React.FC = () => {
                 
                 <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2">
                   <div>
-                    <p className="font-semibold text-brand-text-muted mb-2 uppercase tracking-wide text-[10px]">Fitting Status</p>
+                    <p className="font-semibold text-brand-text-muted mb-2 uppercase tracking-wide text-[10px]">Status Fitting</p>
                     <div className="flex items-center gap-2 mb-2">
                       {getStatusIcon(item.status)}
-                      <span className="text-sm font-semibold text-brand-text">{item.status}</span>
+                      <span className="text-sm font-semibold text-brand-text">{attireStatusLabel(item.status)}</span>
                     </div>
                     <div className="w-full bg-brand-surface-hover rounded-full h-1.5 overflow-hidden">
                       <div className={`h-1.5 rounded-full ${getStatusBgColor(item.status)}`} style={{ width: `${getProgress(item.status)}%` }}></div>
                     </div>
                   </div>
                   <div>
-                    <p className="font-semibold text-brand-text-muted mb-2 uppercase tracking-wide text-[10px]">Couturier / Tailor</p>
-                    <p className="text-sm font-semibold text-brand-text">{item.vendor || 'TBD'}</p>
+                    <p className="font-semibold text-brand-text-muted mb-2 uppercase tracking-wide text-[10px]">Perancang / Penjahit</p>
+                    <p className="text-sm font-semibold text-brand-text">{item.vendor || 'Belum ditentukan'}</p>
                     <p className="text-xs text-brand-text-muted mt-1 truncate">{item.desc}</p>
                   </div>
                   <div className="sm:col-span-2 bg-brand-surface-hover/30 rounded-xl p-4 border border-brand-border/30">
-                    <p className="font-semibold text-brand-text-muted mb-2 uppercase tracking-wide text-[10px]">Measurements</p>
-                    <p className="text-sm text-brand-text font-medium leading-relaxed">{item.measurements || 'Not provided'}</p>
+                    <p className="font-semibold text-brand-text-muted mb-2 uppercase tracking-wide text-[10px]">Ukuran</p>
+                    <p className="text-sm text-brand-text font-medium leading-relaxed">{item.measurements || 'Belum tersedia'}</p>
                   </div>
                 </div>
               </div>
             ))}
-            
+
             {filteredItems.length === 0 && (
               <div className="text-center py-16 text-brand-text-muted border-2 border-dashed border-brand-border rounded-2xl bg-brand-surface/50">
                 <Shirt size={48} className="mx-auto text-brand-border mb-4" />
-                <p className="font-semibold text-lg text-brand-text mb-1">No attire records found.</p>
-                <p className="text-sm">Click "Add Member" to create a new fitting record.</p>
+                <p className="font-semibold text-lg text-brand-text mb-1">Belum ada catatan busana.</p>
+                <p className="text-sm">Klik "Tambah Anggota" untuk membuat catatan fitting baru.</p>
               </div>
             )}
           </div>
@@ -280,8 +281,8 @@ export const Attire: React.FC = () => {
           {/* Vendor Notes */}
           <div className="bg-brand-surface rounded-2xl border border-brand-border shadow-sm p-6">
             <div className="flex justify-between items-center mb-5">
-              <h3 className="font-headline text-xl text-brand-text">Vendor Notes</h3>
-              <button onClick={openAddNoteModal} className="text-brand-text-muted hover:bg-brand-primary-hover hover:text-white bg-brand-surface-hover p-1.5 rounded-full transition-colors" title="Add Note">
+              <h3 className="font-headline text-xl text-brand-text">Catatan Vendor</h3>
+              <button onClick={openAddNoteModal} className="text-brand-text-muted hover:bg-brand-primary-hover hover:text-white bg-brand-surface-hover p-1.5 rounded-full transition-colors" title="Tambah Catatan">
                 <Plus size={18} />
               </button>
             </div>
@@ -304,16 +305,16 @@ export const Attire: React.FC = () => {
                   {note.dueDate && (
                     <div className="flex items-center gap-1.5 text-[11px] font-semibold text-brand-primary bg-brand-primary/10 w-fit px-2 py-1 rounded-md">
                       <Calendar size={12} />
-                      Due: {formatDate(note.dueDate)}
+                      Tenggat: {formatDate(note.dueDate)}
                     </div>
                   )}
                 </div>
               ))}
-              
+
               {attireVendorNotes.length === 0 && (
                 <div className="text-center py-6 text-brand-text-muted">
                   <FileText size={24} className="mx-auto mb-2 opacity-50" />
-                  <p className="text-xs">No vendor notes added yet.</p>
+                  <p className="text-xs">Belum ada catatan vendor.</p>
                 </div>
               )}
             </div>
@@ -328,23 +329,23 @@ export const Attire: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-6 border-b border-brand-border">
-              <h3 className="font-headline text-2xl text-brand-text">{editingId ? 'Edit Member Profile' : 'Add New Member'}</h3>
+              <h3 className="font-headline text-2xl text-brand-text">{editingId ? 'Edit Profil Anggota' : 'Tambah Anggota Baru'}</h3>
               <button onClick={() => setShowModal(false)} className="text-brand-text-muted hover:text-brand-text transition-colors">
                 <X size={24} />
               </button>
             </div>
-            
+
             <form onSubmit={handleAdd} className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex-shrink-0">
-                  <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider mb-2 block">Profile Photo</label>
+                  <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider mb-2 block">Foto Profil</label>
                   <div className="w-32 h-32 rounded-full border-2 border-dashed border-brand-border flex flex-col items-center justify-center gap-2 bg-brand-surface-hover/50 text-brand-text-muted overflow-hidden relative">
                     {newItem.imageUrl ? (
                       <img src={newItem.imageUrl} alt="Profile" className="w-full h-full rounded-full object-cover" />
                     ) : (
                       <>
                         <Camera size={24} />
-                        <span className="text-[10px] font-semibold uppercase">Upload</span>
+                        <span className="text-[10px] font-semibold uppercase">Unggah</span>
                       </>
                     )}
                   </div>
@@ -375,63 +376,63 @@ export const Attire: React.FC = () => {
                 
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Full Name</label>
-                    <input required value={newItem.name} onChange={e => setNewItem({...newItem, name: e.target.value})} type="text" className="w-full px-4 py-2.5 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" placeholder="e.g. Julianne Moore" />
+                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Nama Lengkap</label>
+                    <input required value={newItem.name} onChange={e => setNewItem({...newItem, name: e.target.value})} type="text" className="w-full px-4 py-2.5 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" placeholder="cth. Julianne Moore" />
                   </div>
-                  
+
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Role</label>
-                    <select 
-                      value={allRolesList.includes(newItem.role as string) ? newItem.role : 'Other'} 
-                      onChange={e => setNewItem({...newItem, role: e.target.value})} 
+                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Peran</label>
+                    <select
+                      value={allRolesList.includes(newItem.role as string) ? newItem.role : 'Other'}
+                      onChange={e => setNewItem({...newItem, role: e.target.value})}
                       className="w-full px-4 py-2.5 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all appearance-none"
                     >
                       {allRolesList.filter(c => c !== 'Other').map(c => <option key={c} value={c}>{c}</option>)}
-                      <option value="Other">Other</option>
+                      <option value="Other">Lainnya</option>
                     </select>
                     {(!allRolesList.includes(newItem.role as string) || newItem.role === 'Other') && (
-                      <input 
-                        type="text" 
-                        value={newItem.role === 'Other' ? '' : (newItem.role || '')} 
-                        onChange={e => setNewItem({...newItem, role: e.target.value})} 
-                        className="w-full px-4 py-2.5 mt-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" 
-                        placeholder="Specify other role..." 
+                      <input
+                        type="text"
+                        value={newItem.role === 'Other' ? '' : (newItem.role || '')}
+                        onChange={e => setNewItem({...newItem, role: e.target.value})}
+                        className="w-full px-4 py-2.5 mt-2 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all"
+                        placeholder="Sebutkan peran lain..."
                       />
                     )}
                   </div>
-                  
+
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Fitting Status</label>
+                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Status Fitting</label>
                     <select value={newItem.status} onChange={e => setNewItem({...newItem, status: e.target.value})} className="w-full px-4 py-2.5 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all appearance-none">
-                      <option value="Not Started">Not Started</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Final Fitting">Final Fitting</option>
-                      <option value="Completed">Completed</option>
+                      <option value="Not Started">Belum Mulai</option>
+                      <option value="In Progress">Berjalan</option>
+                      <option value="Final Fitting">Fitting Akhir</option>
+                      <option value="Completed">Selesai</option>
                     </select>
                   </div>
-                  
+
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Couturier / Tailor</label>
-                    <input value={newItem.vendor} onChange={e => setNewItem({...newItem, vendor: e.target.value})} type="text" className="w-full px-4 py-2.5 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" placeholder="e.g. Savile Row" />
+                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Perancang / Penjahit</label>
+                    <input value={newItem.vendor} onChange={e => setNewItem({...newItem, vendor: e.target.value})} type="text" className="w-full px-4 py-2.5 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" placeholder="cth. Savile Row" />
                   </div>
-                  
+
                   <div className="sm:col-span-2 space-y-1.5">
-                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Description</label>
-                    <input value={newItem.desc} onChange={e => setNewItem({...newItem, desc: e.target.value})} type="text" className="w-full px-4 py-2.5 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" placeholder="e.g. Midnight Blue Tuxedo" />
+                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Deskripsi</label>
+                    <input value={newItem.desc} onChange={e => setNewItem({...newItem, desc: e.target.value})} type="text" className="w-full px-4 py-2.5 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" placeholder="cth. Tuxedo Biru Dongker" />
                   </div>
                 </div>
               </div>
 
               <div className="space-y-3 pt-2">
-                <h4 className="text-sm font-semibold text-brand-primary uppercase tracking-widest border-b border-brand-border pb-2">Measurements Info</h4>
+                <h4 className="text-sm font-semibold text-brand-primary uppercase tracking-widest border-b border-brand-border pb-2">Info Ukuran</h4>
                 <div className="space-y-1.5">
-                  <input value={newItem.measurements} onChange={e => setNewItem({...newItem, measurements: e.target.value})} type="text" placeholder="e.g. Chest: 40, Waist: 32, Inseam: 30" className="w-full px-4 py-3 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
+                  <input value={newItem.measurements} onChange={e => setNewItem({...newItem, measurements: e.target.value})} type="text" placeholder="cth. Dada: 40, Pinggang: 32, Inseam: 30" className="w-full px-4 py-3 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
                 </div>
               </div>
 
               <div className="pt-6 flex gap-4">
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-3 bg-brand-surface-hover border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-border/50 transition-colors">Cancel</button>
-                <button type="submit" className="flex-1 px-4 py-3 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover transition-colors shadow-sm">{editingId ? 'Save Changes' : 'Add Member'}</button>
+                <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-3 bg-brand-surface-hover border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-border/50 transition-colors">Batal</button>
+                <button type="submit" className="flex-1 px-4 py-3 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover transition-colors shadow-sm">{editingId ? 'Simpan Perubahan' : 'Tambah Anggota'}</button>
               </div>
             </form>
           </div>
@@ -443,31 +444,31 @@ export const Attire: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-6 border-b border-brand-border">
-              <h3 className="font-headline text-2xl text-brand-text">{editingNoteId ? 'Edit Vendor Note' : 'Add Vendor Note'}</h3>
+              <h3 className="font-headline text-2xl text-brand-text">{editingNoteId ? 'Edit Catatan Vendor' : 'Tambah Catatan Vendor'}</h3>
               <button onClick={() => setShowNoteModal(false)} className="text-brand-text-muted hover:text-brand-text transition-colors">
                 <X size={24} />
               </button>
             </div>
-            
+
             <form onSubmit={handleAddNote} className="p-6 space-y-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Vendor / Topic</label>
-                <input required value={newNote.vendorName} onChange={e => setNewNote({...newNote, vendorName: e.target.value})} type="text" className="w-full px-4 py-2.5 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" placeholder="e.g. Maison de Blanc" />
+                <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Vendor / Topik</label>
+                <input required value={newNote.vendorName} onChange={e => setNewNote({...newNote, vendorName: e.target.value})} type="text" className="w-full px-4 py-2.5 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" placeholder="cth. Maison de Blanc" />
               </div>
-              
+
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Due Date (Optional)</label>
+                <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Tenggat Waktu (Opsional)</label>
                 <input value={newNote.dueDate} onChange={e => setNewNote({...newNote, dueDate: e.target.value})} type="date" className="w-full px-4 py-2.5 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Notes</label>
-                <textarea required value={newNote.notes} onChange={e => setNewNote({...newNote, notes: e.target.value})} rows={4} className="w-full px-4 py-3 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all resize-none" placeholder="Enter instructions or reminders..." />
+                <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Catatan</label>
+                <textarea required value={newNote.notes} onChange={e => setNewNote({...newNote, notes: e.target.value})} rows={4} className="w-full px-4 py-3 rounded-xl bg-brand-surface-hover border border-brand-border text-brand-text text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all resize-none" placeholder="Masukkan instruksi atau pengingat..." />
               </div>
-              
+
               <div className="pt-4 flex gap-4">
-                <button type="button" onClick={() => setShowNoteModal(false)} className="flex-1 px-4 py-3 bg-brand-surface-hover border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-border/50 transition-colors">Cancel</button>
-                <button type="submit" disabled={!newNote.vendorName || !newNote.notes} className="flex-1 px-4 py-3 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">{editingNoteId ? 'Save Changes' : 'Add Note'}</button>
+                <button type="button" onClick={() => setShowNoteModal(false)} className="flex-1 px-4 py-3 bg-brand-surface-hover border border-brand-border text-brand-text rounded-xl font-semibold text-sm hover:bg-brand-border/50 transition-colors">Batal</button>
+                <button type="submit" disabled={!newNote.vendorName || !newNote.notes} className="flex-1 px-4 py-3 bg-brand-primary text-white rounded-xl font-semibold text-sm hover:bg-brand-primary-hover transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">{editingNoteId ? 'Simpan Perubahan' : 'Tambah Catatan'}</button>
               </div>
             </form>
           </div>

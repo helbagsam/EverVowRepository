@@ -133,11 +133,11 @@ export const Settings: React.FC = () => {
       
       <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="font-headline text-4xl text-brand-text mb-2">Settings & Profile</h2>
-          <p className="text-brand-text-muted">Manage your planner account, client details, and preferences.</p>
+          <h2 className="font-headline text-4xl text-brand-text mb-2">Pengaturan & Profil</h2>
+          <p className="text-brand-text-muted">Kelola akun planner, detail klien, dan preferensi kamu.</p>
         </div>
         <button onClick={handleSave} className="flex items-center justify-center gap-2 px-8 py-3 bg-brand-primary text-white rounded-xl font-semibold shadow-md hover:bg-brand-primary-hover active:scale-95 transition-all">
-          <Save size={18} /> Save Changes
+          <Save size={18} /> Simpan Perubahan
         </button>
       </header>
 
@@ -151,7 +151,7 @@ export const Settings: React.FC = () => {
               activeTab === 'client' ? 'bg-brand-primary text-white shadow-md' : 'text-brand-text-muted hover:bg-brand-surface-hover hover:text-brand-primary'
             }`}
           >
-            <Heart size={18} /> Client Profile
+            <Heart size={18} /> Profil Klien
           </button>
           <button 
             onClick={() => setActiveTab('getting-started')}
@@ -159,7 +159,7 @@ export const Settings: React.FC = () => {
               activeTab === 'getting-started' ? 'bg-brand-primary text-white shadow-md' : 'text-brand-text-muted hover:bg-brand-surface-hover hover:text-brand-primary'
             }`}
           >
-            <PlayCircle size={18} /> Getting Started
+            <PlayCircle size={18} /> Panduan Awal
           </button>
           <button
             onClick={() => setActiveTab('team')}
@@ -167,7 +167,7 @@ export const Settings: React.FC = () => {
               activeTab === 'team' ? 'bg-brand-primary text-white shadow-md' : 'text-brand-text-muted hover:bg-brand-surface-hover hover:text-brand-primary'
             }`}
           >
-            <Users size={18} /> Team & Assignee
+            <Users size={18} /> Tim & Penanggung Jawab
           </button>
           <button
             onClick={() => setActiveTab('categories')}
@@ -175,15 +175,15 @@ export const Settings: React.FC = () => {
               activeTab === 'categories' ? 'bg-brand-primary text-white shadow-md' : 'text-brand-text-muted hover:bg-brand-surface-hover hover:text-brand-primary'
             }`}
           >
-            <Users size={18} /> Guest Categories
+            <Users size={18} /> Kategori Tamu
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('preferences')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
               activeTab === 'preferences' ? 'bg-brand-primary text-white shadow-md' : 'text-brand-text-muted hover:bg-brand-surface-hover hover:text-brand-primary'
             }`}
           >
-            <SettingsIcon size={18} /> Preferences
+            <SettingsIcon size={18} /> Preferensi
           </button>
         </aside>
 
@@ -197,7 +197,7 @@ export const Settings: React.FC = () => {
               <section className="card overflow-hidden">
                 <div className="px-8 py-6 border-b border-brand-border flex items-center gap-3 bg-brand-surface-hover/50">
                   <Heart className="text-brand-primary" />
-                  <h3 className="font-headline text-2xl text-brand-primary">The Couple</h3>
+                  <h3 className="font-headline text-2xl text-brand-primary">Pasangan Pengantin</h3>
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-8 items-start">
                   <div className="flex flex-col items-center text-center gap-4">
@@ -209,24 +209,24 @@ export const Settings: React.FC = () => {
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Bride's Full Name</label>
+                        <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Nama Lengkap Mempelai Wanita</label>
                         <input type="text" value={formProfile.brideName} onChange={(e) => setFormProfile({...formProfile, brideName: e.target.value})} className="w-full bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Groom's Full Name</label>
+                        <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Nama Lengkap Mempelai Pria</label>
                         <input type="text" value={formProfile.groomName} onChange={(e) => setFormProfile({...formProfile, groomName: e.target.value})} className="w-full bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Contact Email</label>
+                        <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Email Kontak</label>
                         <div className="relative">
                           <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-text-muted" />
                           <input type="email" value={formProfile.contactEmail} onChange={(e) => setFormProfile({...formProfile, contactEmail: e.target.value})} className="w-full bg-brand-bg border border-brand-border rounded-xl pl-10 pr-4 py-3 text-sm text-brand-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Contact Phone</label>
+                        <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Telepon Kontak</label>
                         <div className="relative">
                           <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-text-muted" />
                           <input type="tel" value={formProfile.contactPhone} onChange={(e) => setFormProfile({...formProfile, contactPhone: e.target.value})} className="w-full bg-brand-bg border border-brand-border rounded-xl pl-10 pr-4 py-3 text-sm text-brand-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
@@ -240,34 +240,34 @@ export const Settings: React.FC = () => {
               <section className="card overflow-hidden">
                 <div className="px-8 py-6 border-b border-brand-border flex items-center gap-3 bg-brand-surface-hover/50">
                   <MapPin className="text-brand-primary" />
-                  <h3 className="font-headline text-2xl text-brand-primary">Event Details</h3>
+                  <h3 className="font-headline text-2xl text-brand-primary">Detail Acara</h3>
                 </div>
                 <div className="p-8 space-y-6">
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Wedding Title / Hashtag</label>
+                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Judul Pernikahan / Hashtag</label>
                     <input type="text" value={formProfile.weddingTitle} onChange={(e) => setFormProfile({...formProfile, weddingTitle: e.target.value})} className="w-full bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Wedding Date</label>
+                      <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Tanggal Pernikahan</label>
                       <input type="date" value={weddingDate} onChange={(e) => setWeddingDate(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Time</label>
+                      <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Waktu</label>
                       <input type="time" value={formProfile.weddingTime} onChange={(e) => setFormProfile({...formProfile, weddingTime: e.target.value})} className="w-full bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Primary Venue</label>
+                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Venue Utama</label>
                     <input type="text" value={formProfile.primaryVenue} onChange={(e) => setFormProfile({...formProfile, primaryVenue: e.target.value})} className="w-full bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Target Guests</label>
+                      <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Target Tamu</label>
                       <input type="number" value={targetGuests} onChange={(e) => setTargetGuests(parseInt(e.target.value) || 0)} className="w-full bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Target Budget (IDR)</label>
+                      <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Target Anggaran (IDR)</label>
                       <input type="number" value={totalBudget} onChange={(e) => setTotalBudget(parseInt(e.target.value) || 0)} className="w-full bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all" />
                     </div>
                   </div>
@@ -354,7 +354,7 @@ export const Settings: React.FC = () => {
                 <div className="px-8 py-6 border-b border-brand-border flex items-center gap-3 bg-brand-surface-hover/50">
                   <Users className="text-brand-primary" />
                   <div>
-                    <h3 className="font-headline text-2xl text-brand-primary">Team & Assignee</h3>
+                    <h3 className="font-headline text-2xl text-brand-primary">Tim & Penanggung Jawab</h3>
                     <p className="text-xs text-brand-text-muted mt-1">Kelola nama planner/tim yang bisa dipilih sebagai assignee di menu Timeline.</p>
                   </div>
                 </div>
@@ -396,7 +396,7 @@ export const Settings: React.FC = () => {
                           ) : (
                             <div className="flex-1">
                               <p className="font-semibold text-sm text-brand-text">{m.name}</p>
-                              <p className="text-xs text-brand-text-muted">{taskCount} task ditugaskan</p>
+                              <p className="text-xs text-brand-text-muted">{taskCount} tugas ditugaskan</p>
                             </div>
                           )}
                           <div className="flex items-center gap-1">
@@ -428,7 +428,7 @@ export const Settings: React.FC = () => {
                 <div className="px-8 py-6 border-b border-brand-border flex items-center gap-3 bg-brand-surface-hover/50">
                   <Users className="text-brand-primary" />
                   <div>
-                    <h3 className="font-headline text-2xl text-brand-primary">Guest Categories</h3>
+                    <h3 className="font-headline text-2xl text-brand-primary">Kategori Tamu</h3>
                     <p className="text-xs text-brand-text-muted mt-1">Kelola daftar Group yang muncul di dropdown menu Guest List (tambah, form, dan filter).</p>
                   </div>
                 </div>
@@ -499,27 +499,27 @@ export const Settings: React.FC = () => {
               <section className="card overflow-hidden">
                 <div className="px-8 py-6 border-b border-brand-border flex items-center gap-3 bg-brand-surface-hover/50">
                   <Monitor className="text-brand-primary" />
-                  <h3 className="font-headline text-2xl text-brand-primary">Appearance & Theme</h3>
+                  <h3 className="font-headline text-2xl text-brand-primary">Tampilan & Tema</h3>
                 </div>
                 <div className="p-8">
                   <div className="flex flex-col gap-4 max-w-sm">
-                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Theme Mode</label>
+                    <label className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">Mode Tema</label>
                     <div className="flex bg-brand-surface-hover rounded-xl p-1 border border-brand-border">
-                      <button 
+                      <button
                         onClick={() => setTheme('light')}
                         className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition-all ${theme === 'light' ? 'bg-brand-surface shadow-md text-brand-primary' : 'text-brand-text-muted hover:text-brand-text'}`}
                       >
-                        <Sun size={18} /> Light
+                        <Sun size={18} /> Terang
                       </button>
-                      <button 
+                      <button
                         onClick={() => setTheme('dark')}
                         className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition-all ${theme === 'dark' ? 'bg-brand-surface shadow-md text-brand-primary' : 'text-brand-text-muted hover:text-brand-text'}`}
                       >
-                        <Moon size={18} /> Dark
+                        <Moon size={18} /> Gelap
                       </button>
                     </div>
                     <p className="text-xs text-brand-text-muted mt-2 leading-relaxed">
-                      Experience the luxury of EverVow in both pristine light mode and sophisticated dark mode. Changes apply immediately across all modules.
+                      Rasakan kemewahan EverVow, baik dalam mode terang yang bersih maupun mode gelap yang elegan. Perubahan langsung berlaku di semua modul.
                     </p>
                   </div>
                 </div>
@@ -533,10 +533,10 @@ export const Settings: React.FC = () => {
       {showConfirm && (
         <ConfirmDialog 
           isOpen={showConfirm}
-          title="Save Changes"
-          message="Are you sure you want to save these profile changes?"
+          title="Simpan Perubahan"
+          message="Apakah kamu yakin ingin menyimpan perubahan profil ini?"
           type="info"
-          confirmText="Yes, Save"
+          confirmText="Ya, Simpan"
           onConfirm={confirmSave}
           onCancel={() => setShowConfirm(false)}
         />
