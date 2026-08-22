@@ -200,7 +200,7 @@ export async function POST(req: NextRequest) {
 
   const messageData = getPath(payload, ["data", "message_data"]) as JsonPayload | undefined;
   const refId = asString(messageData?.refId);
-  const messageId = asString(getPath(payload, ["data", "message_id"]));
+  const messageId = asString(messageData?.message_id);
   const grandTotalRaw = getPath(messageData ?? {}, ["totals", "grandTotal"]);
   const grandTotal = asString(grandTotalRaw);
 
